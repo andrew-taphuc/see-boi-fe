@@ -1,0 +1,77 @@
+name: Notify Microsoft Teams on new PR
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  notify-teams:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Teams notification
+        uses: actions/github-script@v7
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+
+            const prNumber   = pr.number;
+            const prTitle    = pr.title;
+            const prUrl      = pr.html_url;
+            const prAuthor   = pr.user.login;
+            const baseBranch = pr.base.ref;   // branch đích, ví dụ: main / develop
+            const repoName   = context.repo.repo;
+            const ownerName  = context.repo.owner;
+
+            // Nội dung chính sẽ gửi sang Teams.
+            // Teams Incoming Webhook chấp nhận JSON kiểu "MessageCard". :contentReference[oaicite:4]{index=4}
+            // Lưu ý: Không thể @channel bằng webhook, nên ta sẽ nhấn mạnh bằng emoji/cảnh báo.
+            const cardPayload = {
+              "@type": "MessageCard",
+              "@context": "http://schema.org/extensions",
+              "themeColor": "FF0000", // đỏ cảnh báo
+              "summary": `PR #${prNumber} - ${prTitle}`,
+              "title": `🚨 Pull Request mới cần review`,
+              "sections": [
+                {
+                  "activityTitle": `**${ownerName}/${repoName}**`,
+                  "activitySubtitle": `PR #${prNumber}: ${prTitle}`,
+                  "facts": [
+                    {
+                      "name": "Tác giả",
+                      "value": prAuthor
+                    },
+                    {
+                      "name": "Target branch",
+                      "value": baseBranch
+                    },
+                    {
+                      "name": "Link PR",
+                      "value": prUrl
+                    }
+                  ],
+                  "markdown": true
+                }
+              ],
+              "potentialAction": [
+                {
+                  "@type": "OpenUri",
+                  "name": "🔍 Xem PR ngay",
+                  "targets": [
+                    { "os": "default", "uri": prUrl }
+                  ]
+                }
+              ]
+            };
+
+            const res = await fetch(process.env.TEAMS_WEBHOOK_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(cardPayload),
+            });
+
+            if (!res.ok) {
+              core.setFailed("Teams webhook failed: " + (await res.text()));
+            }
