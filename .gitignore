@@ -1,0 +1,99 @@
+# =========================================
+# OS FILES
+# =========================================
+.DS_Store
+Thumbs.db
+
+# =========================================
+# NODE / GENERAL
+# =========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Lock file (optional: remove if team needs it)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# =========================================
+# ENVIRONMENT
+# =========================================
+.env
+.env.*
+!.env.example
+
+# =========================================
+# VITE / FRONTEND BUILD
+# =========================================
+dist/
+build/
+*.local
+.vite/
+.cache/
+.eslintcache
+*.tsbuildinfo
+
+# =========================================
+# REACT / TAILWIND
+# =========================================
+.postcss-cache/
+*.css.map
+
+# Tailwind JIT cache
+*.tailwind.css
+tailwind.config.js.timestamp*
+
+# =========================================
+# NESTJS / BACKEND
+# =========================================
+dist/
+logs/
+*.log
+src/**/*.spec.ts
+*.tsbuildinfo
+
+# =========================================
+# PRISMA
+# =========================================
+# Generated Prisma Client
+prisma/client/
+prisma/.cache/
+prisma/migrations/.DS_Store
+
+# SQLite (nó hay xuất hiện trong dev)
+*.db
+*.db-journal
+
+# =========================================
+# TYPESCRIPT
+# =========================================
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# =========================================
+# TEST OUTPUT
+# =========================================
+coverage/
+.nyc_output/
+
+# =========================================
+# IDE / EDITOR FILES
+# =========================================
+.vscode/
+.history/
+.idea/
+*.code-workspace
+
+# =========================================
+# MISC
+# =========================================
+temp/
+tmp/
+*.tmp
+*.bak
+*.old
+*.orig
