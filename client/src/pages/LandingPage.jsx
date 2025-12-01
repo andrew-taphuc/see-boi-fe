@@ -6,6 +6,8 @@ import tuViWheel from "../assets/tu-vi-wheel.jpg";
 import nhanTuongImage from "../assets/nhan-tuong.jpg";
 import Header from "../components/landingPage/Header";
 import Footer from "../components/landingPage/Footer";
+import Login from "../components/Login&Register/Login";
+import Register from "../components/Login&Register/Register";
 
 const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,12 +21,19 @@ const LandingPage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const [popupType, setPopupType] = useState(null);
+  const openLogin = () => setPopupType("login");
+  const openRegister = () => setPopupType("register");
+  const closePopup = () => setPopupType(null);
+
   return (
     <div className="min-h-screen bg-[#E8DCC4]">
       <Header
         isScrolled={isScrolled}
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
+        onOpenLogin={openLogin}
+        onOpenRegister={openRegister}
       />
 
       {/* Hero Section */}
@@ -258,6 +267,25 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* --- PHẦN POPUP MODAL --- */}
+      {popupType && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={closePopup} // Bấm ra ngoài thì đóng popup
+          ></div>
+
+          <div className="relative z-10 w-full max-w-md animate-fade-in-up">
+            {popupType === "login" && (
+              <Login onClose={closePopup} onSwitchToRegister={openRegister} />
+            )}
+
+            {popupType === "register" && (
+              <Register onClose={closePopup} onSwitchToLogin={openLogin} />
+            )}
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );
