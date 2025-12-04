@@ -12,6 +12,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<MainLayout><LandingPage /></MainLayout>} />
+      <Route path="/landingpage" element={<MainLayout><LandingPage /></MainLayout>} />
       <Route path="/tuvi" element={<MainLayout><TuVi /></MainLayout>} />
       <Route path="/tarot" element={<MainLayout><Tarot /></MainLayout>} />
       <Route path="/nhantuong" element={<MainLayout><NhanTuong /></MainLayout>} />
