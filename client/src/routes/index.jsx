@@ -5,6 +5,8 @@ import TuVi from "../pages/TuVi";
 import Tarot from "../pages/Tarot";
 import NhanTuong from "../pages/NhanTuong";
 import SocialMedia from "../pages/SocialMedia";
+import Login from "../components/Login&Register/Login";
+import Register from "../components/Login&Register/Register";
 
 const AppRoutes = () => {
   return (
