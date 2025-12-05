@@ -1,12 +1,12 @@
-import { Routes, Route } from 'react-router-dom'
-import MainLayout from '../layouts/MainLayout'
-import LandingPage from '../pages/LandingPage'
-import TuVi from '../pages/TuVi'
-import Tarot from '../pages/Tarot'
-import NhanTuong from '../pages/NhanTuong'
-import SocialMedia from '../pages/SocialMedia'
-import Login from '../pages/Login'
-import Register from '../pages/Register'
+import { Routes, Route } from "react-router-dom";
+import MainLayout from "../layouts/MainLayout";
+import LandingPage from "../pages/LandingPage";
+import TuVi from "../pages/TuVi";
+import Tarot from "../pages/Tarot";
+import NhanTuong from "../pages/NhanTuong";
+import SocialMedia from "../pages/SocialMedia";
+import Login from "../components/Login&Register/Login";
+import Register from "../components/Login&Register/Register";
 
 const AppRoutes = () => {
   return (
@@ -20,8 +20,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
     </Routes>
-  )
-}
+  );
+};
 
-export default AppRoutes
-
+export default AppRoutes;

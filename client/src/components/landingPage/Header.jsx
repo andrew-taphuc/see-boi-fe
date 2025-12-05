@@ -2,7 +2,13 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import ThemeToggle from "../ThemeToggle";
 
-const Header = ({ isScrolled, isMobileMenuOpen, setIsMobileMenuOpen }) => {
+const Header = ({
+  isScrolled,
+  isMobileMenuOpen,
+  setIsMobileMenuOpen,
+  onOpenLogin,
+  onOpenRegister,
+}) => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -44,11 +50,21 @@ const Header = ({ isScrolled, isMobileMenuOpen, setIsMobileMenuOpen }) => {
             >
               Nhân tướng học
             </Link>
-            <Link to="/login">
-              <button className="bg-amber-800 text-white px-4 py-2 rounded hover:bg-amber-900 transition-colors">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onOpenLogin}
+                className="bg-amber-800 text-white px-4 py-2 rounded hover:bg-amber-900 transition-colors cursor-pointer"
+              >
                 Đăng nhập
               </button>
-            </Link>
+
+              <button
+                onClick={onOpenRegister}
+                className="bg-amber-800 text-white px-4 py-2 rounded hover:bg-amber-900 transition-colors cursor-pointer"
+              >
+                Đăng ký
+              </button>
+            </div>
             <div className="border-l border-gray-300 pl-2">
               <ThemeToggle />
             </div>
@@ -99,15 +115,27 @@ const Header = ({ isScrolled, isMobileMenuOpen, setIsMobileMenuOpen }) => {
               >
                 Nhân tướng học
               </Link>
-              <Link
-                to="/login"
-                className="pt-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <button className="bg-amber-800 text-white px-4 py-2 rounded w-full hover:bg-amber-900 transition-colors">
+              <div className="pt-2 flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    onOpenLogin();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="bg-amber-800 text-white px-4 py-2 rounded w-full hover:bg-amber-900 transition-colors"
+                >
                   Đăng nhập
                 </button>
-              </Link>
+
+                <button
+                  onClick={() => {
+                    onOpenRegister();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-center py-2 text-gray-900 border border-gray-300 rounded hover:bg-gray-50"
+                >
+                  Đăng ký
+                </button>
+              </div>
             </div>
           </div>
         )}
