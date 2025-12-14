@@ -1,5 +1,7 @@
 // components/HoroscopeForm.jsx
 import React, { useState } from "react";
+import TuviResult from "./TuviResult";
+import laSoMau from "../../data/mockHoroscopeData.json";
 
 const TuViForm = () => {
   // 1. KHỞI TẠO STATE ĐỂ QUẢN LÝ DỮ LIỆU
@@ -21,6 +23,8 @@ const TuViForm = () => {
     });
     setError(""); // Xóa lỗi ngay khi người dùng chọn lại
   };
+
+  const [showResult, setShowResult] = useState(false);
 
   // 2. HÀM KIỂM TRA NGÀY HỢP LỆ
   const validateDate = () => {
@@ -51,9 +55,8 @@ const TuViForm = () => {
       return;
     }
 
-    // Nếu hợp lệ thì xử lý tiếp (ví dụ: gửi API)
-    alert("Dữ liệu hợp lệ! Đang lập lá số...");
-    console.log("Data:", formData);
+    // NẾU HỢP LỆ THÌ BẬT POPUP
+    setShowResult(true);
   };
 
   // Tạo mảng dữ liệu (giữ nguyên như cũ)
@@ -65,6 +68,13 @@ const TuViForm = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto p-1">
+      {/* ĐẶT POPUP Ở ĐÂY (Nằm ngoài form nhưng trong Fragment <>) */}
+      <TuviResult
+        isOpen={showResult}
+        onClose={() => setShowResult(false)}
+        data={laSoMau}
+      />
+
       <div className="relative bg-black/60 backdrop-blur-sm border-y-8 border-x-8 border-yellow-700 rounded-lg p-6 shadow-2xl">
         <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-red-800 border-2 border-yellow-500 px-8 py-2 rounded-full shadow-lg z-10">
           <h2 className="!font-['Playfair_Display'] text-2xl font-bold text-white uppercase tracking-widest font-serif drop-shadow-md whitespace-nowrap">
