@@ -28,7 +28,7 @@ const footerSections = [
 
 const Footer = () => {
   return (
-    <footer className="bg-red-950/90 py-16">
+    <footer id="nhantuong-footer" className="bg-red-950/90 py-16">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Main Footer Content */}
@@ -116,7 +116,7 @@ const Footer = () => {
           <div className="mt-12 pt-6 border-t border-yellow-600/20 text-center">
             <div className="text-yellow-100/70 text-xs">
               Copyright © 2025 by{" "}
-              <span className="text-yellow-400">nhantuong.vn</span>. All rights
+              <span className="text-yellow-400">hoinhungnguoideptrai.vn</span>. All rights
               reserved.
             </div>
           </div>
