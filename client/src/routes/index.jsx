@@ -11,6 +11,7 @@ import PostDetail from "../pages/PostDetail";
 import Login from "../components/Login&Register/Login";
 import Register from "../components/Login&Register/Register";
 
+
 const AppRoutes = () => {
   return (
     <Routes>
