@@ -1,0 +1,56 @@
+{
+  "thienBan": {
+    "hoTen": "Nguyễn Văn A",
+    "ngaySinh": "31/03/1995",
+    "amLich": "01/03/1995",
+    "gioSinh": "Tý (23h - 1h)",
+    "gioiTinh": "Nam",
+    "namXem": 2025,
+    "banMenh": "Sơn Đầu Hỏa",
+    "cuc": "Hỏa Lục Cục",
+    "chuMenh": "Tham Lang",
+    "chuThan": "Linh Tinh",
+    "amDuong": "Dương Nam",
+    "tuongQuan": "Âm Dương Thuận Lý"
+  },
+  "cacCung": [
+    { "id": "ty", "diaChi": "Tỵ", "tenCung": "Tật Ách", "chinhTinh": [{ "name": "Thiên Đồng", "daq": "D" }], "phuTinh": { "tot": ["Thiên Việt", "Đường Phù"], "xau": ["Thiên Hình", "Phá Toái"] }, "daiVan": 72, "tieuVan": "Hợi" },
+    { "id": "ngo", "diaChi": "Ngọ", "tenCung": "Tài Bạch", "chinhTinh": [{ "name": "Vũ Khúc", "daq": "V" }, { "name": "Thiên Phủ", "daq": "M" }], "phuTinh": { "tot": ["Đào Hoa", "Hồng Loan"], "xau": ["Phi Liêm"] }, "daiVan": 82, "tieuVan": "Tuất" },
+    { "id": "mui", "diaChi": "Mùi", "tenCung": "Tử Tức", "chinhTinh": [{ "name": "Thái Dương", "daq": "D" }, { "name": "Thái Âm", "daq": "D" }], "phuTinh": { "tot": ["Hóa Khoa", "Hỉ Thần"], "xau": ["Điếu Khách", "Quả Tú"] }, "daiVan": 92, "tieuVan": "Dậu" },
+    { "id": "than", "diaChi": "Thân", "tenCung": "Phu Thê", "chinhTinh": [{ "name": "Tham Lang", "daq": "D" }], "phuTinh": { "tot": ["Bát Tọa", "Quốc Ấn"], "xau": ["Hóa Kỵ", "Bệnh Phù"] }, "daiVan": 102, "tieuVan": "Thân" },
+    { "id": "thin", "diaChi": "Thìn", "tenCung": "Thiên Di", "chinhTinh": [{ "name": "Phá Quân", "daq": "D" }], "phuTinh": { "tot": ["Văn Khúc", "Hóa Lộc"], "xau": ["Tướng Quân", "Thiên La"] }, "daiVan": 62, "tieuVan": "Tý" },
+    { "id": "dau", "diaChi": "Dậu", "tenCung": "Huynh Đệ", "chinhTinh": [{ "name": "Thiên Cơ", "daq": "M" }, { "name": "Cự Môn", "daq": "M" }], "phuTinh": { "tot": ["Hóa Quyền", "Thiên Khốc"], "xau": ["Đại Hao", "Thái Tuế"] }, "daiVan": 112, "tieuVan": "Mùi" },
+    { "id": "mao", "diaChi": "Mão", "tenCung": "Nô Bộc", "chinhTinh": [], "phuTinh": { "tot": ["Thiên Khôi", "Đà La"], "xau": ["Hỏa Tinh", "Tiểu Hao"] }, "daiVan": 52, "tieuVan": "Sửu" },
+    { "id": "tuat", "diaChi": "Tuất", "tenCung": "Mệnh", "isThan": true, "chinhTinh": [{ "name": "Tử Vi", "daq": "V" }, { "name": "Thiên Tướng", "daq": "V" }], "phuTinh": { "tot": ["Văn Xương", "Thiên Trù"], "xau": ["Linh Tinh", "Phục Binh"] }, "daiVan": 2, "tieuVan": "Ngọ" },
+    { "id": "dan", "diaChi": "Dần", "tenCung": "Quan Lộc", "chinhTinh": [{ "name": "Liêm Trinh", "daq": "V" }], "phuTinh": { "tot": ["Hữu Bật", "Thanh Long"], "xau": ["Tử Phù", "Kiếp Sát"] }, "daiVan": 42, "tieuVan": "Dần" },
+    { "id": "suu", "diaChi": "Sửu", "tenCung": "Điền Trạch", "chinhTinh": [], "phuTinh": { "tot": ["Long Trì", "Phượng Các"], "xau": ["Kinh Dương", "Quan Phủ"] }, "daiVan": 32, "tieuVan": "Mão" },
+    { "id": "ty_dia", "diaChi": "Tý", "tenCung": "Phúc Đức", "chinhTinh": [{ "name": "Thất Sát", "daq": "M" }], "phuTinh": { "tot": ["Tả Phù", "Lộc Tồn"], "xau": ["Đẩu Quân", "Lưu Hà"] }, "daiVan": 22, "tieuVan": "Thìn" },
+    { "id": "hoi", "diaChi": "Hợi", "tenCung": "Phụ Mẫu", "chinhTinh": [{ "name": "Thiên Lương", "daq": "H" }], "phuTinh": { "tot": ["Thiên Quý", "Thiên Mã"], "xau": ["Đà La", "Địa Kiếp"] }, "daiVan": 12, "tieuVan": "Tỵ" }
+  ],
+
+  "binhGiai": {
+    "tongQuan": [
+      {
+        "tieuDe": "Cung Thân đồng cung với cung Mệnh",
+        "noiDung": "Tính tình cứng rắn, cố chấp, bộc trực thẳng thắn, miệng cứng nhưng lòng mềm. Tiên hậu thiên đều ở một cung, mệnh vận có khuynh hướng tốt nhiều xấu nhiều. Cung có cát tinh, tam phương có cát tinh vây quanh, mới được tốt nhiều.",
+        "nguon": "Tử vi đẩu số tinh hoa tập thành - Đại Đức Sơn Nhân"
+      },
+      {
+        "tieuDe": "Lai Nhân Cung ở cung Tử Tức",
+        "noiDung": "Lớp vãn bối, người hợp tác, đào hoa, sẽ ảnh hưởng đến cuộc đời của mệnh tạo. 'Lai nhân cung' ở tam phương của cung nô bộc là cách cục nhờ vả người khác để lập nghiệp.",
+        "nguon": "Trung Châu tử vi đẩu số - Tứ Hóa Phái"
+      },
+      {
+        "tieuDe": "Cân Xương Tính Số: Số 3 lượng 4",
+        "noiDung": "Số mạng cao xanh đã định rồi. Có căn tu niệm được cao ngôi. Xuất gia đầu Phật quy Tam Bảo. Uy đức tòa sen chín phẩm ngồi.",
+        "nguon": "Diễn cầm tam thế"
+      }
+    ],
+    "luanGiai12Cung": [
+      { "tenCung": "Cung Mệnh", "noiDung": "Thân hình đẫy đà, da trắng, mặt tròn..." },
+      { "tenCung": "Cung Phụ Mẫu", "noiDung": "Cha mẹ khá giả, nhưng sớm xa cách một trong hai người..." }
+    ]
+  }
+
+  
+}
