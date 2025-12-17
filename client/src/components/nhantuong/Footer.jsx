@@ -33,46 +33,46 @@ const Footer = () => {
         <div className="max-w-6xl mx-auto">
           {/* Main Footer Content */}
           <div className="flex flex-col md:flex-row items-start md:items-start justify-between gap-8 md:gap-12">
-            {/* Logo Section - Center on mobile, left on desktop */}
-            <div className="w-full md:w-auto md:shrink-0 text-center md:text-center">
-              <a
-                href="/nhantuong"
-                className="inline-flex flex-col items-center mb-4 hover:opacity-80 transition-opacity"
-                title="Trang chủ"
-              >
-                {/* Logo with clouds */}
-                <div className="flex items-center gap-2 mb-2">
-                  <img src={Logo1} width="50" height="20" alt="Intro Logo 1" />
-                  <div className="text-yellow-400 font-bold text-2xl">
-                    Nhân Tướng
+            {/* Logo Section */}
+            <div className="w-full md:w-auto md:shrink-0 text-center">
+              <div className="md:text-left">
+                <a
+                  href="/nhantuong"
+                  className="inline-flex flex-col items-center mb-4 hover:opacity-80 transition-opacity"
+                  title="Trang chủ"
+                >
+                  {/* Logo with clouds */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <img
+                      src={Logo1}
+                      width="60"
+                      height="20"
+                      alt="Intro Logo 1"
+                    />
+                    <div className="text-yellow-400 font-bold text-2xl">
+                      Nhân Tướng
+                    </div>
+                    <img
+                      src={Logo2}
+                      width="60"
+                      height="20"
+                      alt="Intro Logo 2"
+                    />
                   </div>
-                  <img src={Logo2} width="50" height="20" alt="Intro Logo 2" />
-                </div>
-                <p className="text-yellow-300/80 text-xs">
-                  Xem tướng hiểu mình
-                </p>
-              </a>
-              <a
-                href="/gioi-thieu"
-                className="block  text-yellow-100/80 hover:text-yellow-300 transition-colors"
-              >
-                Giới thiệu
-              </a>
-              <a
-                href="/kien-thuc-nhan-tuong"
-                className="block text-yellow-100/80 hover:text-yellow-300 transition-colors"
-              >
-                Kiến thức
-              </a>
+                  <p className="text-yellow-300/80 text-xs">
+                    Xem tướng hiểu mình
+                  </p>
+                </a>
+              </div>
             </div>
 
             {/* Chính sách và Nhận tư vấn Sections */}
             {footerSections.map((section, idx) => (
-              <div key={idx} className="w-full md:w-auto">
-                <h3 className="text-yellow-400 font-semibold mb-3 text-sm">
+              <div key={idx} className="w-full md:w-auto px-4">
+                <h3 className="text-yellow-400 font-semibold mb-3 text-sm md:text-2xl">
                   {section.title}
                 </h3>
-                <ul className="space-y-1.5 text-sm">
+                <ul className="space-y-1.5 text-sm md:text-base">
                   {section.links.map((link, linkIdx) => (
                     <li key={linkIdx}>
                       {link.href ? (
@@ -116,8 +116,8 @@ const Footer = () => {
           <div className="mt-12 pt-6 border-t border-yellow-600/20 text-center">
             <div className="text-yellow-100/70 text-xs">
               Copyright © 2025 by{" "}
-              <span className="text-yellow-400">hoinhungnguoideptrai.vn</span>. All rights
-              reserved.
+              <span className="text-yellow-400">hoinhungnguoideptrai.vn</span>.
+              All rights reserved.
             </div>
           </div>
         </div>

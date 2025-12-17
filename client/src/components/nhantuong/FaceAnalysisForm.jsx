@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 // Form field configurations
 const formFields = {
@@ -8,7 +8,7 @@ const formFields = {
       label: "Họ và tên",
       placeholder: "Nhập họ và tên",
       required: true,
-      colSpan: "col-span-12 sm:col-span-7",
+      colSpan: "col-span-8 md:col-span-7",
     },
     {
       name: "email",
@@ -28,7 +28,7 @@ const formFields = {
         { value: "female", label: "Nữ" },
       ],
       required: true,
-      colSpan: "col-span-12 sm:col-span-5",
+      colSpan: "col-span-4 md:col-span-5",
     },
   ],
 };
@@ -78,70 +78,122 @@ const FaceAnalysisForm = () => {
   );
 
   return (
-    <div id="xem-tuong" className="container mt-20 mx-auto px-4 pb-20">
+    <div id="xem-tuong" className="container mt-10 md:mt-20 mx-auto px-4 pb-20">
+      <div className="text-center">
+        <h2 className="text-3xl md:text-4xl font-light text-white mb-2">
+          Luận giải
+        </h2>
+      </div>
       <div className="max-w-6xl mx-auto pt-10">
-        <div className="bg-gradient-to-br from-red-900/60 via-red-800/50 to-red-900/60 backdrop-blur-sm rounded-3xl border-2 border-yellow-600/40 p-8 shadow-2xl">
-          {/* Main Layout: Upload Left, Form Right */}
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Upload Image Section - Left Side */}
-            <div className="lg:w-1/3">
-              <label
-                htmlFor="fileInput"
-                className="flex items-start gap-4 cursor-pointer"
-              >
-                {/* Upload Icon with Conic Border */}
-                <div className="relative flex-shrink-0">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-2 border-yellow-500/40 flex items-center justify-center hover:border-yellow-400 transition-all duration-300">
-                    <svg
-                      className="w-10 h-10 text-yellow-400"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5z" />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Upload Text */}
-                <div className="flex-1">
-                  <h3 className="text-lg text-yellow-400 font-medium mb-2">
+        <div className="bg-gradient-to-br from-red-900/60 via-red-800/50 to-red-900/60 backdrop-blur-sm rounded-3xl border-2 border-yellow-600/40 p-4 md:p-8 shadow-2xl">
+          {/* Main Layout: Stacked (Mobile < 768px) | Side by Side (Desktop >= 768px) */}
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+            {/* Upload Image Section - Top (Mobile) / Left (Desktop) */}
+            <div className="md:w-1/3">
+              {/* Mobile: Image upload box with dashed border */}
+              <div className="md:hidden">
+                <label htmlFor="fileInput" className="block cursor-pointer">
+                  <h3 className="text-base text-yellow-400 font-medium mb-3">
                     Tải ảnh khuôn mặt vào đây
                   </h3>
-                  <p className="text-yellow-100/70 text-sm leading-relaxed">
-                    Vui lòng tải ảnh khuôn mặt chụp chính diện, rõ nét.
-                    <br />
-                    Tránh dùng ảnh mờ, thiếu sáng, nghiêng mặt, đeo khẩu trang
-                    hoặc chỉnh sửa.
-                  </p>
-                </div>
-              </label>
-              <input
-                id="fileInput"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
 
-              {/* Image Preview */}
-              {imagePreview && (
-                <div className="mt-6">
-                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-yellow-500/40">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
+                  {/* Upload box or preview */}
+                  {imagePreview ? (
+                    <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 border-yellow-500/40">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-yellow-500/40 flex flex-col items-center justify-center bg-red-950/30 hover:border-yellow-400 transition-all duration-300">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-2 border-yellow-500/40 flex items-center justify-center mb-3">
+                        <svg
+                          className="w-8 h-8 text-yellow-400"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5z" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+
+                  <p className="text-yellow-100/70 text-xs leading-relaxed mt-3">
+                    Vui lòng tải ảnh khuôn mặt chụp chính diện, rõ nét. Ảnh
+                    không được che mặt, thiếu sáng, điểm hoặc dùng app làm đẹp.
+                  </p>
+                </label>
+                <input
+                  id="fileInput"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </div>
+
+              {/* Desktop: Original horizontal layout */}
+              <div className="hidden md:block">
+                <label
+                  htmlFor="fileInputDesktop"
+                  className="flex items-start gap-4 cursor-pointer"
+                >
+                  {/* Upload Icon with Conic Border */}
+                  <div className="relative flex-shrink-0">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-2 border-yellow-500/40 flex items-center justify-center hover:border-yellow-400 transition-all duration-300">
+                      <svg
+                        className="w-10 h-10 text-yellow-400"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3zM7 9l1.41 1.41L11 7.83V16h2V7.83l2.59 2.58L17 9l-5-5z" />
+                      </svg>
+                    </div>
                   </div>
-                </div>
-              )}
+
+                  {/* Upload Text */}
+                  <div className="flex-1">
+                    <h3 className="text-lg text-yellow-400 font-medium mb-2">
+                      Tải ảnh khuôn mặt vào đây
+                    </h3>
+                    <p className="text-yellow-100/70 text-sm leading-relaxed">
+                      Vui lòng tải ảnh khuôn mặt chụp chính diện, rõ nét.
+                      <br />
+                      Tránh dùng ảnh mờ, thiếu sáng, nghiêng mặt, đeo khẩu trang
+                      hoặc chỉnh sửa.
+                    </p>
+                  </div>
+                </label>
+                <input
+                  id="fileInputDesktop"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+
+                {/* Image Preview */}
+                {imagePreview && (
+                  <div className="mt-6">
+                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-yellow-500/40">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Form Fields - Right Side */}
-            <div className="lg:w-2/3">
-              <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Form Fields - Bottom (Mobile) / Right (Desktop) */}
+            <div className="md:w-2/3">
+              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
                 {/* Full Name and Gender Row */}
-                <div className="grid grid-cols-12 gap-4">
+                <div className="grid grid-cols-12 gap-3 md:gap-4">
                   <div className={formFields.textInputs[0].colSpan}>
                     <label className="block text-yellow-400 text-sm font-medium mb-2">
                       {formFields.textInputs[0].label}{" "}
@@ -155,7 +207,7 @@ const FaceAnalysisForm = () => {
                       value={formData[formFields.textInputs[0].name]}
                       onChange={handleInputChange}
                       placeholder={formFields.textInputs[0].placeholder}
-                      className="w-full px-4 py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white placeholder-yellow-100/40 focus:border-yellow-500 focus:outline-none transition-colors text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white placeholder-yellow-100/40 focus:border-yellow-500 focus:outline-none transition-colors text-sm"
                       required={formFields.textInputs[0].required}
                     />
                   </div>
@@ -170,7 +222,7 @@ const FaceAnalysisForm = () => {
                       name={formFields.selects[0].name}
                       value={formData[formFields.selects[0].name]}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white focus:border-yellow-500 focus:outline-none transition-colors text-sm"
+                      className="w-full px-3 md:px-4 py-2 md:py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white focus:border-yellow-500 focus:outline-none transition-colors text-sm"
                       required={formFields.selects[0].required}
                     >
                       {formFields.selects[0].options.map((opt, idx) => (
@@ -183,28 +235,28 @@ const FaceAnalysisForm = () => {
                 </div>
 
                 {/* Date of Birth Row */}
-                <div className="grid grid-cols-12 gap-4">
+                <div className="grid grid-cols-3 gap-3 md:gap-4">
                   {[
                     {
                       name: "day",
                       label: "Ngày sinh",
-                      placeholder: "Chọn ngày sinh",
+                      placeholder: "Chọn",
                       options: days,
                     },
                     {
                       name: "month",
                       label: "Tháng sinh",
-                      placeholder: "Chọn tháng sinh",
+                      placeholder: "Chọn",
                       options: months,
                     },
                     {
                       name: "year",
                       label: "Năm sinh",
-                      placeholder: "Chọn năm sinh",
+                      placeholder: "Chọn",
                       options: years,
                     },
                   ].map((field, idx) => (
-                    <div key={idx} className="col-span-4">
+                    <div key={idx}>
                       <label className="block text-yellow-400 text-sm font-medium mb-2">
                         {field.label} <span className="text-yellow-300">*</span>
                       </label>
@@ -212,7 +264,7 @@ const FaceAnalysisForm = () => {
                         name={field.name}
                         value={formData[field.name]}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white focus:border-yellow-500 focus:outline-none transition-colors text-sm"
+                        className="w-full px-2 md:px-3 py-2 md:py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white focus:border-yellow-500 focus:outline-none transition-colors text-sm"
                         required
                       >
                         <option value="">{field.placeholder}</option>
@@ -237,7 +289,7 @@ const FaceAnalysisForm = () => {
                     value={formData[formFields.textInputs[1].name]}
                     onChange={handleInputChange}
                     placeholder={formFields.textInputs[1].placeholder}
-                    className="w-full px-4 py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white placeholder-yellow-100/40 focus:border-yellow-500 focus:outline-none transition-colors text-sm"
+                    className="w-full px-3 md:px-4 py-2 md:py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white placeholder-yellow-100/40 focus:border-yellow-500 focus:outline-none transition-colors text-sm"
                   />
                 </div>
 
@@ -249,8 +301,8 @@ const FaceAnalysisForm = () => {
           </div>
 
           {/* Bottom Section: Checkbox and Buttons */}
-          <div className="mt-8 pt-6 border-t border-yellow-600/20">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="mt-6 md:mt-8 pt-6 border-t border-yellow-600/20">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               {/* Terms Checkbox */}
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
@@ -259,7 +311,7 @@ const FaceAnalysisForm = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, agreeTerms: e.target.checked })
                   }
-                  className="mt-1 w-5 h-5 rounded border-yellow-600/30 bg-red-950/50 text-yellow-500 focus:ring-yellow-500 focus:ring-offset-0 cursor-pointer"
+                  className="mt-0.5 w-5 h-5 rounded border-yellow-600/30 bg-red-950/50 text-yellow-500 focus:ring-yellow-500 focus:ring-offset-0 cursor-pointer"
                   required
                 />
                 <span className="text-yellow-100/90 text-sm">
@@ -274,14 +326,14 @@ const FaceAnalysisForm = () => {
               </label>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
                 <button
                   type="submit"
                   onClick={handleSubmit}
-                  className="relative group flex-1 sm:flex-initial"
+                  className="relative group flex-1 md:flex-initial"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300" />
-                  <div className="relative bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                  <div className="relative bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm md:text-base">
                     Luận Giải
                   </div>
                 </button>
