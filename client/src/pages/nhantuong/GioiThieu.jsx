@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import Header from "../../components/nhantuong/Header";
-import Navigation from "../../components/nhantuong/Navigation";
 import ImageBackground from "../../assets/nhantuong/bg.jpg";
 import ButtonInfo from "../../assets/nhantuong/button_info.svg";
 import Hook from "../../assets/nhantuong/hook.svg";
+import MenuBackground from "../../assets/nhantuong/menu_background.svg";
 
 // Navigation Buttons Configuration
 const navigationButtons = {
@@ -12,16 +13,16 @@ const navigationButtons = {
   ],
   right: [
     { href: "/tarot", label: "Xem Tarot" },
-    { href: "/socialmedia", label: "MXH tâm linh" },
+    { href: "/socialmedia", label: "Social" },
   ],
 };
 
 // Reusable Navigation Button Component
 const NavButton = ({ href, label }) => (
   <a href={href} className="relative flex flex-col items-center gap-2 group">
-    <div className="relative w-20 h-20">
+    <div className="relative w-32 h-32">
       <img src={ButtonInfo} alt={label} className="w-full h-full" />
-      <p className="absolute inset-0 flex items-center justify-center text-yellow-900 text-xs font-medium">
+      <p className="absolute inset-0 flex items-center justify-center text-yellow-900 text-xl font-semibold">
         {label}
       </p>
     </div>
@@ -29,8 +30,65 @@ const NavButton = ({ href, label }) => (
 );
 
 const GioiThieu = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 200);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const menuItems = [
+    { label: "Nhân tướng", href: "/nhantuong" },
+    { label: "Luận giải", href: "/nhantuong#xem-tuong" },
+    { label: "Tính năng", href: "/nhantuong#tinh-nang" },
+    { label: "Giới thiệu", href: "/nhantuong/gioi-thieu" },
+    { label: "Liên hệ", href: "/nhantuong#nhantuong-footer" },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#2d0a0a] relative overflow-hidden">
+    <div className="min-h-screen bg-[#2d0a0a] relative">
+      {/* Sticky Navigation Bar - Shows on Scroll */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-full opacity-0"
+        }`}
+      >
+        <div className="relative bg-red-950/10 backdrop-blur-md shadow-[0_4px_20px_rgba(124,109,72,0.1)] before:absolute before:inset-0 before:bg-red-950/25 before:backdrop-blur-sm before:-z-10">
+          <div className="container mx-auto relative z-10">
+            <div className="flex justify-center">
+              <div
+                className="px-32 py-5"
+                style={{
+                  backgroundImage: `url(${MenuBackground})`,
+                  backgroundSize: "contain",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                }}
+              >
+                <ul className="flex gap-24 items-center text-xl">
+                  {menuItems.map((item, index) => (
+                    <li key={index}>
+                      <a
+                        href={item.href}
+                        className="text-yellow-100/90 hover:text-yellow-300 transition-colors font-medium"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="relative z-10">
         <div
           className="min-h-screen"
@@ -43,18 +101,17 @@ const GioiThieu = () => {
           }}
         >
           <Header />
-          <Navigation />
 
           {/* Content Section */}
           <div className="container mx-auto px-40 pb-10">
             <div className="flex gap-8 items-start justify-center">
               {/* Left Column - Navigation Buttons */}
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6 sticky top-32 self-start z-40">
                 {navigationButtons.left.map((btn, idx) => (
                   <NavButton key={idx} {...btn} />
                 ))}
                 <div className="flex justify-center">
-                  <img src={Hook} alt="decoration" className="w-16 h-auto" />
+                  <img src={Hook} alt="decoration" className="w-20 h-auto" />
                 </div>
               </div>
 
@@ -289,12 +346,12 @@ const GioiThieu = () => {
               </div>
 
               {/* Right Column - Navigation Buttons */}
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6 sticky top-32 self-start z-40">
                 {navigationButtons.right.map((btn, idx) => (
                   <NavButton key={idx} {...btn} />
                 ))}
                 <div className="flex justify-center">
-                  <img src={Hook} alt="decoration" className="w-16 h-auto" />
+                  <img src={Hook} alt="decoration" className="w-20 h-auto" />
                 </div>
               </div>
             </div>
