@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, CalendarDays, Sparkles, Eye, Settings, LogOut, User, HelpCircle } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import UserSwitcher from '../UserSwitcher';
 import ballLogo from '../../assets/ball.png';
 
 const SocialHeader = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isAvatarOpen, setIsAvatarOpen] = useState(false);
   const notificationRef = useRef(null);
@@ -85,8 +88,11 @@ const SocialHeader = () => {
           </Link>
         </nav>
 
-        {/* Right: Notification & Avatar */}
+        {/* Right: User Switcher, Notification & Avatar */}
         <div className="flex items-center gap-3 flex-shrink-0">
+          {/* User Switcher - chỉ hiển thị khi có currentUser */}
+          {currentUser && <UserSwitcher />}
+          
           {/* Notification Bell with Dropdown */}
           <div className="relative" ref={notificationRef}>
             <button 
@@ -132,39 +138,46 @@ const SocialHeader = () => {
           </div>
           
           {/* Avatar with Dropdown */}
-          <div className="relative" ref={avatarRef}>
-            <button 
-              onClick={() => setIsAvatarOpen(!isAvatarOpen)}
-              className="w-9 h-9 rounded-full border-2 border-purple-500 overflow-hidden hover:opacity-80 transition-opacity"
-            >
-              <img 
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG3lfMOpNq0uh7wbVh3ER14gQdTt_ydu1zfQ&s" 
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
-            </button>
-            
-            {/* Avatar Dropdown Menu */}
-            {isAvatarOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
-                <div className="p-3 border-b border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG3lfMOpNq0uh7wbVh3ER14gQdTt_ydu1zfQ&s" 
-                      alt="Avatar"
-                      className="w-10 h-10 rounded-full border-2 border-purple-500 object-cover"
-                    />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">Người dùng</p>
-                      <p className="text-xs text-gray-500">user@example.com</p>
+          {currentUser && (
+            <div className="relative" ref={avatarRef}>
+              <button 
+                onClick={() => setIsAvatarOpen(!isAvatarOpen)}
+                className="w-9 h-9 rounded-full border-2 border-purple-500 overflow-hidden hover:opacity-80 transition-opacity"
+              >
+                <div 
+                  className="w-full h-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${currentUser.avatarUrl})` }}
+                />
+              </button>
+              
+              {/* Avatar Dropdown Menu */}
+              {isAvatarOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+                  <div className="p-3 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-10 h-10 rounded-full border-2 border-purple-500 bg-cover bg-center flex-shrink-0"
+                        style={{ backgroundImage: `url(${currentUser.avatarUrl})` }}
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {currentUser.userName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {currentUser.email}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="py-1">
-                  <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <User size={18} className="text-gray-500" />
-                    <span>Trang cá nhân</span>
-                  </button>
+                  <div className="py-1">
+                    <Link
+                      to={`/user/${currentUser.id}`}
+                      onClick={() => setIsAvatarOpen(false)}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <User size={18} className="text-gray-500" />
+                      <span>Trang cá nhân</span>
+                    </Link>
                   <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                     <Settings size={18} className="text-gray-500" />
                     <span>Cài đặt</span>
@@ -173,18 +186,22 @@ const SocialHeader = () => {
                     <HelpCircle size={18} className="text-gray-500" />
                     <span>Trợ giúp</span>
                   </button>
-                  <div className="border-t border-gray-200 my-1"></div>
-                  <button 
-                    onClick={() => navigate('/login')}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut size={18} />
-                    <span>Đăng xuất</span>
-                  </button>
+                    <div className="border-t border-gray-200 my-1"></div>
+                    <button 
+                      onClick={() => {
+                        // TODO: Implement logout khi có authentication thật
+                        navigate('/login');
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut size={18} />
+                      <span>Đăng xuất</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>

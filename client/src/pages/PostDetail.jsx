@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Share2, ThumbsUp, MessageSquare, Heart } from 'lucide-react';
 import postsData from '../data/posts.json';
 import usersData from '../data/users.json';
@@ -69,17 +69,17 @@ const PostDetail = () => {
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <a href={`#/user/${user.id}`} className="block">
+                <Link to={`/user/${user.id}`} className="block">
                   <div 
                     className="w-12 h-12 rounded-full border-2 border-blue-500 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${user.avatar})` }}
+                    style={{ backgroundImage: `url(${user.avatarUrl})` }}
                   />
-                </a>
+                </Link>
                 <div>
                   <div className="flex items-center gap-2">
-                    <a href={`#/user/${user.id}`} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                      {user.name}
-                    </a>
+                    <Link to={`/user/${user.id}`} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                      {user.userName}
+                    </Link>
                     <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                       + Theo dõi
                     </button>

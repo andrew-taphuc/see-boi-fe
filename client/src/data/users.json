@@ -1,20 +1,32 @@
 [
   {
     "id": 1,
-    "name": "Minh Anh",
-    "avatar": "https://randomuser.me/api/portraits/women/68.jpg",
-    "description": "Nhà huấn luyện thiền sáng và phát triển bản thân. Luôn mong muốn chia sẻ năng lượng tích cực mỗi ngày."
+    "userName": "Minh Anh",
+    "email": "minhanh@example.com",
+    "fullName": "Minh Anh",
+    "avatarUrl": "https://randomuser.me/api/portraits/women/68.jpg",
+    "birthday": null,
+    "gender": "female",
+    "bio": "Nhà huấn luyện thiền sáng và phát triển bản thân. Luôn mong muốn chia sẻ năng lượng tích cực mỗi ngày."
   },
   {
     "id": 2,
-    "name": "Quốc Bảo",
-    "avatar": "https://randomuser.me/api/portraits/men/32.jpg",
-    "description": "Tác giả về chủ đề tâm lý ứng dụng và luật hấp dẫn, yêu thích khám phá những điều mới lạ trong cuộc sống."
+    "userName": "Quốc Bảo",
+    "email": "quocbao@example.com",
+    "fullName": "Quốc Bảo",
+    "avatarUrl": "https://randomuser.me/api/portraits/men/32.jpg",
+    "birthday": null,
+    "gender": "male",
+    "bio": "Tác giả về chủ đề tâm lý ứng dụng và luật hấp dẫn, yêu thích khám phá những điều mới lạ trong cuộc sống."
   },
   {
     "id": 3,
-    "name": "Thanh Vân",
-    "avatar": "https://randomuser.me/api/portraits/women/85.jpg",
-    "description": "Chuyên chia sẻ về các nghi lễ chữa lành đơn giản, thích lan tỏa những giá trị bình yên đến cộng đồng."
+    "userName": "Thanh Vân",
+    "email": "thanhvan@example.com",
+    "fullName": "Thanh Vân",
+    "avatarUrl": "https://randomuser.me/api/portraits/women/85.jpg",
+    "birthday": null,
+    "gender": "female",
+    "bio": "Chuyên chia sẻ về các nghi lễ chữa lành đơn giản, thích lan tỏa những giá trị bình yên đến cộng đồng."
   }
 ]

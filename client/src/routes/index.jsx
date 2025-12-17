@@ -8,6 +8,7 @@ import GioiThieu from "../pages/nhantuong/GioiThieu";
 import KetQua from "../pages/nhantuong/KetQua";
 import SocialMedia from "../pages/SocialMedia";
 import PostDetail from "../pages/PostDetail";
+import UserProfile from "../pages/UserProfile";
 import Login from "../components/Login&Register/Login";
 import Register from "../components/Login&Register/Register";
 
@@ -24,6 +25,7 @@ const AppRoutes = () => {
       <Route path="/nhantuong/ket-qua" element={<MainLayout><KetQua /></MainLayout>} />
       <Route path="/socialmedia" element={<MainLayout><SocialMedia /></MainLayout>} />
       <Route path="/post/:id" element={<MainLayout><PostDetail /></MainLayout>} />
+      <Route path="/user/:id" element={<MainLayout><UserProfile /></MainLayout>} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
     </Routes>

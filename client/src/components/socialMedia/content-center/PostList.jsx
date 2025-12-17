@@ -30,8 +30,9 @@ const PostList = () => {
 
       return {
         id: post.id,
-        author: user?.name || 'Người dùng',
-        avatar: user?.avatar || 'https://ui-avatars.com/api/?name=User',
+        userId: post.userId, // Lưu userId để link đến profile
+        author: user?.userName || 'Người dùng',
+        avatar: user?.avatarUrl || 'https://ui-avatars.com/api/?name=User',
         time: timeAgo,
         title: post.title,
         content: post.content,
@@ -101,18 +102,18 @@ const PostList = () => {
 
             {/* Avatar bo tròn có viền xanh + tên người dùng */}
             <div className="flex items-center gap-2 mt-auto">
-              <a href={`#/user/${post.id}`} className="block">
+              <Link to={`/user/${post.userId}`} className="block">
                 <img 
                   src={post.avatar} 
                   alt={post.author}
                   className="w-8 h-8 rounded-full border border-blue-500 min-w-[32px] min-h-[32px]"
                 />
-              </a>
-              <a href={`#/user/${post.id}`} className="block">
+              </Link>
+              <Link to={`/user/${post.userId}`} className="block">
                 <span className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
                   {post.author}
                 </span>
-              </a>
+              </Link>
             </div>
           </div>
         </article>
