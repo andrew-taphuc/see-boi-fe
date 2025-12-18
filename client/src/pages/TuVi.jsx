@@ -3,7 +3,6 @@ import Navbar from "../components/TuviPage/TuviNavbar";
 import TuViForm from "../components/TuviPage/TuViForm";
 import TuViIntro from "../components/TuviPage/TuViIntro";
 import bgImage from "../assets/TuViBackground.jpg";
-import Footer from "../components/TuviPage/TuviFooter";
 import TuviFooter from "../components/TuviPage/TuviFooter";
 
 const TuVi = () => {
