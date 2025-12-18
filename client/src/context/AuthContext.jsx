@@ -15,8 +15,23 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    // Lấy từ localStorage hoặc mặc định user đầu tiên
+    // Kiểm tra token và user từ localStorage (từ API login)
+    const token = localStorage.getItem('token');
     const saved = localStorage.getItem('currentUser');
+    
+    if (token && saved) {
+      try {
+        const parsedUser = JSON.parse(saved);
+        setCurrentUser(parsedUser);
+        return;
+      } catch (error) {
+        // Nếu parse lỗi, xóa dữ liệu không hợp lệ
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+      }
+    }
+    
+    // Nếu không có token (chưa đăng nhập qua API), dùng logic cũ với usersData
     if (saved) {
       try {
         const parsedUser = JSON.parse(saved);
@@ -35,12 +50,22 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('currentUser', JSON.stringify(usersData[0]));
       }
     } else {
-      // Mặc định chọn user đầu tiên
-      setCurrentUser(usersData[0]);
-      localStorage.setItem('currentUser', JSON.stringify(usersData[0]));
+      // Mặc định chọn user đầu tiên (chỉ khi không có token)
+      if (!token) {
+        setCurrentUser(usersData[0]);
+        localStorage.setItem('currentUser', JSON.stringify(usersData[0]));
+      }
     }
   }, []);
 
+  // Login từ API (với token)
+  const loginAPI = (user, token) => {
+    setCurrentUser(user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('token', token);
+  };
+
+  // Login từ local (không có token, dùng cho switchUser)
   const login = (user) => {
     setCurrentUser(user);
     localStorage.setItem('currentUser', JSON.stringify(user));
@@ -49,6 +74,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
   };
 
   const switchUser = (userId) => {
@@ -59,7 +85,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, switchUser }}>
+    <AuthContext.Provider value={{ currentUser, login, loginAPI, logout, switchUser }}>
       {children}
     </AuthContext.Provider>
   );

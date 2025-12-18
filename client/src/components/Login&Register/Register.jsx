@@ -1,35 +1,113 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import axiosInstance from "../../utils/axiosInstance";
 import LoginRegisterButton from "./Login&RegisterButton";
 import { validatePassword } from "../../utils/validatePassword";
 
 // Nhận props: onClose, onSwitchToLogin
 const Register = ({ onClose, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
+    username: "",
+    fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { loginAPI } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    // Tự động set fullName giống username khi username thay đổi
+    if (name === "username") {
+      setFormData({ ...formData, username: value, fullName: value });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
     if (error) setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError("Mật khẩu xác nhận không khớp!");
       return;
     }
+
     const validation = validatePassword(formData.password);
     if (!validation.isValid) {
       setError(validation.error);
       return;
     }
-    alert("Đăng ký thành công!");
-    onSwitchToLogin(); // Chuyển về login sau khi đăng ký xong
+
+    setLoading(true);
+
+    try {
+      const response = await axiosInstance.post("/auth/register", {
+        username: formData.username,
+        fullName: formData.fullName || formData.username,
+        email: formData.email,
+        password: formData.password,
+      }, {
+        skipAuthRedirect: true // Flag để interceptor biết không redirect
+      });
+
+      if (response.data) {
+        // Lấy access_token và user từ response
+        const { access_token, user } = response.data;
+        
+        if (!access_token || !user) {
+          throw new Error("Response không hợp lệ từ server");
+        }
+        
+        // Tự động đăng nhập sau khi đăng ký thành công
+        loginAPI(user, access_token);
+        
+        // Đóng popup nếu có (khi được gọi từ popup)
+        if (onClose) {
+          onClose();
+        }
+        
+        // Redirect đến socialmedia page
+        navigate("/socialmedia");
+      }
+    } catch (err) {
+      // Xử lý các loại lỗi khác nhau
+      if (err.response) {
+        // Backend trả về response với status code
+        const status = err.response.status;
+        const message = err.response.data?.message;
+        
+        switch (status) {
+          case 409:
+            setError(message || "Email hoặc username đã tồn tại. Vui lòng thử lại.");
+            break;
+          case 400:
+            setError(message || "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
+            break;
+          case 500:
+            setError("Lỗi hệ thống. Vui lòng thử lại sau.");
+            break;
+          default:
+            setError(message || "Đăng ký thất bại. Vui lòng thử lại.");
+        }
+      } else if (err.request) {
+        // Request được gửi nhưng không nhận được response (mất kết nối)
+        setError("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+      } else {
+        // Lỗi khi setup request
+        setError("Đã xảy ra lỗi. Vui lòng thử lại.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,6 +137,19 @@ const Register = ({ onClose, onSwitchToLogin }) => {
       </h2>
 
       <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2 font-medium">Tên người dùng</label>
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            placeholder="username"
+            required
+          />
+        </div>
+
         <div className="mb-4">
           <label className="block text-gray-700 mb-2 font-medium">Email</label>
           <input
@@ -103,8 +194,8 @@ const Register = ({ onClose, onSwitchToLogin }) => {
         </div>
 
         {error && (
-          <div className="mb-4 text-red-500 text-sm italic font-medium text-center">
-            * {error}
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+            {error}
           </div>
         )}
 
@@ -122,8 +213,14 @@ const Register = ({ onClose, onSwitchToLogin }) => {
         </div>
 
         <div className="mt-4">
-          <button type="submit" className="w-full">
-            <LoginRegisterButton ButtonName="Đăng ký" />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full"
+          >
+            <LoginRegisterButton 
+              ButtonName={loading ? "Đang đăng ký..." : "Đăng ký"} 
+            />
           </button>
         </div>
       </form>
