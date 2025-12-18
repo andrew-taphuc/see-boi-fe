@@ -1,8 +1,97 @@
-import React from "react";
-import LoginRegisterButton from "./Login&RegisterButton";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import axiosInstance from "../../utils/axiosInstance";
 
 // Nhận props: onClose (để tắt popup), onSwitchToRegister (để chuyển sang đăng ký)
 const Login = ({ onClose, onSwitchToRegister }) => {
+  const [usernameOrEmail, setUsernameOrEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { loginAPI } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await axiosInstance.post("/auth/login", {
+        email: usernameOrEmail, // Backend tự động phát hiện username hoặc email
+        password,
+      }, {
+        skipAuthRedirect: true // Flag để interceptor biết không redirect
+      });
+
+      if (response.data) {
+        // Lưu token và user info
+        const { access_token, user } = response.data;
+        
+        if (!access_token || !user) {
+          throw new Error("Response không hợp lệ từ server");
+        }
+        
+        loginAPI(user, access_token);
+        
+        // Đóng popup nếu có (khi được gọi từ popup)
+        if (onClose) {
+          onClose();
+        }
+        
+        // Redirect đến socialmedia page
+        navigate("/socialmedia");
+      }
+    } catch (err) {
+      // Xử lý các loại lỗi khác nhau theo status codes:
+      // 200 OK: Đăng nhập thành công (đã xử lý trong try block)
+      // 400 Bad Request: Dữ liệu đầu vào không hợp lệ
+      // 401 Unauthorized: Mật khẩu không chính xác
+      // 403 Forbidden: Tài khoản OAuth (không có password)
+      // 404 Not Found: Tài khoản không tồn tại
+      // 500 Internal Server Error: Lỗi server/database
+      if (err.response) {
+        // Backend trả về response với status code
+        const status = err.response.status;
+        const message = err.response.data?.message;
+        
+        switch (status) {
+          case 400:
+            // Bad Request: Dữ liệu đầu vào không hợp lệ
+            setError(message || "Dữ liệu đầu vào không hợp lệ. Vui lòng kiểm tra lại.");
+            break;
+          case 401:
+            // Unauthorized: Mật khẩu không chính xác
+            setError("Mật khẩu không chính xác. Vui lòng kiểm tra lại.");
+            break;
+          case 403:
+            // Forbidden: Tài khoản OAuth (không có password)
+            setError("Tài khoản này được đăng nhập qua OAuth. Vui lòng sử dụng phương thức đăng nhập khác.");
+            break;
+          case 404:
+            // Not Found: Tài khoản không tồn tại
+            setError("Tài khoản không tồn tại. Vui lòng kiểm tra lại email hoặc username.");
+            break;
+          case 500:
+            // Internal Server Error: Lỗi server/database
+            setError("Lỗi hệ thống. Vui lòng thử lại sau.");
+            break;
+          default:
+            setError(message || "Đăng nhập thất bại. Vui lòng thử lại.");
+        }
+      } else if (err.request) {
+        // Request được gửi nhưng không nhận được response (mất kết nối)
+        setError("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
+      } else {
+        // Lỗi khi setup request
+        setError("Đã xảy ra lỗi. Vui lòng thử lại.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     // Xóa h-screen và background gradient. Chỉ giữ lại khung trắng.
     <div className="bg-white p-10 rounded-xl shadow-2xl w-full max-w-md relative">
@@ -30,13 +119,22 @@ const Login = ({ onClose, onSwitchToRegister }) => {
         Đăng nhập
       </h2>
 
-      <form action="">
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2 font-medium">Email</label>
+          <label className="block text-gray-700 mb-2 font-medium">Email hoặc Username</label>
           <input
-            type="email"
+            type="text"
+            value={usernameOrEmail}
+            onChange={(e) => setUsernameOrEmail(e.target.value)}
+            required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
-            placeholder="abc@email.com"
+            placeholder="Email hoặc username"
           />
         </div>
 
@@ -46,6 +144,9 @@ const Login = ({ onClose, onSwitchToRegister }) => {
           </label>
           <input
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
             placeholder="Mật khẩu"
           />
@@ -72,7 +173,13 @@ const Login = ({ onClose, onSwitchToRegister }) => {
         </div>
 
         <div className="mt-4">
-          <LoginRegisterButton ButtonName="Đăng nhập" />
+          <button
+            type="submit"
+            disabled={loading}
+            className="text-xl w-full bg-amber-600 text-white font-semibold py-3 rounded-lg hover:bg-amber-800 transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+          </button>
         </div>
       </form>
     </div>
