@@ -1,5 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import usersData from '../data/users.json';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const AuthContext = createContext();
 
@@ -15,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    // Kiểm tra token và user từ localStorage (từ API login)
+    // Chỉ dùng auth thật (token + currentUser từ API login)
     const token = localStorage.getItem('token');
     const saved = localStorage.getItem('currentUser');
     
@@ -30,62 +29,46 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
       }
     }
-    
-    // Nếu không có token (chưa đăng nhập qua API), dùng logic cũ với usersData
-    if (saved) {
-      try {
-        const parsedUser = JSON.parse(saved);
-        // Kiểm tra xem user có còn tồn tại trong usersData không
-        const userExists = usersData.find(u => u.id === parsedUser.id);
-        if (userExists) {
-          setCurrentUser(userExists);
-        } else {
-          // Nếu user không tồn tại, dùng user đầu tiên
-          setCurrentUser(usersData[0]);
-          localStorage.setItem('currentUser', JSON.stringify(usersData[0]));
-        }
-      } catch (error) {
-        // Nếu parse lỗi, dùng user đầu tiên
-        setCurrentUser(usersData[0]);
-        localStorage.setItem('currentUser', JSON.stringify(usersData[0]));
-      }
-    } else {
-      // Mặc định chọn user đầu tiên (chỉ khi không có token)
-      if (!token) {
-        setCurrentUser(usersData[0]);
-        localStorage.setItem('currentUser', JSON.stringify(usersData[0]));
-      }
-    }
+
+    // Không có token hợp lệ => chưa đăng nhập
+    setCurrentUser(null);
   }, []);
 
   // Login từ API (với token)
-  const loginAPI = (user, token) => {
+  const loginAPI = useCallback((user, token) => {
     setCurrentUser(user);
     localStorage.setItem('currentUser', JSON.stringify(user));
     localStorage.setItem('token', token);
-  };
+  }, []);
 
-  // Login từ local (không có token, dùng cho switchUser)
-  const login = (user) => {
-    setCurrentUser(user);
-    localStorage.setItem('currentUser', JSON.stringify(user));
-  };
+  // Cập nhật user hiện tại (ví dụ sau khi PATCH /user/me)
+  const updateCurrentUser = useCallback((partialOrNextUser) => {
+    setCurrentUser((prev) => {
+      const next =
+        typeof partialOrNextUser === 'function'
+          ? partialOrNextUser(prev)
+          : partialOrNextUser;
 
-  const logout = () => {
+      if (next) {
+        localStorage.setItem('currentUser', JSON.stringify(next));
+      }
+      return next;
+    });
+  }, []);
+
+  const logout = useCallback(() => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
     localStorage.removeItem('token');
-  };
+  }, []);
 
-  const switchUser = (userId) => {
-    const user = usersData.find(u => u.id === userId);
-    if (user) {
-      login(user);
-    }
-  };
+  const value = useMemo(
+    () => ({ currentUser, loginAPI, logout, updateCurrentUser }),
+    [currentUser, loginAPI, logout, updateCurrentUser]
+  );
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, loginAPI, logout, switchUser }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
