@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, CalendarDays, Sparkles, Eye, Settings, LogOut, User, HelpCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import UserSwitcher from '../UserSwitcher';
 import ballLogo from '../../assets/ball.png';
 
 const SocialHeader = () => {
@@ -90,9 +89,6 @@ const SocialHeader = () => {
 
         {/* Right: User Switcher, Notification & Avatar */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          {/* User Switcher - chỉ hiển thị khi có currentUser */}
-          {currentUser && <UserSwitcher />}
-          
           {/* Notification Bell with Dropdown */}
           <div className="relative" ref={notificationRef}>
             <button 

@@ -4,7 +4,9 @@ import { ChevronDown, User, Check } from 'lucide-react';
 import usersData from '../data/users.json';
 
 const UserSwitcher = () => {
-  const { currentUser, switchUser } = useAuth();
+  // Feature này dùng dữ liệu mock users.json (user ảo). Hiện tại đã bỏ mock auth,
+  // nên giữ component ở trạng thái tắt để tránh crash nếu còn import đâu đó.
+  const { currentUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -23,11 +25,12 @@ const UserSwitcher = () => {
   }, []);
 
   const handleUserSelect = (user) => {
-    switchUser(user.id);
+    // no-op
     setIsOpen(false);
   };
 
   if (!currentUser) return null;
+  return null;
 
   return (
     <div className="relative" ref={dropdownRef}>

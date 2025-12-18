@@ -1,49 +1,172 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Edit2, UserPlus, Check, Settings, Calendar, Users } from 'lucide-react';
-import usersData from '../data/users.json';
+import { Edit2, UserPlus, Check, Settings, Calendar, Users, Save, Loader2 } from 'lucide-react';
 import postsData from '../data/posts.json';
 import SocialHeader from '../components/socialMedia/SocialHeader';
+import axiosInstance from '../utils/axiosInstance';
 
 const UserProfile = () => {
   const { id } = useParams();
-  const { currentUser } = useAuth();
-  const navigate = useNavigate();
+  const { currentUser, updateCurrentUser } = useAuth();
   const [user, setUser] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedBio, setEditedBio] = useState('');
+  const [editedFullName, setEditedFullName] = useState('');
+  const [editedAvatarUrl, setEditedAvatarUrl] = useState('');
+  const [editedBirthday, setEditedBirthday] = useState(''); // yyyy-MM-dd
+  const [editedGender, setEditedGender] = useState(''); // MALE|FEMALE|OTHER|''
+  const [isLoadingMe, setIsLoadingMe] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   
-  const isOwnProfile = currentUser && currentUser.id === parseInt(id);
+  const resolvedId = useMemo(() => (id ? parseInt(id) : null), [id]);
+  const isOwnProfile = useMemo(() => {
+    if (!currentUser || !resolvedId) return false;
+    return currentUser.id === resolvedId;
+  }, [currentUser, resolvedId]);
+
+  const normalizeDateToInput = (value) => {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '';
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
 
   useEffect(() => {
-    const userId = parseInt(id);
-    const foundUser = usersData.find(u => u.id === userId);
-    
-    if (foundUser) {
-      setUser(foundUser);
-      setEditedBio(foundUser.bio || '');
-      
-      // Lấy bài đăng của user
-      const posts = postsData.filter(p => p.userId === userId);
-      // Sắp xếp theo thời gian mới nhất
-      posts.sort((a, b) => new Date(b.time) - new Date(a.time));
-      setUserPosts(posts);
+    let cancelled = false;
+
+    const loadMe = async () => {
+      setIsLoadingMe(true);
+      setErrorMsg('');
+      setSuccessMsg('');
+      try {
+        const res = await axiosInstance.get('/user/me');
+        if (cancelled) return;
+        const me = res.data;
+        setUser(me);
+        setEditedBio(me?.bio || '');
+        setEditedFullName(me?.fullName || '');
+        setEditedAvatarUrl(me?.avatarUrl || '');
+        setEditedBirthday(normalizeDateToInput(me?.birthday));
+        setEditedGender(me?.gender || '');
+
+        // Sync ngay vào context/localStorage để header đổi avatar/name
+        updateCurrentUser?.(me);
+
+        // Posts vẫn dùng mock hiện tại (chưa có backend posts)
+        const posts = postsData.filter((p) => p.userId === me?.id);
+        posts.sort((a, b) => new Date(b.time) - new Date(a.time));
+        setUserPosts(posts);
+      } catch (e) {
+        if (cancelled) return;
+        setErrorMsg(
+          e?.response?.data?.message ||
+            'Không thể tải thông tin cá nhân. Vui lòng thử lại.'
+        );
+      } finally {
+        if (!cancelled) setIsLoadingMe(false);
+      }
+    };
+
+    const loadUserById = async () => {
+      const userId = parseInt(id);
+      if (!userId || Number.isNaN(userId)) {
+        setUser(null);
+        return;
+      }
+
+      setIsLoadingMe(true);
+      setErrorMsg('');
+      setSuccessMsg('');
+      try {
+        const res = await axiosInstance.get(`/user/${userId}`);
+        if (cancelled) return;
+        const u = res.data;
+        setUser(u);
+        setEditedBio(u?.bio || '');
+        setEditedFullName(u?.fullName || '');
+        setEditedAvatarUrl(u?.avatarUrl || '');
+        setEditedBirthday(normalizeDateToInput(u?.birthday));
+        setEditedGender(u?.gender || '');
+
+        const posts = postsData.filter((p) => p.userId === u?.id);
+        posts.sort((a, b) => new Date(b.time) - new Date(a.time));
+        setUserPosts(posts);
+      } catch (e) {
+        if (cancelled) return;
+        const status = e?.response?.status;
+        if (status === 404) {
+          setUser(null);
+          setErrorMsg('Không tìm thấy người dùng');
+        } else {
+          setErrorMsg(
+            e?.response?.data?.message ||
+              'Không thể tải thông tin người dùng. Vui lòng thử lại.'
+          );
+        }
+      } finally {
+        if (!cancelled) setIsLoadingMe(false);
+      }
+    };
+
+    if (isOwnProfile) {
+      loadMe();
+    } else {
+      loadUserById();
     }
-  }, [id]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isOwnProfile, updateCurrentUser]);
 
   const handleFollow = () => {
     setIsFollowing(!isFollowing);
     // TODO: Implement follow logic khi có backend
   };
 
-  const handleSaveEdit = () => {
-    // TODO: Implement save edit logic khi có backend
-    // Tạm thời chỉ cập nhật local state
-    setUser({ ...user, bio: editedBio });
-    setIsEditMode(false);
+  const handleSaveEdit = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    if (!isOwnProfile) return;
+
+    setIsSaving(true);
+    try {
+      const payload = {
+        fullName: editedFullName?.trim() || null,
+        avatarUrl: editedAvatarUrl?.trim() || null,
+        birthday: editedBirthday ? new Date(editedBirthday).toISOString() : null,
+        gender: editedGender || null,
+        bio: editedBio?.trim() || null,
+      };
+
+      const res = await axiosInstance.patch('/user/me', payload);
+      const updated = res.data;
+      setUser(updated);
+      setEditedBio(updated?.bio || '');
+      setEditedFullName(updated?.fullName || '');
+      setEditedAvatarUrl(updated?.avatarUrl || '');
+      setEditedBirthday(normalizeDateToInput(updated?.birthday));
+      setEditedGender(updated?.gender || '');
+      updateCurrentUser?.(updated);
+      setIsEditMode(false);
+      setSuccessMsg('Đã cập nhật thông tin cá nhân.');
+    } catch (e) {
+      setErrorMsg(
+        e?.response?.data?.message ||
+          'Cập nhật thất bại. Vui lòng thử lại.'
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -55,12 +178,28 @@ const UserProfile = () => {
     });
   };
 
+  if (isLoadingMe) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <SocialHeader />
+        <div className="pt-14 flex items-center justify-center min-h-screen">
+          <div className="flex items-center gap-2 text-gray-600">
+            <Loader2 className="animate-spin" size={18} />
+            <span>Đang tải thông tin cá nhân...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-100">
         <SocialHeader />
         <div className="pt-14 flex items-center justify-center min-h-screen">
-          <p className="text-gray-600">Không tìm thấy người dùng</p>
+          <p className="text-gray-600">
+            {errorMsg || 'Không tìm thấy người dùng'}
+          </p>
         </div>
       </div>
     );
@@ -74,13 +213,36 @@ const UserProfile = () => {
         {/* Profile Header Card */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
           <div className="p-6">
+            {!!errorMsg && (
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {errorMsg}
+              </div>
+            )}
+            {!!successMsg && (
+              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                {successMsg}
+              </div>
+            )}
             <div className="flex items-start gap-6">
               {/* Avatar */}
               <div className="flex-shrink-0">
-                <div 
+                <div
                   className="w-32 h-32 rounded-full border-4 border-blue-500 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${user.avatarUrl})` }}
+                  style={{ backgroundImage: `url(${user.avatarUrl || ''})` }}
                 />
+                {isEditMode && isOwnProfile && (
+                  <div className="mt-3">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Avatar URL
+                    </label>
+                    <input
+                      value={editedAvatarUrl}
+                      onChange={(e) => setEditedAvatarUrl(e.target.value)}
+                      className="w-56 max-w-[14rem] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      placeholder="https://..."
+                    />
+                  </div>
+                )}
               </div>
 
               {/* User Info */}
@@ -90,9 +252,35 @@ const UserProfile = () => {
                     <h1 className="text-3xl font-bold text-gray-900 mb-1">
                       {user.userName}
                     </h1>
-                    <p className="text-gray-600 mb-2">{user.fullName}</p>
+                    {isEditMode && isOwnProfile ? (
+                      <div className="mb-2">
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Họ và tên
+                        </label>
+                        <input
+                          value={editedFullName}
+                          onChange={(e) => setEditedFullName(e.target.value)}
+                          className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          placeholder="Nhập họ và tên"
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-gray-600 mb-2">{user.fullName}</p>
+                    )}
                     {user.email && (
                       <p className="text-sm text-gray-500">{user.email}</p>
+                    )}
+
+                    {/* Extra info khi xem profile bản thân */}
+                    {isOwnProfile && (
+                      <div className="mt-2 text-sm text-gray-600 flex flex-wrap gap-x-4 gap-y-1">
+                        <span>
+                          <span className="font-semibold text-gray-800">Level:</span> {user.level ?? 1}
+                        </span>
+                        <span>
+                          <span className="font-semibold text-gray-800">XP:</span> {user.xp ?? 0}
+                        </span>
+                      </div>
                     )}
                   </div>
                   
@@ -143,6 +331,34 @@ const UserProfile = () => {
                 {/* Bio - Editable if own profile */}
                 {isEditMode && isOwnProfile ? (
                   <div className="mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Ngày sinh
+                        </label>
+                        <input
+                          type="date"
+                          value={editedBirthday}
+                          onChange={(e) => setEditedBirthday(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          Giới tính
+                        </label>
+                        <select
+                          value={editedGender}
+                          onChange={(e) => setEditedGender(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+                        >
+                          <option value="">Chưa chọn</option>
+                          <option value="MALE">Nam</option>
+                          <option value="FEMALE">Nữ</option>
+                          <option value="OTHER">Khác</option>
+                        </select>
+                      </div>
+                    </div>
                     <textarea
                       value={editedBio}
                       onChange={(e) => setEditedBio(e.target.value)}
@@ -153,14 +369,24 @@ const UserProfile = () => {
                     <div className="flex gap-2 mt-2">
                       <button
                         onClick={handleSaveEdit}
-                        className="px-4 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                        disabled={isSaving}
+                        className={`px-4 py-1 rounded-lg transition-colors text-sm flex items-center gap-2 ${
+                          isSaving ? 'bg-blue-400 text-white cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
+                        }`}
                       >
-                        Lưu
+                        {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
+                        <span>Lưu</span>
                       </button>
                       <button
                         onClick={() => {
                           setIsEditMode(false);
                           setEditedBio(user.bio || '');
+                          setEditedFullName(user.fullName || '');
+                          setEditedAvatarUrl(user.avatarUrl || '');
+                          setEditedBirthday(normalizeDateToInput(user.birthday));
+                          setEditedGender(user.gender || '');
+                          setErrorMsg('');
+                          setSuccessMsg('');
                         }}
                         className="px-4 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                       >
@@ -198,6 +424,18 @@ const UserProfile = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Meta info */}
+                {isOwnProfile && (
+                  <div className="mt-4 text-xs text-gray-500">
+                    <div>
+                      Tạo lúc: {user.createdAt ? formatDate(user.createdAt) : '—'}
+                    </div>
+                    <div>
+                      Cập nhật: {user.updatedAt ? formatDate(user.updatedAt) : '—'}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
