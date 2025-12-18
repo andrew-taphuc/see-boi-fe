@@ -12,14 +12,21 @@ const Header = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 pt-8 pb-4">
+    <div className="container mx-auto px-4 pt-4 md:pt-8 pb-4">
       {/* Header Section */}
-      <div className="flex flex-col items-center mb-6">
-        <a href="/nhantuong" className="flex items-center gap-4 mb-4">
-          <img src={Logo1} width="110" height="49" alt="Intro Logo 1" />
+      <div className="flex flex-col items-center mb-4 md:mb-6">
+        <a
+          href="/nhantuong"
+          className="flex items-center gap-1 md:gap-4 mb-3 md:mb-4"
+        >
+          <img
+            src={Logo1}
+            className="w-12 h-6 md:w-[110px] md:h-[49px]"
+            alt="Intro Logo 1"
+          />
           <div className="text-center">
             <h1
-              className="text-5xl font-serif text-yellow-400 tracking-wider"
+              className="text-2xl md:text-5xl font-serif text-yellow-400 tracking-wider"
               style={{
                 fontFamily: "'Crimson Text', serif",
                 textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
@@ -27,16 +34,22 @@ const Header = () => {
             >
               Nhân Tướng
             </h1>
-            <p className="text-yellow-500 text-sm tracking-[0.3em] mt-1">
+            <p className="text-yellow-500 text-xs md:text-sm tracking-[0.2em] md:tracking-[0.3em]">
               Xem tướng hiểu mình
             </p>
           </div>
-          <img src={Logo2} width="110" height="49" alt="Intro Logo 2" />
+          <img
+            src={Logo2}
+            className="w-12 h-6 md:w-[110px] md:h-[49px]"
+            alt="Intro Logo 2"
+          />
         </a>
       </div>
 
-      {/* Navigation Section */}
-      <div className="flex justify-center">
+    
+
+      {/* Desktop Navigation Section */}
+      <div className="hidden md:flex justify-center">
         <div
           className="px-32 py-12"
           style={{

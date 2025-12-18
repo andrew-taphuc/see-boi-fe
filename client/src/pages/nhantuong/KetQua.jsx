@@ -1,10 +1,18 @@
+import { useState } from "react";
 import Header from "../../components/nhantuong/Header";
 import ImageBackground from "../../assets/nhantuong/bg.jpg";
 import ButtonInfo from "../../assets/nhantuong/button_info.svg";
 import Hook from "../../assets/nhantuong/hook.svg";
 import { analysisData } from "../../data/analysisData";
+import BackgroundMenu from "../../assets/nhantuong/background_menu.svg";
+import MenuIcon from "../../assets/nhantuong/menu.svg";
+import CloseIcon from "../../assets/nhantuong/close2.svg";
+import BtnBackground from "../../assets/nhantuong/btn.svg";
+import BackToTop from "../../assets/nhantuong/gps-navigation.png";
 
 const KetQua = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const analysisTags = [
     { label: "Năm nay:", value: "Giáp Thân" },
     { label: "Tháng sinh:", value: "Nhâm Thân" },
@@ -14,6 +22,18 @@ const KetQua = () => {
     { label: "Quẻ:", value: "Càn Trực Độc (Quẻ thái chủ)" },
     { label: "Dung môn:", value: "Mộc" },
     { label: "Hỷ thần:", value: "Hỏa" },
+  ];
+
+  const mobileMenuItems = [
+    { label: "Trang chủ", href: "/landingpage" },
+    { label: "Tử Vi", href: "/tuvi" },
+    { label: "Xem Tarot", href: "/tarot" },
+    { label: "Social", href: "/socialmedia" },
+    { label: "Nhân Tướng", href: "/nhantuong" },
+    { label: "Luận giải", href: "/nhantuong#xem-tuong" },
+    { label: "Tính năng", href: "/nhantuong#tinh-nang" },
+    { label: "Giới thiệu", href: "/nhantuong/gioi-thieu" },
+    { label: "Liên hệ", href: "/nhantuong#nhantuong-footer" },
   ];
 
   const navigationButtons = {
@@ -49,14 +69,91 @@ const KetQua = () => {
         backgroundAttachment: "fixed",
       }}
     >
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className={`md:hidden fixed top-4 -left-3 z-[60] transition-opacity duration-300 ${
+          isMobileMenuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+        aria-label="Toggle menu"
+      >
+        <div className="relative">
+          <img
+            src={BackgroundMenu}
+            alt="background_menu"
+            className="w-16 h-auto"
+          />
+          <img
+            src={MenuIcon}
+            alt="Menu"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6"
+          />
+        </div>
+      </button>
+
+      {/* Mobile Sidebar Menu */}
+      <div
+        className={`md:hidden fixed top-0 left-0 h-full bg-[#7F0200] z-50 transform transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } shadow-2xl overflow-y-auto rounded-tr-[20px] rounded-br-[20px]`}
+        style={{ width: "calc(100vw - 60px)" }}
+      >
+        <button
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="absolute top-6 left-1/2 -translate-x-1/2 z-10 w-12 h-12"
+          aria-label="Close menu"
+        >
+          <img src={CloseIcon} alt="Close" className="w-full h-full" />
+        </button>
+
+        <div className="flex flex-col gap-6 mt-25 px-6">
+          {mobileMenuItems.map((item, index) => (
+            <a
+              key={index}
+              href={item.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block relative"
+            >
+              <div className="relative h-[50px] flex items-center justify-center">
+                <img
+                  src={BtnBackground}
+                  alt="button"
+                  className="absolute inset-0 w-full h-full object-contain"
+                />
+                <span className="text-yellow-900 font-medium text-lg relative z-10">
+                  {item.label}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Back to Top Button */}
+      <a
+        href="#top"
+        className="fixed bottom-2 md:bottom-6 right-2 md:right-4 w-12 h-12 z-50 cursor-pointer"
+        title="Back to Top"
+      >
+        <img src={BackToTop} alt="Back to Top" className="w-full h-full" />
+      </a>
+
       <div className="relative z-10">
         {/* Header with background */}
         <Header />
         {/* Content Section with 3 columns */}
-        <div className="container mx-auto px-20 pb-10">
+        <div className="container mx-auto px-4 md:px-20">
           <div className="flex gap-6 items-start justify-center">
-            {/* Left Column - Navigation Buttons */}
-            <div className="flex flex-col gap-6 sticky top-24 self-start">
+            {/* Left Column - Navigation Buttons - Desktop Only */}
+            <div className="hidden md:flex flex-col gap-6 sticky top-24 self-start">
               {navigationButtons.left.map((btn, idx) => (
                 <NavButton key={idx} {...btn} />
               ))}
@@ -66,8 +163,8 @@ const KetQua = () => {
             </div>
 
             {/* Center Column - Main Content */}
-            <div className="max-w-5xl mx-auto flex-shrink-0">
-              <div className="relative bg-gradient-to-br from-red-900/40 via-red-800/30 to-red-900/40 backdrop-blur-xs rounded-3xl border-2 border-yellow-600/40 p-12 shadow-2xl">
+            <div className="w-full md:max-w-5xl mx-auto flex-shrink-0">
+              <div className="relative bg-gradient-to-br from-red-900/40 via-red-800/30 to-red-900/40 backdrop-blur-xs rounded-3xl border-2 border-yellow-600/40 p-6 md:p-12 shadow-2xl">
                 {/* Corner decorations */}
                 {[
                   "top-4 left-4 border-t-2 border-l-2 rounded-tl-lg",
@@ -83,11 +180,11 @@ const KetQua = () => {
 
                 <div className="space-y-8">
                   {/* Header Section */}
-                  <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-light text-yellow-300">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+                    <h1 className="text-2xl md:text-3xl font-light text-yellow-300">
                       Kết quả phân tích khuôn mặt
                     </h1>
-                    <button className="flex items-center gap-2 text-yellow-300 border border-yellow-400/60 px-4 py-2 rounded-lg hover:bg-yellow-400/10 transition-colors">
+                    <button className="flex items-center gap-2 text-yellow-300 border border-yellow-400/60 px-4 py-2 rounded-lg hover:bg-yellow-400/10 transition-colors whitespace-nowrap">
                       <span className="text-sm">Luận Giải Mẫu</span>
                       <svg
                         className="w-4 h-4"
@@ -106,17 +203,19 @@ const KetQua = () => {
                   </div>
 
                   {/* User Info Card */}
-                  <div className="flex gap-6 bg-red-900/30 rounded-xl p-6 border border-yellow-600/20">
+                  <div className="flex gap-4 md:gap-6 bg-red-900/30 rounded-xl p-4 md:p-6 border border-yellow-600/20">
+                    {/* Avatar Column */}
                     <div className="flex-shrink-0">
                       <img
                         src="https://via.placeholder.com/150"
                         alt="Avatar"
-                        className="w-32 h-32 rounded-lg object-cover border-2 border-yellow-500/40"
+                        className="w-40 h-46 md:w-48 md:h-48 rounded-lg object-cover border-2 border-yellow-500/40 shadow-lg"
                       />
                     </div>
 
-                    <div className="flex-1 space-y-3">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                    {/* Info Column */}
+                    <div className="flex-1 flex flex-col justify-between space-y-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-4 text-sm">
                         {[
                           { label: "Họ và tên", value: "Bùi Quang Hưng" },
                           { label: "Giới tính", value: "Nam" },
@@ -124,30 +223,27 @@ const KetQua = () => {
                           { label: "Tuổi", value: "21" },
                         ].map((info, idx) => (
                           <div key={idx}>
-                            <span className="text-yellow-400">
+                            <span className="text-yellow-400 font-medium">
                               {info.label}
                             </span>
-                            <p className="text-yellow-100/90 mt-1">
+                            <p className="text-yellow-100/90 mt-1 font-light">
                               {info.value}
                             </p>
                           </div>
                         ))}
                       </div>
-                      <div className="flex items-center gap-4 pt-2">
-                        <button className="border border-yellow-400/60 text-yellow-300 px-6 py-2 rounded-full text-sm hover:bg-yellow-400/10 transition-colors">
+
+                      <div className="hidden md:flex md:flex-col md:gap-2 md:pt-2">
+                        <button className="border border-yellow-400/60 text-yellow-300 px-6 py-2 rounded-full text-sm hover:bg-yellow-400/10 transition-colors w-fit">
                           Đổi ảnh luận giải
                         </button>
                       </div>
-                      <p className="text-yellow-100/70 text-xs">
-                        Đã có <span className="text-yellow-400">0</span> khách
-                        hàng lựa chọn gói này.
-                      </p>
                     </div>
                   </div>
 
                   {/* Analysis Tags Section */}
                   <div>
-                    <h3 className="text-xl font-semibold text-yellow-300 mb-4">
+                    <h3 className="text-lg md:text-xl font-semibold text-yellow-300 mb-4">
                       Phân tích khuôn mặt chi tiết
                     </h3>
                     <div className="flex flex-wrap gap-3 mb-6">
@@ -168,9 +264,9 @@ const KetQua = () => {
                     {analysisData.map((section) => (
                       <div
                         key={section.num}
-                        className="bg-red-900/20 rounded-xl p-6 border border-yellow-600/20"
+                        className="bg-red-900/20 rounded-xl p-4 md:p-6 border border-yellow-600/20"
                       >
-                        <h4 className="text-lg font-semibold text-yellow-300 mb-3">
+                        <h4 className="text-base md:text-lg font-semibold text-yellow-300 mb-3">
                           <span className="text-yellow-500">{section.num}</span>{" "}
                           - {section.title}
                         </h4>
@@ -203,21 +299,16 @@ const KetQua = () => {
 
                   {/* Bottom Buttons */}
                   <div className="flex items-center justify-center gap-4 pt-6 border-t border-yellow-600/20">
-                    <button className="border border-yellow-400/60 text-yellow-300 px-8 py-3 rounded-full hover:bg-yellow-400/10 transition-colors">
+                    <button className="w-48 md:w-auto border border-yellow-400/60 text-yellow-300 px-8 py-3 rounded-full hover:bg-yellow-400/10 transition-colors">
                       Đổi ảnh luận giải
                     </button>
                   </div>
-
-                  <p className="text-center text-yellow-100/70 text-xs">
-                    Đã có <span className="text-yellow-400">0</span> khách hàng
-                    lựa chọn gói này.
-                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Navigation Buttons */}
-            <div className="flex flex-col gap-6 sticky top-24 self-start">
+            {/* Right Column - Navigation Buttons - Desktop Only */}
+            <div className="hidden md:flex flex-col gap-6 sticky top-24 self-start">
               {navigationButtons.right.map((btn, idx) => (
                 <NavButton key={idx} {...btn} />
               ))}
@@ -228,8 +319,8 @@ const KetQua = () => {
           </div>
         </div>
 
-        <div className="container mx-auto px-40 pb-10">
-          <div className="mt-12 pt-6 text-center">
+        <div className="container mx-auto px-4 md:px-40 pb-5 md:pb-10">
+          <div className="mt-10 pt-6 text-center">
             <div className="text-yellow-100/70 text-xs">
               Copyright © 2025 by{" "}
               <span className="text-yellow-300">nhantuong.vn</span>. All rights
