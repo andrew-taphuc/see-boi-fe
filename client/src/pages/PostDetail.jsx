@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Share2, ThumbsUp, MessageSquare, Heart } from 'lucide-react';
-import postsData from '../data/posts.json';
-import usersData from '../data/users.json';
 import SocialHeader from '../components/socialMedia/SocialHeader';
+import axiosInstance from '../utils/axiosInstance';
+import TiptapViewer from '../components/richtext/TiptapViewer';
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -11,33 +11,82 @@ const PostDetail = () => {
   const [post, setPost] = useState(null);
   const [user, setUser] = useState(null);
   const [formattedDate, setFormattedDate] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
-    const postId = parseInt(id);
-    const foundPost = postsData.find(p => p.id === postId);
-    
-    if (foundPost) {
-      setPost(foundPost);
-      const foundUser = usersData.find(u => u.id === foundPost.userId);
-      setUser(foundUser);
-      
-      // Format date
-      const postDate = new Date(foundPost.time);
-      const formatted = postDate.toLocaleDateString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      setFormattedDate(formatted);
-    }
+    let cancelled = false;
+
+    const load = async () => {
+      const postId = parseInt(id);
+      if (!postId || Number.isNaN(postId)) {
+        setErrorMsg('ID bài viết không hợp lệ');
+        return;
+      }
+
+      setIsLoading(true);
+      setErrorMsg('');
+      try {
+        const res = await axiosInstance.get(`/post/${postId}`);
+        if (cancelled) return;
+        const p = res.data;
+        
+        // Parse contentJson nếu là string
+        if (p?.contentJson && typeof p.contentJson === 'string') {
+          try {
+            p.contentJson = JSON.parse(p.contentJson);
+          } catch (e) {
+            console.error('Error parsing contentJson:', e);
+            p.contentJson = null;
+          }
+        }
+        
+        setPost(p);
+        setUser(p?.user || null);
+
+        const postDate = new Date(p?.createdAt || Date.now());
+        const formatted = postDate.toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        setFormattedDate(formatted);
+      } catch (e) {
+        if (cancelled) return;
+        const status = e?.response?.status;
+        if (status === 404) setErrorMsg('Không tìm thấy bài viết');
+        else setErrorMsg(e?.response?.data?.message || 'Không thể tải bài viết. Vui lòng thử lại.');
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  if (!post || !user) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-gray-600">Không tìm thấy bài viết</p>
+      <div className="min-h-screen bg-gray-100">
+        <SocialHeader />
+        <div className="pt-14 flex items-center justify-center min-h-screen">
+          <p className="text-gray-600">Đang tải bài viết...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <SocialHeader />
+        <div className="pt-14 flex items-center justify-center min-h-screen">
+          <p className="text-gray-600">{errorMsg || 'Không tìm thấy bài viết'}</p>
+        </div>
       </div>
     );
   }
@@ -59,26 +108,28 @@ const PostDetail = () => {
         {/* Single white container for all content */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Thread Title */}
-          <div className="p-6 border-b border-gray-200">
-            <h1 className="text-3xl font-bold text-gray-900 leading-tight">
-              {post.title}
-            </h1>
-          </div>
+          {post.title && (
+            <div className="p-6">
+              <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+                {post.title}
+              </h1>
+            </div>
+          )}
 
           {/* Thread Info */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Link to={`/user/${user.id}`} className="block">
+                <Link to={user?.id ? `/user/${user.id}` : '#'} className="block">
                   <div 
                     className="w-12 h-12 rounded-full border-2 border-blue-500 bg-cover bg-center"
-                    style={{ backgroundImage: `url(${user.avatarUrl})` }}
+                    style={{ backgroundImage: `url(${user?.avatarUrl || ''})` }}
                   />
                 </Link>
                 <div>
                   <div className="flex items-center gap-2">
-                    <Link to={`/user/${user.id}`} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                      {user.userName}
+                    <Link to={user?.id ? `/user/${user.id}` : '#'} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                      {user?.fullName || user?.userName || 'Người dùng'}
                     </Link>
                     <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
                       + Theo dõi
@@ -112,13 +163,19 @@ const PostDetail = () => {
           {/* Article Content */}
           <article className="p-6 border-b border-gray-200">
             <div className="prose max-w-none">
-              <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
-                {post.content.split('\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
+              {post?.contentJson && typeof post.contentJson === 'object' ? (
+                <TiptapViewer contentJson={post.contentJson} />
+              ) : post?.contentText || post?.content ? (
+                <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
+                  {(post.contentText || post.content || '').split('\n').map((paragraph, index) => (
+                    <p key={index} className="mb-4">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-gray-500 italic">Không có nội dung</div>
+              )}
             </div>
           </article>
 
