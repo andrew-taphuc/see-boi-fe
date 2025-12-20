@@ -1,0 +1,61 @@
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror ul li,
+.ProseMirror ol li {
+  margin: 0.25rem 0;
+  display: list-item;
+}
+
+.ProseMirror ul li p,
+.ProseMirror ol li p {
+  margin: 0;
+  display: inline;
+}
+
+.ProseMirror blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  font-style: italic;
+  color: #4b5563;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Text align styles */
+.ProseMirror [style*="text-align: left"] {
+  text-align: left;
+}
+
+.ProseMirror [style*="text-align: center"] {
+  text-align: center;
+}
+
+.ProseMirror [style*="text-align: right"] {
+  text-align: right;
+}
+
+.ProseMirror [style*="text-align: justify"] {
+  text-align: justify;
+}
+

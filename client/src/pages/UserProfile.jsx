@@ -1,13 +1,13 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Edit2, UserPlus, Check, Settings, Calendar, Users, Save, Loader2 } from 'lucide-react';
-import postsData from '../data/posts.json';
+import { Edit2, UserPlus, Check, Settings, Calendar, Users, Save, Loader2, PenSquare } from 'lucide-react';
 import SocialHeader from '../components/socialMedia/SocialHeader';
 import axiosInstance from '../utils/axiosInstance';
 
 const UserProfile = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { currentUser, updateCurrentUser } = useAuth();
   const [user, setUser] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
@@ -39,6 +39,18 @@ const UserProfile = () => {
     return `${yyyy}-${mm}-${dd}`;
   };
 
+  const fetchPostsByUserId = async (userId) => {
+    const res = await axiosInstance.get('/post');
+    const all = Array.isArray(res.data) ? res.data : [];
+    const filtered = all.filter((p) => {
+      if (p?.userId != null) return Number(p.userId) === Number(userId);
+      if (p?.user?.id != null) return Number(p.user.id) === Number(userId);
+      return false;
+    });
+    filtered.sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0));
+    return filtered;
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -60,10 +72,8 @@ const UserProfile = () => {
         // Sync ngay vào context/localStorage để header đổi avatar/name
         updateCurrentUser?.(me);
 
-        // Posts vẫn dùng mock hiện tại (chưa có backend posts)
-        const posts = postsData.filter((p) => p.userId === me?.id);
-        posts.sort((a, b) => new Date(b.time) - new Date(a.time));
-        setUserPosts(posts);
+        const posts = await fetchPostsByUserId(me?.id);
+        if (!cancelled) setUserPosts(posts);
       } catch (e) {
         if (cancelled) return;
         setErrorMsg(
@@ -96,9 +106,8 @@ const UserProfile = () => {
         setEditedBirthday(normalizeDateToInput(u?.birthday));
         setEditedGender(u?.gender || '');
 
-        const posts = postsData.filter((p) => p.userId === u?.id);
-        posts.sort((a, b) => new Date(b.time) - new Date(a.time));
-        setUserPosts(posts);
+        const posts = await fetchPostsByUserId(u?.id);
+        if (!cancelled) setUserPosts(posts);
       } catch (e) {
         if (cancelled) return;
         const status = e?.response?.status;
@@ -175,6 +184,17 @@ const UserProfile = () => {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
+    });
+  };
+
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -288,6 +308,13 @@ const UserProfile = () => {
                   <div className="flex gap-2">
                     {isOwnProfile ? (
                       <>
+                        <button
+                          onClick={() => navigate('/post/create')}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        >
+                          <PenSquare size={18} />
+                          <span>Đăng bài</span>
+                        </button>
                         <button
                           onClick={() => setIsEditMode(!isEditMode)}
                           className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
@@ -458,24 +485,17 @@ const UserProfile = () => {
                   className="block border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 hover:bg-gray-50 -mx-6 px-6 py-2 rounded-lg transition-colors"
                 >
                   <div className="flex gap-4">
-                    {post.image && (
-                      <div className="flex-shrink-0 w-32 h-24 rounded-lg overflow-hidden">
-                        <img
-                          src={post.image}
-                          alt={post.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-                        {post.title}
+                        {post.title || '(Không có tiêu đề)'}
                       </h3>
-                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                        {post.content}
-                      </p>
+                      {(post.contentText || post.content) && (
+                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+                          {post.contentText || post.content}
+                        </p>
+                      )}
                       <p className="text-xs text-gray-500">
-                        {formatDate(post.time)}
+                        {post.createdAt ? formatDateTime(post.createdAt) : ''}
                       </p>
                     </div>
                   </div>
