@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import heroImage from "../assets/hero-tarot.jpg";
 import tarotCard1 from "../assets/tarot-card-1.jpg";
 import tarotCard2 from "../assets/tarot-card-2.jpg";
@@ -10,6 +11,8 @@ import Login from "../components/Login&Register/Login";
 import Register from "../components/Login&Register/Register";
 
 const LandingPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -24,7 +27,26 @@ const LandingPage = () => {
   const [popupType, setPopupType] = useState(null);
   const openLogin = () => setPopupType("login");
   const openRegister = () => setPopupType("register");
-  const closePopup = () => setPopupType(null);
+  const closePopup = () => {
+    setPopupType(null);
+    // Xóa query param khi đóng popup
+    if (searchParams.get('login')) {
+      searchParams.delete('login');
+      setSearchParams(searchParams, { replace: true });
+    }
+  };
+
+  // Tự động mở popup login khi có query param ?login=true
+  useEffect(() => {
+    const loginParam = searchParams.get('login');
+    if (loginParam === 'true' && popupType !== 'login') {
+      setPopupType("login");
+      // Xóa query param sau khi mở popup để URL sạch
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete('login');
+      setSearchParams(newSearchParams, { replace: true });
+    }
+  }, [searchParams, popupType, setSearchParams]);
 
   return (
     <div className="min-h-screen bg-[#E8DCC4]">
