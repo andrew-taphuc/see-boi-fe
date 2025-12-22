@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { isTokenExpired } from '../utils/jwtUtils';
 
 const AuthContext = createContext();
 
@@ -19,6 +20,15 @@ export const AuthProvider = ({ children }) => {
     const saved = localStorage.getItem('currentUser');
     
     if (token && saved) {
+      // Kiểm tra token expiration trước khi restore session
+      if (isTokenExpired(token)) {
+        // Token đã hết hạn, xóa và logout
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+        setCurrentUser(null);
+        return;
+      }
+      
       try {
         const parsedUser = JSON.parse(saved);
         setCurrentUser(parsedUser);
@@ -33,6 +43,23 @@ export const AuthProvider = ({ children }) => {
     // Không có token hợp lệ => chưa đăng nhập
     setCurrentUser(null);
   }, []);
+
+  // Periodic check token expiration (mỗi 1 phút)
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const checkInterval = setInterval(() => {
+      const token = localStorage.getItem('token');
+      if (token && isTokenExpired(token)) {
+        // Token hết hạn, logout
+        setCurrentUser(null);
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+      }
+    }, 60 * 1000); // Check mỗi 1 phút
+
+    return () => clearInterval(checkInterval);
+  }, [currentUser]);
 
   // Login từ API (với token)
   const loginAPI = useCallback((user, token) => {

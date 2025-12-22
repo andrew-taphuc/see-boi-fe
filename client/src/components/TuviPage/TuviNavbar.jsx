@@ -9,6 +9,7 @@ import {
   Menu,
   X,
 } from "lucide-react"; // Đã thêm Menu, X
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
   const menuItems = [
@@ -20,6 +21,7 @@ const Navbar = () => {
   ];
 
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // --- STATE & REF CHO AVATAR ---
   const [isAvatarOpen, setIsAvatarOpen] = useState(false);
@@ -141,7 +143,11 @@ const Navbar = () => {
                   </div>
                   <div className="py-2">
                     <button
-                      onClick={() => navigate("/login")}
+                      onClick={() => {
+                        logout();
+                        setIsAvatarOpen(false);
+                        navigate("/?login=true");
+                      }}
                       className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
                       <LogOut size={18} /> Đăng xuất
