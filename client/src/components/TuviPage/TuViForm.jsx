@@ -1,7 +1,8 @@
 // components/HoroscopeForm.jsx
 import React, { useState } from "react";
 import TuviResult from "./TuviResult";
-import laSoMau from "../../data/mockHoroscopeData.json";
+import { createTuViChart, getTuViChart } from "../../utils/tuviService";
+import { adaptBackendToFrontend } from "../../utils/tuviDataAdapter";
 
 const TuViForm = () => {
   const currentYear = new Date().getFullYear();
@@ -23,6 +24,9 @@ const TuViForm = () => {
 
   const [error, setError] = useState("");
   const [showResult, setShowResult] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [chartData, setChartData] = useState(null);
+  const [oldChartId, setOldChartId] = useState("");
 
   // 2. HANDLER
   const handleChange = (e) => {
@@ -42,8 +46,47 @@ const TuViForm = () => {
     return day <= daysInMonth;
   };
 
-  // 4. SUBMIT
-  const handleSubmit = () => {
+  // 4. XEM LẠI LÁ SỐ CŨ
+  const handleLoadOldChart = async () => {
+    if (!oldChartId.trim()) {
+      setError("Vui lòng nhập ID lá số!");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      console.log("Đang tải lá số ID:", oldChartId);
+      const response = await getTuViChart(oldChartId);
+      console.log("Lá số cũ:", response);
+
+      // Backend trả về {input, houses, aspects, interpretationAI}
+      // Cần wrap vào {output: ...} để adapter xử lý
+      const wrappedData = {
+        chartId: parseInt(oldChartId),
+        output: response,
+      };
+
+      const adaptedData = adaptBackendToFrontend(wrappedData, {
+        name: response.input?.birthDate || "Lá số cũ",
+        ...formData,
+      });
+
+      console.log("Dữ liệu sau adapter:", adaptedData);
+      setChartData(adaptedData);
+      setShowResult(true);
+    } catch (err) {
+      console.error("Lỗi khi tải lá số:", err);
+      setError(err.message || "Không tìm thấy lá số!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 5. SUBMIT - GỌI API
+  const handleSubmit = async () => {
+    // Validate form
     if (!formData.name.trim()) {
       setError("Vui lòng nhập họ tên!");
       return;
@@ -58,7 +101,45 @@ const TuViForm = () => {
       );
       return;
     }
-    setShowResult(true);
+
+    // Bắt đầu gọi API
+    setLoading(true);
+    setError("");
+
+    try {
+      // Chuyển dữ liệu sang format Backend yêu cầu
+      const apiData = {
+        birthDate: `${formData.year}-${String(formData.month).padStart(
+          2,
+          "0"
+        )}-${String(formData.day).padStart(2, "0")}`,
+        birthHour: formData.hour,
+        gender: formData.gender,
+        birthPlace: "", // Có thể thêm field này vào form sau
+        isLunar: formData.calendarType === "am", // true nếu chọn âm lịch
+      };
+
+      console.log("Đang gửi dữ liệu lên Backend:", apiData);
+
+      // Gọi API tạo lá số
+      const response = await createTuViChart(apiData);
+      console.log("Nhận được kết quả từ Backend:", response);
+
+      // Chuyển đổi format Backend → Frontend
+      const adaptedData = adaptBackendToFrontend(response, formData);
+
+      console.log("Dữ liệu sau khi chuyển đổi:", adaptedData);
+
+      // Lưu kết quả và hiển thị
+      setChartData(adaptedData);
+      setShowResult(true);
+    } catch (err) {
+      // Xử lý lỗi
+      console.error("Lỗi khi tạo lá số:", err);
+      setError(err.message || "Có lỗi xảy ra. Vui lòng thử lại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // DATA ARRAYS
@@ -73,7 +154,7 @@ const TuViForm = () => {
       <TuviResult
         isOpen={showResult}
         onClose={() => setShowResult(false)}
-        data={laSoMau}
+        data={chartData}
         userInfo={formData}
       />
 
@@ -194,7 +275,7 @@ const TuViForm = () => {
                 name="timeZone"
                 value={formData.timeZone}
                 onChange={handleChange}
-                className="bg-gray-900 border border-gray-600 rounded p-3 text-white focus:border-yellow-500 text-sm md:text-base"
+                className="bg-gray-900 border border-gray-600 rounded p-3 text-white focus:border-yellow-500 text-sm md:text-base cursor-pointer"
               >
                 <option value="7">GMT +7 (VN)</option>
                 <option value="0">GMT +0</option>
@@ -259,49 +340,51 @@ const TuViForm = () => {
             </div>
           </div>
 
-          {/* --- NĂM XEM & THÁNG XEM --- */}
-          {/* THAY ĐỔI 6: Xếp chồng trên mobile */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="font-semibold text-yellow-200 text-sm md:text-base">
-                Năm xem
-              </label>
-              <input
-                type="number"
-                name="viewYear"
-                value={formData.viewYear}
-                onChange={handleChange}
-                className="bg-gray-900 border border-gray-600 rounded p-3 text-white focus:border-yellow-500 text-sm md:text-base"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-semibold text-yellow-200 text-sm md:text-base">
-                Tháng xem (Âm lịch)
-              </label>
-              <select
-                name="viewMonth"
-                value={formData.viewMonth}
-                onChange={handleChange}
-                className="bg-gray-900 border border-gray-600 rounded p-3 text-white focus:border-yellow-500 cursor-pointer text-sm md:text-base"
-              >
-                {months.map((month) => (
-                  <option key={month} value={month}>
-                    Tháng {month}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
           {/* --- NÚT SUBMIT --- */}
           <div className="flex justify-center mt-6 md:mt-8">
             <button
               type="button"
               onClick={handleSubmit}
-              className="w-full sm:w-auto px-10 py-3 bg-yellow-700 hover:bg-yellow-600 text-white font-bold text-base md:text-lg rounded shadow-lg border-2 border-yellow-500 uppercase transition-transform transform hover:scale-105 active:scale-95 cursor-pointer"
+              disabled={loading}
+              className={`w-full sm:w-auto px-10 py-3 font-bold text-base md:text-lg rounded shadow-lg border-2 uppercase transition-transform transform ${
+                loading
+                  ? "bg-gray-600 border-gray-500 text-gray-300 cursor-not-allowed"
+                  : "bg-yellow-700 hover:bg-yellow-600 text-white border-yellow-500 hover:scale-105 active:scale-95 cursor-pointer"
+              }`}
             >
-              Lập lá số
+              {loading ? "Đang tính toán..." : "Lập lá số"}
             </button>
+          </div>
+
+          {/* === PHẦN XEM LẠI LÁ SỐ CŨ === */}
+          <div className="mt-8 pt-6 border-t-2 border-yellow-700/30">
+            <h3 className="text-center text-yellow-200 font-bold text-lg mb-4">
+              Hoặc xem lại lá số đã lập
+            </h3>
+            <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+              <input
+                type="text"
+                placeholder="Nhập ID lá số (vd: 18)"
+                value={oldChartId}
+                onChange={(e) => setOldChartId(e.target.value)}
+                className="w-full sm:w-64 bg-gray-900 border border-gray-600 rounded p-3 text-white focus:border-yellow-500 text-sm md:text-base"
+              />
+              <button
+                type="button"
+                onClick={handleLoadOldChart}
+                disabled={loading}
+                className={`w-full sm:w-auto px-8 py-3 font-bold text-base rounded shadow-lg border-2 uppercase transition-transform transform ${
+                  loading
+                    ? "bg-gray-600 border-gray-500 text-gray-300 cursor-not-allowed"
+                    : "bg-blue-700 hover:bg-blue-600 text-white border-blue-500 hover:scale-105 active:scale-95 cursor-pointer"
+                }`}
+              >
+                {loading ? "Đang tải..." : "Xem"}
+              </button>
+            </div>
+            <p className="text-center text-yellow-400/60 text-xs mt-2">
+              💡 Tip: ID lá số hiển thị ở góc trên sau khi lập xong
+            </p>
           </div>
         </form>
       </div>
