@@ -11,8 +11,8 @@ import {
   Reply,
   ChevronDown,
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-import axiosInstance from "../../utils/axiosInstance";
+import { useAuth } from "@context/AuthContext";
+import axiosInstance from "@utils/axiosInstance";
 import CommentInput from "./CommentInput";
 
 const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {

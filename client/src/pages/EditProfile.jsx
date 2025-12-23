@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
-import SocialHeader from '../components/socialMedia/SocialHeader';
-import axiosInstance from '../utils/axiosInstance';
+import SocialHeader from '@components/socialMedia/SocialHeader';
+import axiosInstance from '@utils/axiosInstance';
 
 /**
  * Trang cập nhật thông tin người dùng
