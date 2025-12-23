@@ -14,7 +14,7 @@ const FileUploadInput = ({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+        accept="image/jpeg,image/jpg,image/png"
         onChange={onFileSelect}
         disabled={disabled}
         className="hidden"

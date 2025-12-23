@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
-import SocialHeader from '@components/socialMedia/SocialHeader';
-import axiosInstance from '@utils/axiosInstance';
-import ProtectedRoute from '@components/common/ProtectedRoute';
+import SocialHeader from '../components/socialMedia/SocialHeader';
+import axiosInstance from '../utils/axiosInstance';
 
 /**
  * Trang cập nhật thông tin người dùng
@@ -166,11 +165,10 @@ const EditProfile = () => {
   }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-100">
-        <SocialHeader />
+    <div className="min-h-screen bg-gray-100">
+      <SocialHeader />
 
-        <div className="pt-14 max-w-3xl mx-auto px-4 py-8">
+      <div className="pt-14 max-w-3xl mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-6 flex items-center gap-4">
             <button
@@ -347,7 +345,6 @@ const EditProfile = () => {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   );
 };
 

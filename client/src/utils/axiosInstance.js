@@ -13,9 +13,8 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     
-    // Nếu là FormData, không set Content-Type (axios sẽ tự động set với boundary)
+    // Xử lý FormData: xóa Content-Type để axios tự động set với boundary
     if (config.data instanceof FormData) {
-      // Xóa Content-Type header để browser tự động set với boundary
       delete config.headers['Content-Type'];
     }
     
