@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "../components/TuviPage/TuviNavbar";
-import TuViForm from "../components/TuviPage/TuViForm";
-import TuViIntro from "../components/TuviPage/TuViIntro";
-import bgImage from "../assets/TuViBackground.jpg";
-import TuviFooter from "../components/TuviPage/TuviFooter";
+import Navbar from "@components/TuviPage/TuviNavbar";
+import TuViForm from "@components/TuviPage/TuViForm";
+import TuViIntro from "@components/TuviPage/TuViIntro";
+import bgImage from "@assets/TuViBackground.jpg";
+import TuviFooter from "@components/TuviPage/TuviFooter";
 
 const TuVi = () => {
   return (

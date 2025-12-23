@@ -25,16 +25,6 @@ const LeftSidebar = () => {
         </button>
         
         <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
-          <Video className="text-blue-500" size={24} />
-          <span>Watch</span>
-        </button>
-        
-        <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
-          <ShoppingBag className="text-blue-400" size={24} />
-          <span>Marketplace</span>
-        </button>
-        
-        <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
           <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
           <span>Kỷ niệm</span>
         </button>
@@ -42,20 +32,6 @@ const LeftSidebar = () => {
         <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
           <div className="w-6 h-6 bg-purple-500 rounded-full"></div>
           <span>Đã lưu</span>
-        </button>
-        
-        <hr className="my-2" />
-        
-        <h3 className="text-gray-500 font-semibold px-2 mt-4">Lối tắt của bạn</h3>
-        
-        <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
-          <div className="w-9 h-9 bg-blue-100 rounded-lg"></div>
-          <span>Nhóm React Vietnam</span>
-        </button>
-        
-        <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
-          <div className="w-9 h-9 bg-green-100 rounded-lg"></div>
-          <span>Developer Community</span>
         </button>
       </div>
     </aside>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Share2, ThumbsUp, MessageSquare, Heart } from 'lucide-react';
-import SocialHeader from '../components/socialMedia/SocialHeader';
-import axiosInstance from '../utils/axiosInstance';
-import TiptapViewer from '../components/richtext/TiptapViewer';
+import SocialHeader from '@components/socialMedia/SocialHeader';
+import axiosInstance from '@utils/axiosInstance';
+import TiptapViewer from '@components/richtext/TiptapViewer';
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -30,7 +30,7 @@ const PostDetail = () => {
         const res = await axiosInstance.get(`/post/${postId}`);
         if (cancelled) return;
         const p = res.data;
-        
+
         // Parse contentJson nếu là string
         if (p?.contentJson && typeof p.contentJson === 'string') {
           try {
@@ -40,7 +40,7 @@ const PostDetail = () => {
             p.contentJson = null;
           }
         }
-        
+
         setPost(p);
         setUser(p?.user || null);
 
@@ -94,7 +94,7 @@ const PostDetail = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <SocialHeader />
-      
+
       <div className="pt-14 max-w-4xl mx-auto px-4 py-6">
         {/* Back button */}
         <button
@@ -202,6 +202,9 @@ const PostDetail = () => {
               </button>
             </div>
           </div>
+
+          {/* Comments Section */}
+          <CommentList postId={id} />
         </div>
       </div>
     </div>
@@ -209,4 +212,3 @@ const PostDetail = () => {
 };
 
 export default PostDetail;
-

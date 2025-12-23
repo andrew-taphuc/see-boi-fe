@@ -4,6 +4,7 @@ import TuviResult from "./TuviResult";
 import { createTuViChart, getTuViChart } from "../../utils/tuviService";
 import { adaptBackendToFrontend } from "../../utils/tuviDataAdapter";
 
+
 const TuViForm = () => {
   const currentYear = new Date().getFullYear();
 
