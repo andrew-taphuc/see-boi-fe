@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import axiosInstance from "../../utils/axiosInstance";
+import { useAuth } from "@context/AuthContext";
+import axiosInstance from "@utils/axiosInstance";
 
 // Nhận props: onClose (để tắt popup), onSwitchToRegister (để chuyển sang đăng ký)
 const Login = ({ onClose, onSwitchToRegister }) => {

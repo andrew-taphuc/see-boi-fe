@@ -1,6 +1,6 @@
 import { useState } from "react";
-import AddCircle from "../../assets/nhantuong/add_circle.svg";
-import Minus from "../../assets/nhantuong/minus.svg";
+import AddCircle from "@assets/nhantuong/add_circle.svg";
+import Minus from "@assets/nhantuong/minus.svg";
 
 const FAQ = () => {
   const [activeQuestion, setActiveQuestion] = useState(null);

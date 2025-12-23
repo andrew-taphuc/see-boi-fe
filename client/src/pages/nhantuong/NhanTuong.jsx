@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
-import Header from "../../components/nhantuong/Header";
-import HeroSection from "../../components/nhantuong/HeroSection";
-import ButtonInfo from "../../assets/nhantuong/button_info.svg";
-import Hook from "../../assets/nhantuong/hook.svg";
-import MenuBackground from "../../assets/nhantuong/menu_background.svg";
-import BackgroundMenu from "../../assets/nhantuong/background_menu.svg";
-import MenuIcon from "../../assets/nhantuong/menu.svg";
-import CloseIcon from "../../assets/nhantuong/close2.svg";
-import FaceAnalysisForm from "../../components/nhantuong/FaceAnalysisForm";
-import Features from "../../components/nhantuong/Features";
-import FAQ from "../../components/nhantuong/FAQ";
-import Footer from "../../components/nhantuong/Footer";
-import ImageBackground from "../../assets/nhantuong/bg.jpg";
-import ImageBackground2 from "../../assets/nhantuong/pattern7.png";
-import BackToTop from "../../assets/nhantuong/gps-navigation.png";
-import BtnBackground from "../../assets/nhantuong/btn.svg";
+import Header from "@components/nhantuong/Header";
+import HeroSection from "@components/nhantuong/HeroSection";
+import ButtonInfo from "@assets/nhantuong/button_info.svg";
+import Hook from "@assets/nhantuong/hook.svg";
+import MenuBackground from "@assets/nhantuong/menu_background.svg";
+import BackgroundMenu from "@assets/nhantuong/background_menu.svg";
+import MenuIcon from "@assets/nhantuong/menu.svg";
+import CloseIcon from "@assets/nhantuong/close2.svg";
+import FaceAnalysisForm from "@components/nhantuong/FaceAnalysisForm";
+import Features from "@components/nhantuong/Features";
+import FAQ from "@components/nhantuong/FAQ";
+import Footer from "@components/nhantuong/Footer";
+import ImageBackground from "@assets/nhantuong/bg.jpg";
+import ImageBackground2 from "@assets/nhantuong/pattern7.png";
+import BackToTop from "@assets/nhantuong/gps-navigation.png";
+import BtnBackground from "@assets/nhantuong/btn.svg";
 
 const NhanTuong = () => {
   const [isScrolled, setIsScrolled] = useState(false);

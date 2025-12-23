@@ -9,7 +9,7 @@ import {
   Menu,
   X,
 } from "lucide-react"; // Đã thêm Menu, X
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@context/AuthContext";
 
 const Navbar = () => {
   const menuItems = [

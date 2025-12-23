@@ -1,9 +1,16 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Edit2, UserPlus, Check, Settings, Calendar, Users, Save, Loader2, PenSquare } from 'lucide-react';
-import SocialHeader from '../components/socialMedia/SocialHeader';
-import axiosInstance from '../utils/axiosInstance';
+import { useAuth } from '@context/AuthContext';
+import { Edit2, UserPlus, Check, Settings, PenSquare } from 'lucide-react';
+import SocialHeader from '@components/socialMedia/SocialHeader';
+import AvatarUploadModal from '@components/avatarUpload/AvatarUploadModal';
+import AvatarViewModal from '@components/avatarUpload/AvatarViewModal';
+import ProfileAvatar from '@components/userProfile/ProfileAvatar';
+import AvatarMenu from '@components/userProfile/AvatarMenu';
+import ProfileEditForm from '@components/userProfile/ProfileEditForm';
+import ProfileStats from '@components/userProfile/ProfileStats';
+import UserPostsList from '@components/userProfile/UserPostsList';
+import axiosInstance from '@utils/axiosInstance';
 
 const UserProfile = () => {
   const { id } = useParams();
@@ -15,13 +22,15 @@ const UserProfile = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedBio, setEditedBio] = useState('');
   const [editedFullName, setEditedFullName] = useState('');
-  const [editedAvatarUrl, setEditedAvatarUrl] = useState('');
   const [editedBirthday, setEditedBirthday] = useState(''); // yyyy-MM-dd
   const [editedGender, setEditedGender] = useState(''); // MALE|FEMALE|OTHER|''
   const [isLoadingMe, setIsLoadingMe] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isAvatarViewModalOpen, setIsAvatarViewModalOpen] = useState(false);
   
   const resolvedId = useMemo(() => (id ? parseInt(id) : null), [id]);
   const isOwnProfile = useMemo(() => {
@@ -65,7 +74,6 @@ const UserProfile = () => {
         setUser(me);
         setEditedBio(me?.bio || '');
         setEditedFullName(me?.fullName || '');
-        setEditedAvatarUrl(me?.avatarUrl || '');
         setEditedBirthday(normalizeDateToInput(me?.birthday));
         setEditedGender(me?.gender || '');
 
@@ -102,7 +110,6 @@ const UserProfile = () => {
         setUser(u);
         setEditedBio(u?.bio || '');
         setEditedFullName(u?.fullName || '');
-        setEditedAvatarUrl(u?.avatarUrl || '');
         setEditedBirthday(normalizeDateToInput(u?.birthday));
         setEditedGender(u?.gender || '');
 
@@ -141,6 +148,25 @@ const UserProfile = () => {
     // TODO: Implement follow logic khi có backend
   };
 
+  const handleAvatarUpdateSuccess = (updatedUser) => {
+    setUser(updatedUser);
+    setSuccessMsg('Cập nhật ảnh đại diện thành công!');
+    // Reload user data để đảm bảo sync
+    if (isOwnProfile) {
+      const loadMe = async () => {
+        try {
+          const res = await axiosInstance.get('/user/me');
+          const me = res.data;
+          setUser(me);
+          updateCurrentUser?.(me);
+        } catch (e) {
+          console.error('Lỗi reload user data:', e);
+        }
+      };
+      loadMe();
+    }
+  };
+
   const handleSaveEdit = async () => {
     setErrorMsg('');
     setSuccessMsg('');
@@ -149,20 +175,31 @@ const UserProfile = () => {
 
     setIsSaving(true);
     try {
-      const payload = {
-        fullName: editedFullName?.trim() || null,
-        avatarUrl: editedAvatarUrl?.trim() || null,
-        birthday: editedBirthday ? new Date(editedBirthday).toISOString() : null,
-        gender: editedGender || null,
-        bio: editedBio?.trim() || null,
-      };
+      // Tạo FormData - API yêu cầu multipart/form-data
+      const formData = new FormData();
 
-      const res = await axiosInstance.patch('/user/me', payload);
+      // Chỉ thêm các trường có giá trị (không gửi avatarUrl vì API không chấp nhận string)
+      // Avatar chỉ có thể upload qua file, sử dụng AvatarUploadModal
+      if (editedFullName?.trim()) {
+        formData.append('fullName', editedFullName.trim());
+      }
+      if (editedBirthday) {
+        formData.append('birthday', editedBirthday);
+      }
+      if (editedGender) {
+        formData.append('gender', editedGender);
+      }
+      if (editedBio?.trim()) {
+        formData.append('bio', editedBio.trim());
+      }
+
+      // Gửi request với multipart/form-data
+      // Không set Content-Type header, axios sẽ tự động set với boundary phù hợp
+      const res = await axiosInstance.patch('/user/me', formData);
       const updated = res.data;
       setUser(updated);
       setEditedBio(updated?.bio || '');
       setEditedFullName(updated?.fullName || '');
-      setEditedAvatarUrl(updated?.avatarUrl || '');
       setEditedBirthday(normalizeDateToInput(updated?.birthday));
       setEditedGender(updated?.gender || '');
       updateCurrentUser?.(updated);
@@ -245,23 +282,25 @@ const UserProfile = () => {
             )}
             <div className="flex items-start gap-6">
               {/* Avatar */}
-              <div className="flex-shrink-0">
-                <div
-                  className="w-32 h-32 rounded-full border-4 border-blue-500 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${user.avatarUrl || ''})` }}
+              <div className="flex-shrink-0 relative">
+                <ProfileAvatar
+                  avatarUrl={user.avatarUrl}
+                  isOwnProfile={isOwnProfile}
+                  onAvatarClick={() => {
+                    if (isOwnProfile) {
+                      setIsAvatarMenuOpen(true);
+                    } else {
+                      setIsAvatarViewModalOpen(true);
+                    }
+                  }}
                 />
-                {isEditMode && isOwnProfile && (
-                  <div className="mt-3">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Avatar URL
-                    </label>
-                    <input
-                      value={editedAvatarUrl}
-                      onChange={(e) => setEditedAvatarUrl(e.target.value)}
-                      className="w-56 max-w-[14rem] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      placeholder="https://..."
-                    />
-                  </div>
+                {isOwnProfile && (
+                  <AvatarMenu
+                    isOpen={isAvatarMenuOpen}
+                    onClose={() => setIsAvatarMenuOpen(false)}
+                    onUploadClick={() => setIsAvatarModalOpen(true)}
+                    onViewClick={() => setIsAvatarViewModalOpen(true)}
+                  />
                 )}
               </div>
 
@@ -315,13 +354,13 @@ const UserProfile = () => {
                           <PenSquare size={18} />
                           <span>Đăng bài</span>
                         </button>
-                        <button
-                          onClick={() => setIsEditMode(!isEditMode)}
+                        <Link
+                          to="/user/edit"
                           className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                         >
                           <Edit2 size={18} />
                           <span>Chỉnh sửa</span>
-                        </button>
+                        </Link>
                         <Link
                           to="/settings"
                           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
@@ -357,70 +396,27 @@ const UserProfile = () => {
 
                 {/* Bio - Editable if own profile */}
                 {isEditMode && isOwnProfile ? (
-                  <div className="mb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Ngày sinh
-                        </label>
-                        <input
-                          type="date"
-                          value={editedBirthday}
-                          onChange={(e) => setEditedBirthday(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Giới tính
-                        </label>
-                        <select
-                          value={editedGender}
-                          onChange={(e) => setEditedGender(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
-                        >
-                          <option value="">Chưa chọn</option>
-                          <option value="MALE">Nam</option>
-                          <option value="FEMALE">Nữ</option>
-                          <option value="OTHER">Khác</option>
-                        </select>
-                      </div>
-                    </div>
-                    <textarea
-                      value={editedBio}
-                      onChange={(e) => setEditedBio(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                      rows="3"
-                      placeholder="Viết giới thiệu về bản thân..."
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={handleSaveEdit}
-                        disabled={isSaving}
-                        className={`px-4 py-1 rounded-lg transition-colors text-sm flex items-center gap-2 ${
-                          isSaving ? 'bg-blue-400 text-white cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
-                        }`}
-                      >
-                        {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                        <span>Lưu</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsEditMode(false);
-                          setEditedBio(user.bio || '');
-                          setEditedFullName(user.fullName || '');
-                          setEditedAvatarUrl(user.avatarUrl || '');
-                          setEditedBirthday(normalizeDateToInput(user.birthday));
-                          setEditedGender(user.gender || '');
-                          setErrorMsg('');
-                          setSuccessMsg('');
-                        }}
-                        className="px-4 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-                      >
-                        Hủy
-                      </button>
-                    </div>
-                  </div>
+                  <ProfileEditForm
+                    editedFullName={editedFullName}
+                    onFullNameChange={setEditedFullName}
+                    editedBirthday={editedBirthday}
+                    onBirthdayChange={setEditedBirthday}
+                    editedGender={editedGender}
+                    onGenderChange={setEditedGender}
+                    editedBio={editedBio}
+                    onBioChange={setEditedBio}
+                    isSaving={isSaving}
+                    onSave={handleSaveEdit}
+                    onCancel={() => {
+                      setIsEditMode(false);
+                      setEditedBio(user.bio || '');
+                      setEditedFullName(user.fullName || '');
+                      setEditedBirthday(normalizeDateToInput(user.birthday));
+                      setEditedGender(user.gender || '');
+                      setErrorMsg('');
+                      setSuccessMsg('');
+                    }}
+                  />
                 ) : (
                   user.bio && (
                     <p className="text-gray-700 mb-4 leading-relaxed">{user.bio}</p>
@@ -428,29 +424,11 @@ const UserProfile = () => {
                 )}
 
                 {/* Stats */}
-                <div className="flex items-center gap-6 pt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={18} className="text-gray-500" />
-                    <div>
-                      <span className="font-bold text-gray-900">{userPosts.length}</span>
-                      <span className="text-gray-600 ml-1">Bài viết</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users size={18} className="text-gray-500" />
-                    <div>
-                      <span className="font-bold text-gray-900">0</span>
-                      <span className="text-gray-600 ml-1">Người theo dõi</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users size={18} className="text-gray-500" />
-                    <div>
-                      <span className="font-bold text-gray-900">0</span>
-                      <span className="text-gray-600 ml-1">Đang theo dõi</span>
-                    </div>
-                  </div>
-                </div>
+                <ProfileStats
+                  postsCount={userPosts.length}
+                  followersCount={0}
+                  followingCount={0}
+                />
 
                 {/* Meta info */}
                 {isOwnProfile && (
@@ -471,40 +449,27 @@ const UserProfile = () => {
         {/* Posts Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Bài viết</h2>
-          
-          {userPosts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">Chưa có bài viết nào</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {userPosts.map((post) => (
-                <Link
-                  key={post.id}
-                  to={`/post/${post.id}`}
-                  className="block border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 hover:bg-gray-50 -mx-6 px-6 py-2 rounded-lg transition-colors"
-                >
-                  <div className="flex gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-                        {post.title || '(Không có tiêu đề)'}
-                      </h3>
-                      {(post.contentText || post.content) && (
-                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                          {post.contentText || post.content}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-500">
-                        {post.createdAt ? formatDateTime(post.createdAt) : ''}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          <UserPostsList posts={userPosts} formatDateTime={formatDateTime} />
         </div>
       </div>
+
+      {/* Avatar Upload Modal */}
+      {isOwnProfile && (
+        <AvatarUploadModal
+          isOpen={isAvatarModalOpen}
+          onClose={() => setIsAvatarModalOpen(false)}
+          currentAvatarUrl={user?.avatarUrl}
+          onSuccess={handleAvatarUpdateSuccess}
+        />
+      )}
+
+      {/* Avatar View Modal */}
+      <AvatarViewModal
+        isOpen={isAvatarViewModalOpen}
+        onClose={() => setIsAvatarViewModalOpen(false)}
+        avatarUrl={user?.avatarUrl}
+        userName={user?.userName || user?.fullName}
+      />
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, CalendarDays, Sparkles, Eye, Settings, LogOut, User, HelpCircle } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import ballLogo from '../../assets/ball.png';
+import { useAuth } from '@context/AuthContext';
+import ballLogo from '@assets/ball.png';
 
 const SocialHeader = () => {
   const location = useLocation();
