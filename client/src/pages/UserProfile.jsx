@@ -319,29 +319,11 @@ const UserProfile = () => {
                 )}
 
                 {/* Stats */}
-                <div className="flex items-center gap-6 pt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={18} className="text-gray-500" />
-                    <div>
-                      <span className="font-bold text-gray-900">{userPosts.length}</span>
-                      <span className="text-gray-600 ml-1">Bài viết</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users size={18} className="text-gray-500" />
-                    <div>
-                      <span className="font-bold text-gray-900">0</span>
-                      <span className="text-gray-600 ml-1">Người theo dõi</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users size={18} className="text-gray-500" />
-                    <div>
-                      <span className="font-bold text-gray-900">0</span>
-                      <span className="text-gray-600 ml-1">Đang theo dõi</span>
-                    </div>
-                  </div>
-                </div>
+                <ProfileStats
+                  postsCount={userPosts.length}
+                  followersCount={0}
+                  followingCount={0}
+                />
 
                 {/* Meta info */}
                 {isOwnProfile && (
@@ -362,38 +344,7 @@ const UserProfile = () => {
         {/* Posts Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Bài viết</h2>
-          
-          {userPosts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">Chưa có bài viết nào</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {userPosts.map((post) => (
-                <Link
-                  key={post.id}
-                  to={`/post/${post.id}`}
-                  className="block border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 hover:bg-gray-50 -mx-6 px-6 py-2 rounded-lg transition-colors"
-                >
-                  <div className="flex gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-                        {post.title || '(Không có tiêu đề)'}
-                      </h3>
-                      {(post.contentText || post.content) && (
-                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                          {post.contentText || post.content}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-500">
-                        {post.createdAt ? formatDateTime(post.createdAt) : ''}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          <UserPostsList posts={userPosts} formatDateTime={formatDateTime} />
         </div>
       </div>
 

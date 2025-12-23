@@ -1,7 +1,7 @@
 // components/HoroscopeForm.jsx
 import React, { useState } from "react";
 import TuviResult from "./TuviResult";
-import laSoMau from "../../data/mockHoroscopeData.json";
+import laSoMau from "@/data/mockHoroscopeData.json";
 
 const TuViForm = () => {
   const currentYear = new Date().getFullYear();

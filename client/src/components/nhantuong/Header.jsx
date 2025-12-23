@@ -1,6 +1,6 @@
-import Logo1 from "../../assets/nhantuong/introLogo1.svg";
-import Logo2 from "../../assets/nhantuong/introLogo2.svg";
-import MenuBackground from "../../assets/nhantuong/menu_background.svg";
+import Logo1 from "@assets/nhantuong/introLogo1.svg";
+import Logo2 from "@assets/nhantuong/introLogo2.svg";
+import MenuBackground from "@assets/nhantuong/menu_background.svg";
 
 const Header = () => {
   const menuItems = [

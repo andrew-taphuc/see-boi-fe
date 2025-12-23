@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import ThemeToggle from "../ThemeToggle";
+import ThemeToggle from "@components/common/ThemeToggle";
 
 const Header = ({
   isScrolled,

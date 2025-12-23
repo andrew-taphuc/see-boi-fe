@@ -1,8 +1,8 @@
 import React from 'react';
-import SocialHeader from '../components/socialMedia/SocialHeader';
-import LeftSidebar from '../components/socialMedia/content-left/LeftSidebar';
-import CenterContent from '../components/socialMedia/content-center/CenterContent';
-import RightSidebar from '../components/socialMedia/content-right/RightSidebar';
+import SocialHeader from '@components/socialMedia/SocialHeader';
+import LeftSidebar from '@components/socialMedia/content-left/LeftSidebar';
+import CenterContent from '@components/socialMedia/content-center/CenterContent';
+import RightSidebar from '@components/socialMedia/content-right/RightSidebar';
 
 const SocialMedia = () => {
   return (
