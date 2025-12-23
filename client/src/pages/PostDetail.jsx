@@ -4,6 +4,7 @@ import { ArrowLeft, Share2, ThumbsUp, MessageSquare, Heart } from 'lucide-react'
 import SocialHeader from '@components/socialMedia/SocialHeader';
 import axiosInstance from '@utils/axiosInstance';
 import TiptapViewer from '@components/richtext/TiptapViewer';
+import CommentList from '@components/comments/CommentList';
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -21,6 +22,7 @@ const PostDetail = () => {
       const postId = parseInt(id);
       if (!postId || Number.isNaN(postId)) {
         setErrorMsg('ID bài viết không hợp lệ');
+        setIsLoading(false);
         return;
       }
 
@@ -204,7 +206,7 @@ const PostDetail = () => {
           </div>
 
           {/* Comments Section */}
-          <CommentList postId={id} />
+          <CommentList postId={parseInt(id)} />
         </div>
       </div>
     </div>
