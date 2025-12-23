@@ -101,6 +101,8 @@ const UserProfile = () => {
       const userId = parseInt(id);
       if (!userId || Number.isNaN(userId)) {
         setUser(null);
+        setErrorMsg('ID người dùng không hợp lệ');
+        setIsLoadingMe(false);
         return;
       }
 
@@ -453,6 +455,8 @@ const UserProfile = () => {
         onClose={() => setFollowModalOpen(false)}
         userId={user?.id}
         initialTab={followModalInitialTab}
+      />
+
       {/* Avatar Upload Modal */}
       {isOwnProfile && (
         <AvatarUploadModal
