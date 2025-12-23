@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Send, UserX } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@context/AuthContext";
 
 const CommentInput = ({
   onSubmit,

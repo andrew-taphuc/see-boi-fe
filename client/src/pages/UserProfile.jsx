@@ -1,12 +1,14 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
 import { Edit2, UserPlus, Check, Settings, Calendar, Users, PenSquare, Camera, Loader2 } from 'lucide-react';
-import SocialHeader from '../components/socialMedia/SocialHeader';
-import AvatarUploadModal from '../components/AvatarUploadModal';
-import AvatarViewModal from '../components/AvatarViewModal';
-import AvatarMenu from '../components/userProfile/AvatarMenu';
-import axiosInstance from '../utils/axiosInstance';
+import SocialHeader from '@components/socialMedia/SocialHeader';
+import AvatarUploadModal from '@components/AvatarUploadModal';
+import AvatarViewModal from '@components/AvatarViewModal';
+import AvatarMenu from '@components/userProfile/AvatarMenu';
+import ProfileStats from '@components/userProfile/ProfileStats';
+import UserPostsList from '@components/userProfile/UserPostsList';
+import axiosInstance from '@utils/axiosInstance';
 
 const UserProfile = () => {
   const { id } = useParams();
@@ -113,7 +115,7 @@ const UserProfile = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, isOwnProfile, updateCurrentUser]);
+  }, [id, isOwnProfile]);
 
   const handleFollow = () => {
     setIsFollowing(!isFollowing);

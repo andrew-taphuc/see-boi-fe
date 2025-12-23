@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { MessageSquare, ChevronDown, ArrowUpDown } from "lucide-react";
 import CommentItem from "./CommentItem";
 import CommentInput from "./CommentInput";
-import axiosInstance from "../../utils/axiosInstance";
-import { getSocket } from "../../utils/socket";
+import axiosInstance from "@utils/axiosInstance";
+import { getSocket } from "@utils/socket";
 
 const CommentList = ({ postId }) => {
   const [comments, setComments] = useState([]);
