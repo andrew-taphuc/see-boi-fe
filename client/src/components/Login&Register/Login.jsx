@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import axiosInstance from "../../utils/axiosInstance";
+import { useAuth } from "@context/AuthContext";
+import axiosInstance from "@utils/axiosInstance";
 
 // Nhận props: onClose (để tắt popup), onSwitchToRegister (để chuyển sang đăng ký)
 const Login = ({ onClose, onSwitchToRegister }) => {
@@ -40,8 +40,13 @@ const Login = ({ onClose, onSwitchToRegister }) => {
           onClose();
         }
         
-        // Redirect đến socialmedia page
-        navigate("/socialmedia");
+        // Nếu thiếu avatarUrl, birthday hoặc gender, redirect đến trang cập nhật thông tin cá nhân
+        if (!user.avatarUrl || !user.birthday || !user.gender) {
+          navigate("/user/edit");
+        } else {
+          // Redirect đến socialmedia page
+          navigate("/socialmedia");
+        }
       }
     } catch (err) {
       // Xử lý các loại lỗi khác nhau theo status codes:

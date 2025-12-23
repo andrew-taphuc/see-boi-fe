@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Send, ArrowLeft } from 'lucide-react';
-import SocialHeader from '../components/socialMedia/SocialHeader';
-import axiosInstance from '../utils/axiosInstance';
-import TiptapEditor from '../components/richtext/TiptapEditor';
-import PollForm from '../components/posts/PollForm';
-import PrivacyButton from '../components/posts/PrivacyButton';
-import ImageUpload from '../components/posts/ImageUpload';
+import SocialHeader from '@components/socialMedia/SocialHeader';
+import axiosInstance from '@utils/axiosInstance';
+import TiptapEditor from '@components/richtext/TiptapEditor';
+import PollForm from '@components/posts/PollForm';
+import PrivacyButton from '@components/posts/PrivacyButton';
+import ImageUpload from '@components/posts/ImageUpload';
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -126,15 +126,9 @@ const CreatePost = () => {
     setIsSubmitting(true);
     try {
       const payload = buildPayload(draft);
-      const config = imageFile
-        ? {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          }
-        : {};
       
-      const res = await axiosInstance.post('/post', payload, config);
+      // Không cần set Content-Type header, axiosInstance sẽ tự động xử lý FormData
+      const res = await axiosInstance.post('/post', payload);
       // Sau khi tạo xong: điều hướng về chi tiết bài viết
       navigate(`/post/${res.data?.id}`);
     } catch (e) {

@@ -1,10 +1,15 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
-import { Edit2, UserPlus, Check, Settings, Calendar, Users, Save, Loader2, PenSquare } from 'lucide-react';
+import { Edit2, UserPlus, Check, Settings, Calendar, Users, Save, Loader2, PenSquare, Camera } from 'lucide-react';
 import SocialHeader from '@components/socialMedia/SocialHeader';
 import FollowButton from '@components/userProfile/FollowButton';
 import FollowListModal from '@components/userProfile/FollowListModal';
+import AvatarUploadModal from '@components/AvatarUploadModal';
+import AvatarViewModal from '@components/AvatarViewModal';
+import AvatarMenu from '@components/userProfile/AvatarMenu';
+import ProfileStats from '@components/userProfile/ProfileStats';
+import UserPostsList from '@components/userProfile/UserPostsList';
 import axiosInstance from '@utils/axiosInstance';
 
 const UserProfile = () => {
@@ -23,27 +28,19 @@ const UserProfile = () => {
   const [editedBirthday, setEditedBirthday] = useState(''); // yyyy-MM-dd
   const [editedGender, setEditedGender] = useState(''); // MALE|FEMALE|OTHER|''
   const [isLoadingMe, setIsLoadingMe] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [followModalOpen, setFollowModalOpen] = useState(false);
   const [followModalInitialTab, setFollowModalInitialTab] = useState('followers'); // 'followers' or 'following'
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isAvatarViewModalOpen, setIsAvatarViewModalOpen] = useState(false);
+  const [isAvatarMenuOpen, setIsAvatarMenuOpen] = useState(false);
   
   const resolvedId = useMemo(() => (id ? parseInt(id) : null), [id]);
   const isOwnProfile = useMemo(() => {
     if (!currentUser || !resolvedId) return false;
     return currentUser.id === resolvedId;
   }, [currentUser, resolvedId]);
-
-  const normalizeDateToInput = (value) => {
-    if (!value) return '';
-    const d = new Date(value);
-    if (Number.isNaN(d.getTime())) return '';
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  };
 
   const fetchPostsByUserId = async (userId) => {
     const res = await axiosInstance.get('/post');
@@ -69,11 +66,6 @@ const UserProfile = () => {
         if (cancelled) return;
         const me = res.data;
         setUser(me);
-        setEditedBio(me?.bio || '');
-        setEditedFullName(me?.fullName || '');
-        setEditedAvatarUrl(me?.avatarUrl || '');
-        setEditedBirthday(normalizeDateToInput(me?.birthday));
-        setEditedGender(me?.gender || '');
 
         // Sync ngay vào context/localStorage để header đổi avatar/name
         updateCurrentUser?.(me);
@@ -120,11 +112,6 @@ const UserProfile = () => {
         if (cancelled) return;
         const u = res.data;
         setUser(u);
-        setEditedBio(u?.bio || '');
-        setEditedFullName(u?.fullName || '');
-        setEditedAvatarUrl(u?.avatarUrl || '');
-        setEditedBirthday(normalizeDateToInput(u?.birthday));
-        setEditedGender(u?.gender || '');
 
         // Load followers và following count, đồng thời check follow status
         try {
@@ -217,40 +204,22 @@ const UserProfile = () => {
     }
   };
 
-  const handleSaveEdit = async () => {
-    setErrorMsg('');
-    setSuccessMsg('');
-
-    if (!isOwnProfile) return;
-
-    setIsSaving(true);
-    try {
-      const payload = {
-        fullName: editedFullName?.trim() || null,
-        avatarUrl: editedAvatarUrl?.trim() || null,
-        birthday: editedBirthday ? new Date(editedBirthday).toISOString() : null,
-        gender: editedGender || null,
-        bio: editedBio?.trim() || null,
+  const handleAvatarUpdateSuccess = (updatedUser) => {
+    setUser(updatedUser);
+    setSuccessMsg('Cập nhật ảnh đại diện thành công!');
+    // Reload user data để đảm bảo sync
+    if (isOwnProfile) {
+      const loadMe = async () => {
+        try {
+          const res = await axiosInstance.get('/user/me');
+          const me = res.data;
+          setUser(me);
+          updateCurrentUser?.(me);
+        } catch (e) {
+          console.error('Lỗi reload user data:', e);
+        }
       };
-
-      const res = await axiosInstance.patch('/user/me', payload);
-      const updated = res.data;
-      setUser(updated);
-      setEditedBio(updated?.bio || '');
-      setEditedFullName(updated?.fullName || '');
-      setEditedAvatarUrl(updated?.avatarUrl || '');
-      setEditedBirthday(normalizeDateToInput(updated?.birthday));
-      setEditedGender(updated?.gender || '');
-      updateCurrentUser?.(updated);
-      setIsEditMode(false);
-      setSuccessMsg('Đã cập nhật thông tin cá nhân.');
-    } catch (e) {
-      setErrorMsg(
-        e?.response?.data?.message ||
-          'Cập nhật thất bại. Vui lòng thử lại.'
-      );
-    } finally {
-      setIsSaving(false);
+      loadMe();
     }
   };
 
@@ -321,23 +290,34 @@ const UserProfile = () => {
             )}
             <div className="flex items-start gap-6">
               {/* Avatar */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 relative">
                 <div
-                  className="w-32 h-32 rounded-full border-4 border-blue-500 bg-cover bg-center"
+                  className="w-32 h-32 rounded-full border-4 border-blue-500 bg-cover bg-center cursor-pointer transition-all duration-200 relative group"
                   style={{ backgroundImage: `url(${user.avatarUrl || ''})` }}
-                />
-                {isEditMode && isOwnProfile && (
-                  <div className="mt-3">
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Avatar URL
-                    </label>
-                    <input
-                      value={editedAvatarUrl}
-                      onChange={(e) => setEditedAvatarUrl(e.target.value)}
-                      className="w-56 max-w-[14rem] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      placeholder="https://..."
-                    />
-                  </div>
+                  onClick={() => {
+                    if (isOwnProfile) {
+                      setIsAvatarMenuOpen(true);
+                    } else {
+                      setIsAvatarViewModalOpen(true);
+                    }
+                  }}
+                >
+                  {/* Hover overlay với icon camera - chỉ hiện khi là own profile */}
+                  {isOwnProfile && (
+                    <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                      <Camera size={32} className="text-white" />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Menu dropdown - chỉ hiện khi click vào avatar của own profile */}
+                {isOwnProfile && (
+                  <AvatarMenu
+                    isOpen={isAvatarMenuOpen}
+                    onClose={() => setIsAvatarMenuOpen(false)}
+                    onUploadClick={() => setIsAvatarModalOpen(true)}
+                    onViewClick={() => setIsAvatarViewModalOpen(true)}
+                  />
                 )}
               </div>
 
@@ -348,21 +328,7 @@ const UserProfile = () => {
                     <h1 className="text-3xl font-bold text-gray-900 mb-1">
                       {user.userName}
                     </h1>
-                    {isEditMode && isOwnProfile ? (
-                      <div className="mb-2">
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Họ và tên
-                        </label>
-                        <input
-                          value={editedFullName}
-                          onChange={(e) => setEditedFullName(e.target.value)}
-                          className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                          placeholder="Nhập họ và tên"
-                        />
-                      </div>
-                    ) : (
-                      <p className="text-gray-600 mb-2">{user.fullName}</p>
-                    )}
+                    <p className="text-gray-600 mb-2">{user.fullName}</p>
                     {user.email && (
                       <p className="text-sm text-gray-500">{user.email}</p>
                     )}
@@ -391,13 +357,13 @@ const UserProfile = () => {
                           <PenSquare size={18} />
                           <span>Đăng bài</span>
                         </button>
-                        <button
-                          onClick={() => setIsEditMode(!isEditMode)}
+                        <Link
+                          to="/user/edit"
                           className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                         >
                           <Edit2 size={18} />
                           <span>Chỉnh sửa</span>
-                        </button>
+                        </Link>
                         <Link
                           to="/settings"
                           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
@@ -416,76 +382,9 @@ const UserProfile = () => {
                   </div>
                 </div>
 
-                {/* Bio - Editable if own profile */}
-                {isEditMode && isOwnProfile ? (
-                  <div className="mb-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Ngày sinh
-                        </label>
-                        <input
-                          type="date"
-                          value={editedBirthday}
-                          onChange={(e) => setEditedBirthday(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Giới tính
-                        </label>
-                        <select
-                          value={editedGender}
-                          onChange={(e) => setEditedGender(e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white"
-                        >
-                          <option value="">Chưa chọn</option>
-                          <option value="MALE">Nam</option>
-                          <option value="FEMALE">Nữ</option>
-                          <option value="OTHER">Khác</option>
-                        </select>
-                      </div>
-                    </div>
-                    <textarea
-                      value={editedBio}
-                      onChange={(e) => setEditedBio(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                      rows="3"
-                      placeholder="Viết giới thiệu về bản thân..."
-                    />
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={handleSaveEdit}
-                        disabled={isSaving}
-                        className={`px-4 py-1 rounded-lg transition-colors text-sm flex items-center gap-2 ${
-                          isSaving ? 'bg-blue-400 text-white cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'
-                        }`}
-                      >
-                        {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                        <span>Lưu</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsEditMode(false);
-                          setEditedBio(user.bio || '');
-                          setEditedFullName(user.fullName || '');
-                          setEditedAvatarUrl(user.avatarUrl || '');
-                          setEditedBirthday(normalizeDateToInput(user.birthday));
-                          setEditedGender(user.gender || '');
-                          setErrorMsg('');
-                          setSuccessMsg('');
-                        }}
-                        className="px-4 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-                      >
-                        Hủy
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  user.bio && (
-                    <p className="text-gray-700 mb-4 leading-relaxed">{user.bio}</p>
-                  )
+                {/* Bio */}
+                {user.bio && (
+                  <p className="text-gray-700 mb-4 leading-relaxed">{user.bio}</p>
                 )}
 
                 {/* Stats */}
@@ -544,38 +443,7 @@ const UserProfile = () => {
         {/* Posts Section */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Bài viết</h2>
-          
-          {userPosts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">Chưa có bài viết nào</p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {userPosts.map((post) => (
-                <Link
-                  key={post.id}
-                  to={`/post/${post.id}`}
-                  className="block border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 hover:bg-gray-50 -mx-6 px-6 py-2 rounded-lg transition-colors"
-                >
-                  <div className="flex gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-                        {post.title || '(Không có tiêu đề)'}
-                      </h3>
-                      {(post.contentText || post.content) && (
-                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                          {post.contentText || post.content}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-500">
-                        {post.createdAt ? formatDateTime(post.createdAt) : ''}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          <UserPostsList posts={userPosts} formatDateTime={formatDateTime} />
         </div>
       </div>
 
@@ -585,6 +453,22 @@ const UserProfile = () => {
         onClose={() => setFollowModalOpen(false)}
         userId={user?.id}
         initialTab={followModalInitialTab}
+      {/* Avatar Upload Modal */}
+      {isOwnProfile && (
+        <AvatarUploadModal
+          isOpen={isAvatarModalOpen}
+          onClose={() => setIsAvatarModalOpen(false)}
+          currentAvatarUrl={user?.avatarUrl}
+          onSuccess={handleAvatarUpdateSuccess}
+        />
+      )}
+
+      {/* Avatar View Modal */}
+      <AvatarViewModal
+        isOpen={isAvatarViewModalOpen}
+        onClose={() => setIsAvatarViewModalOpen(false)}
+        avatarUrl={user?.avatarUrl}
+        userName={user?.userName || user?.fullName}
       />
     </div>
   );

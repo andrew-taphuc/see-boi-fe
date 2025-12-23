@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import axiosInstance from "../../utils/axiosInstance";
+import { useAuth } from "@context/AuthContext";
+import axiosInstance from "@utils/axiosInstance";
 import LoginRegisterButton from "./Login&RegisterButton";
-import { validatePassword } from "../../utils/validatePassword";
+import { validatePassword } from "@utils/validatePassword";
 
 // Nhận props: onClose, onSwitchToLogin
 const Register = ({ onClose, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
-    username: "",
+    userName: "",
     fullName: "",
     email: "",
     password: "",
@@ -22,9 +22,9 @@ const Register = ({ onClose, onSwitchToLogin }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Tự động set fullName giống username khi username thay đổi
-    if (name === "username") {
-      setFormData({ ...formData, username: value, fullName: value });
+    // Tự động set fullName = userName khi userName thay đổi
+    if (name === "userName") {
+      setFormData({ ...formData, userName: value, fullName: value });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -50,9 +50,12 @@ const Register = ({ onClose, onSwitchToLogin }) => {
     setLoading(true);
 
     try {
+      // Đảm bảo fullName = userName nếu chưa được set
+      const finalFullName = formData.fullName || formData.userName;
+      
       const response = await axiosInstance.post("/auth/register", {
-        username: formData.username,
-        fullName: formData.fullName || formData.username,
+        userName: formData.userName,
+        fullName: finalFullName,
         email: formData.email,
         password: formData.password,
       }, {
@@ -75,8 +78,8 @@ const Register = ({ onClose, onSwitchToLogin }) => {
           onClose();
         }
         
-        // Redirect đến socialmedia page
-        navigate("/socialmedia");
+        // Redirect đến trang cập nhật thông tin cá nhân
+        navigate("/user/edit");
       }
     } catch (err) {
       // Xử lý các loại lỗi khác nhau
@@ -87,7 +90,7 @@ const Register = ({ onClose, onSwitchToLogin }) => {
         
         switch (status) {
           case 409:
-            setError(message || "Email hoặc username đã tồn tại. Vui lòng thử lại.");
+            setError(message || "Email hoặc userName đã tồn tại. Vui lòng thử lại.");
             break;
           case 400:
             setError(message || "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.");
@@ -141,11 +144,11 @@ const Register = ({ onClose, onSwitchToLogin }) => {
           <label className="block text-gray-700 mb-2 font-medium">Tên người dùng</label>
           <input
             type="text"
-            name="username"
-            value={formData.username}
+            name="userName"
+            value={formData.userName}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-            placeholder="username"
+            placeholder="userName"
             required
           />
         </div>

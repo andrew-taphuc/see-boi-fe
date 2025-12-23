@@ -1,14 +1,14 @@
 import { useState } from "react";
-import Header from "../../components/nhantuong/Header";
-import ImageBackground from "../../assets/nhantuong/bg.jpg";
-import ButtonInfo from "../../assets/nhantuong/button_info.svg";
-import Hook from "../../assets/nhantuong/hook.svg";
-import { analysisData } from "../../data/analysisData";
-import BackgroundMenu from "../../assets/nhantuong/background_menu.svg";
-import MenuIcon from "../../assets/nhantuong/menu.svg";
-import CloseIcon from "../../assets/nhantuong/close2.svg";
-import BtnBackground from "../../assets/nhantuong/btn.svg";
-import BackToTop from "../../assets/nhantuong/gps-navigation.png";
+import Header from "@components/nhantuong/Header";
+import ImageBackground from "@assets/nhantuong/bg.jpg";
+import ButtonInfo from "@assets/nhantuong/button_info.svg";
+import Hook from "@assets/nhantuong/hook.svg";
+import { analysisData } from "@/data/analysisData";
+import BackgroundMenu from "@assets/nhantuong/background_menu.svg";
+import MenuIcon from "@assets/nhantuong/menu.svg";
+import CloseIcon from "@assets/nhantuong/close2.svg";
+import BtnBackground from "@assets/nhantuong/btn.svg";
+import BackToTop from "@assets/nhantuong/gps-navigation.png";
 
 const KetQua = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

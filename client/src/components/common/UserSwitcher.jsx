@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
 import { ChevronDown, User, Check } from 'lucide-react';
-import usersData from '../data/users.json';
+import usersData from '@/data/users.json';
 
 const UserSwitcher = () => {
   // Feature này dùng dữ liệu mock users.json (user ảo). Hiện tại đã bỏ mock auth,

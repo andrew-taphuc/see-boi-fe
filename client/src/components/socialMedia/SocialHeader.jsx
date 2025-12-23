@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Bell, CalendarDays, Sparkles, Eye, Settings, LogOut, User, HelpCircle } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import ballLogo from '../../assets/ball.png';
+import { useAuth } from '@context/AuthContext';
+import ballLogo from '@assets/ball.png';
 
 const SocialHeader = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isAvatarOpen, setIsAvatarOpen] = useState(false);
   const notificationRef = useRef(null);
@@ -36,7 +36,7 @@ const SocialHeader = () => {
         {/* Left: Logo & Brand Name */}
         <div className="flex items-center gap-4 flex-1">
           <Link 
-            to="/" 
+            to="/socialmedia" 
             className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0"
           >
             <img 
@@ -185,7 +185,8 @@ const SocialHeader = () => {
                     <div className="border-t border-gray-200 my-1"></div>
                     <button 
                       onClick={() => {
-                        // TODO: Implement logout khi có authentication thật
+                        logout();
+                        setIsAvatarOpen(false);
                         navigate('/');
                       }}
                       className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
