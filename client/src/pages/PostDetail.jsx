@@ -3,14 +3,17 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Share2, ThumbsUp, MessageSquare, Heart } from 'lucide-react';
 import SocialHeader from '@components/socialMedia/SocialHeader';
 import axiosInstance from '@utils/axiosInstance';
+import FollowButton from '../components/userProfile/FollowButton';
 import TiptapViewer from '@components/richtext/TiptapViewer';
 import CommentList from '@components/comments/CommentList';
 
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [post, setPost] = useState(null);
   const [user, setUser] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [formattedDate, setFormattedDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -70,6 +73,34 @@ const PostDetail = () => {
       cancelled = true;
     };
   }, [id]);
+
+  // Check follow status khi user hoặc currentUser thay đổi
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkFollowStatus = async () => {
+      if (user?.id && currentUser?.id && user.id !== currentUser.id) {
+        try {
+          const isFollowingRes = await axiosInstance.get(`/user/${user.id}/is-following`);
+          if (!cancelled && isFollowingRes?.data) {
+            setIsFollowing(isFollowingRes.data.isFollowing || false);
+          }
+        } catch (err) {
+          console.error('Error checking follow status:', err);
+          if (!cancelled) {
+            setIsFollowing(false);
+          }
+        }
+      } else {
+        setIsFollowing(false);
+      }
+    };
+
+    checkFollowStatus();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, currentUser?.id]);
 
   if (isLoading) {
     return (
@@ -133,13 +164,15 @@ const PostDetail = () => {
                     <Link to={user?.id ? `/user/${user.id}` : '#'} className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
                       {user?.fullName || user?.userName || 'Người dùng'}
                     </Link>
-                    <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                      + Theo dõi
-                    </button>
+                    <FollowButton
+                      userId={user?.id}
+                      initialIsFollowing={isFollowing}
+                      onFollowChange={setIsFollowing}
+                      size="sm"
+                    />
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                     <span>{formattedDate}</span>
-                    <span>Phản hồi: {Math.floor(Math.random() * 20) + 2}</span>
                   </div>
                 </div>
               </div>
