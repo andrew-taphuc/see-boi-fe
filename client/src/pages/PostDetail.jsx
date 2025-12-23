@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Share2, ThumbsUp, MessageSquare, Heart } from 'lucide-react';
-import SocialHeader from '../components/socialMedia/SocialHeader';
-import axiosInstance from '../utils/axiosInstance';
-import TiptapViewer from '../components/richtext/TiptapViewer';
+import SocialHeader from '@components/socialMedia/SocialHeader';
+import axiosInstance from '@utils/axiosInstance';
+import TiptapViewer from '@components/richtext/TiptapViewer';
 
 const PostDetail = () => {
   const { id } = useParams();

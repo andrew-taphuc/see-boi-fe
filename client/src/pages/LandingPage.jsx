@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import heroImage from "../assets/hero-tarot.jpg";
-import tarotCard1 from "../assets/tarot-card-1.jpg";
-import tarotCard2 from "../assets/tarot-card-2.jpg";
-import tuViWheel from "../assets/tu-vi-wheel.jpg";
-import nhanTuongImage from "../assets/nhan-tuong.jpg";
-import Header from "../components/landingPage/Header";
-import Footer from "../components/landingPage/Footer";
-import Login from "../components/Login&Register/Login";
-import Register from "../components/Login&Register/Register";
+import heroImage from "@assets/hero-tarot.jpg";
+import tarotCard1 from "@assets/tarot-card-1.jpg";
+import tarotCard2 from "@assets/tarot-card-2.jpg";
+import tuViWheel from "@assets/tu-vi-wheel.jpg";
+import nhanTuongImage from "@assets/nhan-tuong.jpg";
+import Header from "@components/landingPage/Header";
+import Footer from "@components/landingPage/Footer";
+import Login from "@components/Login&Register/Login";
+import Register from "@components/Login&Register/Register";
 
 const LandingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();

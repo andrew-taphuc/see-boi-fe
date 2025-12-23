@@ -1,5 +1,5 @@
-import Logo1 from "../../assets/nhantuong/introLogo1.svg";
-import Logo2 from "../../assets/nhantuong/introLogo2.svg";
+import Logo1 from "@assets/nhantuong/introLogo1.svg";
+import Logo2 from "@assets/nhantuong/introLogo2.svg";
 
 // Footer navigation data
 const footerSections = [

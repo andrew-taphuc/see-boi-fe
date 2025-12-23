@@ -1,9 +1,9 @@
 import { useRef, useEffect } from "react";
-import pattern3 from "../../assets/nhantuong/pattern3.svg";
-import func1 from "../../assets/nhantuong/func1.svg";
-import func2 from "../../assets/nhantuong/func2.svg";
-import func3 from "../../assets/nhantuong/func3.svg";
-import func4 from "../../assets/nhantuong/func4.svg";
+import pattern3 from "@assets/nhantuong/pattern3.svg";
+import func1 from "@assets/nhantuong/func1.svg";
+import func2 from "@assets/nhantuong/func2.svg";
+import func3 from "@assets/nhantuong/func3.svg";
+import func4 from "@assets/nhantuong/func4.svg";
 
 const FeatureCard = ({ icon, title, description }) => (
   <div className="relative group">

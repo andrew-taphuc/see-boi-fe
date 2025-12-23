@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import axiosInstance from "../../utils/axiosInstance";
+import { useAuth } from "@context/AuthContext";
+import axiosInstance from "@utils/axiosInstance";
 import LoginRegisterButton from "./Login&RegisterButton";
-import { validatePassword } from "../../utils/validatePassword";
+import { validatePassword } from "@utils/validatePassword";
 
 // Nhận props: onClose, onSwitchToLogin
 const Register = ({ onClose, onSwitchToLogin }) => {
