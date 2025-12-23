@@ -1,9 +1,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@context/AuthContext';
 import { Edit2, UserPlus, Check, Settings, Calendar, Users, Save, Loader2, PenSquare } from 'lucide-react';
-import SocialHeader from '../components/socialMedia/SocialHeader';
-import axiosInstance from '../utils/axiosInstance';
+import SocialHeader from '@components/socialMedia/SocialHeader';
+import FollowButton from '@components/userProfile/FollowButton';
+import FollowListModal from '@components/userProfile/FollowListModal';
+import axiosInstance from '@utils/axiosInstance';
 
 const UserProfile = () => {
   const { id } = useParams();
@@ -12,6 +14,8 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedBio, setEditedBio] = useState('');
   const [editedFullName, setEditedFullName] = useState('');
@@ -22,6 +26,8 @@ const UserProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [followModalOpen, setFollowModalOpen] = useState(false);
+  const [followModalInitialTab, setFollowModalInitialTab] = useState('followers'); // 'followers' or 'following'
   
   const resolvedId = useMemo(() => (id ? parseInt(id) : null), [id]);
   const isOwnProfile = useMemo(() => {
@@ -72,6 +78,20 @@ const UserProfile = () => {
         // Sync ngay vào context/localStorage để header đổi avatar/name
         updateCurrentUser?.(me);
 
+        // Load followers và following count
+        try {
+          const [followersRes, followingRes] = await Promise.all([
+            axiosInstance.get(`/user/${me?.id}/followers`),
+            axiosInstance.get(`/user/${me?.id}/following`)
+          ]);
+          if (!cancelled) {
+            setFollowersCount(Array.isArray(followersRes.data) ? followersRes.data.length : 0);
+            setFollowingCount(Array.isArray(followingRes.data) ? followingRes.data.length : 0);
+          }
+        } catch (e) {
+          console.error('Error loading follow counts:', e);
+        }
+
         const posts = await fetchPostsByUserId(me?.id);
         if (!cancelled) setUserPosts(posts);
       } catch (e) {
@@ -106,6 +126,53 @@ const UserProfile = () => {
         setEditedBirthday(normalizeDateToInput(u?.birthday));
         setEditedGender(u?.gender || '');
 
+        // Load followers và following count, đồng thời check follow status
+        try {
+          // Xử lý riêng từng API để tránh lỗi một API làm fail cả batch
+          const promises = [
+            axiosInstance.get(`/user/${userId}/followers`).catch(err => {
+              console.error('Error loading followers:', err);
+              return { data: [] };
+            }),
+            // API following có thể fail do backend lỗi, nên catch riêng
+            axiosInstance.get(`/user/${userId}/following`).catch(err => {
+              console.error('Error loading following (backend may have issue):', err);
+              return { data: [] };
+            })
+          ];
+
+          // Sử dụng API mới để check follow status đơn giản hơn
+          if (currentUser?.id && !isOwnProfile) {
+            promises.push(
+              axiosInstance.get(`/user/${userId}/is-following`).catch((err) => {
+                console.error('Error checking follow status:', err);
+                return { data: { isFollowing: false } };
+              })
+            );
+          } else {
+            promises.push(Promise.resolve({ data: { isFollowing: false } }));
+          }
+
+          const [followersRes, followingRes, isFollowingRes] = await Promise.all(promises);
+          
+          if (!cancelled) {
+            setFollowersCount(Array.isArray(followersRes.data) ? followersRes.data.length : 0);
+            setFollowingCount(Array.isArray(followingRes.data) ? followingRes.data.length : 0);
+            
+            // Lấy follow status từ API mới
+            if (currentUser?.id && !isOwnProfile && isFollowingRes?.data) {
+              setIsFollowing(isFollowingRes.data.isFollowing || false);
+            } else {
+              // Nếu không có currentUser hoặc là own profile, set về false
+              setIsFollowing(false);
+            }
+          }
+        } catch (e) {
+          console.error('Error loading follow counts:', e);
+          // Nếu lỗi, set về false
+          setIsFollowing(false);
+        }
+
         const posts = await fetchPostsByUserId(u?.id);
         if (!cancelled) setUserPosts(posts);
       } catch (e) {
@@ -134,11 +201,20 @@ const UserProfile = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, isOwnProfile, updateCurrentUser]);
+  }, [id, isOwnProfile, updateCurrentUser, currentUser?.id]);
 
-  const handleFollow = () => {
-    setIsFollowing(!isFollowing);
-    // TODO: Implement follow logic khi có backend
+  const handleFollowChange = async (newStatus) => {
+    setIsFollowing(newStatus);
+    
+    // Reload lại followersCount của user này khi follow/unfollow
+    if (!isOwnProfile && user?.id) {
+      try {
+        const followersRes = await axiosInstance.get(`/user/${user.id}/followers`);
+        setFollowersCount(Array.isArray(followersRes.data) ? followersRes.data.length : 0);
+      } catch (e) {
+        console.error('Error reloading followers count:', e);
+      }
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -331,26 +407,11 @@ const UserProfile = () => {
                         </Link>
                       </>
                     ) : (
-                      <button
-                        onClick={handleFollow}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                          isFollowing
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            : 'bg-blue-500 text-white hover:bg-blue-600'
-                        }`}
-                      >
-                        {isFollowing ? (
-                          <>
-                            <Check size={18} />
-                            <span>Đang theo dõi</span>
-                          </>
-                        ) : (
-                          <>
-                            <UserPlus size={18} />
-                            <span>Theo dõi</span>
-                          </>
-                        )}
-                      </button>
+                      <FollowButton
+                        userId={user?.id}
+                        initialIsFollowing={isFollowing}
+                        onFollowChange={handleFollowChange}
+                      />
                     )}
                   </div>
                 </div>
@@ -436,20 +497,32 @@ const UserProfile = () => {
                       <span className="text-gray-600 ml-1">Bài viết</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setFollowModalInitialTab('followers');
+                      setFollowModalOpen(true);
+                    }}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                  >
                     <Users size={18} className="text-gray-500" />
                     <div>
-                      <span className="font-bold text-gray-900">0</span>
+                      <span className="font-bold text-gray-900">{followersCount}</span>
                       <span className="text-gray-600 ml-1">Người theo dõi</span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
+                  </button>
+                  <button
+                    onClick={() => {
+                      setFollowModalInitialTab('following');
+                      setFollowModalOpen(true);
+                    }}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                  >
                     <Users size={18} className="text-gray-500" />
                     <div>
-                      <span className="font-bold text-gray-900">0</span>
+                      <span className="font-bold text-gray-900">{followingCount}</span>
                       <span className="text-gray-600 ml-1">Đang theo dõi</span>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
                 {/* Meta info */}
@@ -505,6 +578,14 @@ const UserProfile = () => {
           )}
         </div>
       </div>
+
+      {/* Follow List Modal */}
+      <FollowListModal
+        isOpen={followModalOpen}
+        onClose={() => setFollowModalOpen(false)}
+        userId={user?.id}
+        initialTab={followModalInitialTab}
+      />
     </div>
   );
 };
