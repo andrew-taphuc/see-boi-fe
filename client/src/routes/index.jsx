@@ -10,6 +10,7 @@ import SocialMedia from "../pages/SocialMedia";
 import PostDetail from "../pages/PostDetail";
 import CreatePost from "../pages/CreatePost";
 import UserProfile from "../pages/UserProfile";
+import EditProfile from "../pages/EditProfile";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 
@@ -34,6 +35,14 @@ const AppRoutes = () => {
       <Route path="/post/create" element={<MainLayout><CreatePost /></MainLayout>} />
       <Route path="/post/:id" element={<MainLayout><PostDetail /></MainLayout>} />
       <Route path="/user/:id" element={<MainLayout><UserProfile /></MainLayout>} />
+      <Route 
+        path="/user/edit" 
+        element={
+          <ProtectedRoute>
+            <MainLayout><EditProfile /></MainLayout>
+          </ProtectedRoute>
+        } 
+      />
     </Routes>
   );
 };

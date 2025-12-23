@@ -13,6 +13,11 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     
+    // Xử lý FormData: xóa Content-Type để axios tự động set với boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
     if (token) {
       // Kiểm tra token expiration trước khi gửi request
       if (isTokenExpired(token)) {
