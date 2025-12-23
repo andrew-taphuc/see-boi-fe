@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import postsData from '../../../data/posts.json';
-import usersData from '../../../data/users.json';
+import postsData from '@data/posts.json';
+import usersData from '@data/users.json';
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);

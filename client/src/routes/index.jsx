@@ -1,19 +1,19 @@
 import { Routes, Route } from "react-router-dom";
-import MainLayout from "../layouts/MainLayout";
 import TuviLayout from "../layouts/TuviLayout";
-import LandingPage from "../pages/LandingPage";
-import TuVi from "../pages/TuVi";
 import TuviResultPage from "../pages/TuviResultPage";
-import Tarot from "../pages/Tarot";
-import NhanTuong from "../pages/nhantuong/NhanTuong";
-import GioiThieu from "../pages/nhantuong/GioiThieu";
-import KetQua from "../pages/nhantuong/KetQua";
-import SocialMedia from "../pages/SocialMedia";
-import PostDetail from "../pages/PostDetail";
-import CreatePost from "../pages/CreatePost";
-import UserProfile from "../pages/UserProfile";
-import EditProfile from "../pages/EditProfile";
-import ProtectedRoute from "../components/common/ProtectedRoute";
+import MainLayout from "@layouts/MainLayout";
+import LandingPage from "@pages/LandingPage";
+import TuVi from "@pages/TuVi";
+import Tarot from "@pages/Tarot";
+import NhanTuong from "@pages/nhantuong/NhanTuong";
+import GioiThieu from "@pages/nhantuong/GioiThieu";
+import KetQua from "@pages/nhantuong/KetQua";
+import SocialMedia from "@pages/SocialMedia";
+import PostDetail from "@pages/PostDetail";
+import CreatePost from "@pages/CreatePost";
+import UserProfile from "@pages/UserProfile";
+import EditProfile from "@pages/EditProfile";
+import ProtectedRoute from "@components/common/ProtectedRoute";
 
 const AppRoutes = () => {
   return (

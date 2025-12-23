@@ -8,7 +8,9 @@
       "@context/*": ["src/context/*"],
       "@utils/*": ["src/utils/*"],
       "@assets/*": ["src/assets/*"],
-      "@layouts/*": ["src/layouts/*"]
+      "@layouts/*": ["src/layouts/*"],
+      "@data/*": ["src/data/*"],
+      "@constants/*": ["src/constants/*"]
     }
   },
   "include": ["src"]

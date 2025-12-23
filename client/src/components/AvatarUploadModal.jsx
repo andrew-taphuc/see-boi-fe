@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import axiosInstance from '../utils/axiosInstance';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
+import axiosInstance from '@utils/axiosInstance';
+import { useAuth } from '@context/AuthContext';
+import { useToast } from '@context/ToastContext';
 import UploadModeTabs from './avatarUpload/UploadModeTabs';
 import AvatarPreview from './avatarUpload/AvatarPreview';
 import FileUploadInput from './avatarUpload/FileUploadInput';
