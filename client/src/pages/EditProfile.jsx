@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
 import SocialHeader from '@components/socialMedia/SocialHeader';
 import axiosInstance from '@utils/axiosInstance';
+import { getDefaultAvatar } from '@constants/defaultAvatars';
 
 /**
  * Trang cập nhật thông tin người dùng
@@ -28,6 +29,11 @@ const EditProfile = () => {
   });
 
   const [user, setUser] = useState(null);
+
+  // Check if this is first-time setup (thiếu avatarUrl, birthday hoặc gender)
+  const isFirstTimeSetup = useMemo(() => {
+    return user && (!user.avatarUrl || !user.birthday || !user.gender);
+  }, [user]);
 
   // Load user data
   useEffect(() => {
@@ -87,7 +93,23 @@ const EditProfile = () => {
     setError('');
     setSuccess('');
 
-    // Validate email nếu có
+    // Nếu là lần đầu setup, bắt buộc điền đầy đủ (trừ bio)
+    if (isFirstTimeSetup) {
+      if (!formData.fullName?.trim()) {
+        setError('Vui lòng nhập họ và tên');
+        return;
+      }
+      if (!formData.birthday) {
+        setError('Vui lòng chọn ngày sinh');
+        return;
+      }
+      if (!formData.gender) {
+        setError('Vui lòng chọn giới tính');
+        return;
+      }
+    }
+
+    // Validate email
     if (formData.email && !isValidEmail(formData.email)) {
       setError('Email không hợp lệ');
       return;
@@ -99,10 +121,11 @@ const EditProfile = () => {
       // Tạo FormData
       const submitFormData = new FormData();
 
-      // Chỉ thêm các trường có giá trị
+      // Thêm các trường bắt buộc hoặc có giá trị
       if (formData.fullName?.trim()) {
         submitFormData.append('fullName', formData.fullName.trim());
       }
+      // userName và email không được thay đổi, chỉ gửi nếu có
       if (formData.userName?.trim()) {
         submitFormData.append('userName', formData.userName.trim());
       }
@@ -114,6 +137,11 @@ const EditProfile = () => {
       }
       if (formData.gender) {
         submitFormData.append('gender', formData.gender);
+        // Nếu là lần đầu setup, gán avatarUrl dựa trên gender
+        if (isFirstTimeSetup) {
+          const defaultAvatarUrl = getDefaultAvatar(formData.gender);
+          submitFormData.append('avatarUrl', defaultAvatarUrl);
+        }
       }
       if (formData.bio?.trim()) {
         submitFormData.append('bio', formData.bio.trim());
@@ -128,9 +156,14 @@ const EditProfile = () => {
       updateCurrentUser?.(updatedUser);
       setSuccess('Cập nhật thông tin thành công!');
       
-      // Redirect về profile sau 1.5 giây
+      // Nếu là lần đầu setup, redirect đến socialmedia sau 1.5 giây
+      // Nếu không, redirect về profile sau 1.5 giây
       setTimeout(() => {
-        navigate(`/user/${updatedUser.id}`);
+        if (isFirstTimeSetup) {
+          navigate('/socialmedia');
+        } else {
+          navigate(`/user/${updatedUser.id}`);
+        }
       }, 1500);
     } catch (err) {
       console.error('Lỗi cập nhật profile:', err);
@@ -177,7 +210,9 @@ const EditProfile = () => {
             >
               <ArrowLeft size={24} className="text-gray-700" />
             </button>
-            <h1 className="text-3xl font-bold text-gray-900">Chỉnh sửa thông tin cá nhân</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {isFirstTimeSetup ? 'Cập nhật thông tin cá nhân' : 'Chỉnh sửa thông tin cá nhân'}
+            </h1>
           </div>
 
           {/* Messages */}
@@ -201,7 +236,7 @@ const EditProfile = () => {
                   htmlFor="fullName"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Họ và tên
+                  Họ và tên {isFirstTimeSetup && <span className="text-red-500">*</span>}
                 </label>
                 <input
                   type="text"
@@ -209,6 +244,7 @@ const EditProfile = () => {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
+                  required={isFirstTimeSetup}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Nhập họ và tên"
                 />
@@ -228,7 +264,8 @@ const EditProfile = () => {
                   name="userName"
                   value={formData.userName}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                   placeholder="Nhập tên người dùng"
                 />
               </div>
@@ -247,7 +284,8 @@ const EditProfile = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                   placeholder="Nhập email"
                 />
               </div>
@@ -260,7 +298,7 @@ const EditProfile = () => {
                     htmlFor="birthday"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Ngày sinh
+                    Ngày sinh {isFirstTimeSetup && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="date"
@@ -268,6 +306,7 @@ const EditProfile = () => {
                     name="birthday"
                     value={formData.birthday}
                     onChange={handleInputChange}
+                    required={isFirstTimeSetup}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -278,13 +317,14 @@ const EditProfile = () => {
                     htmlFor="gender"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Giới tính
+                    Giới tính {isFirstTimeSetup && <span className="text-red-500">*</span>}
                   </label>
                   <select
                     id="gender"
                     name="gender"
                     value={formData.gender}
                     onChange={handleInputChange}
+                    required={isFirstTimeSetup}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
                     <option value="">Chưa chọn</option>
@@ -316,17 +356,19 @@ const EditProfile = () => {
 
               {/* Submit Buttons */}
               <div className="flex gap-3 pt-4 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Hủy
-                </button>
+                {!isFirstTimeSetup && (
+                  <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Hủy
+                  </button>
+                )}
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="flex-1 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className={`${isFirstTimeSetup ? 'w-full' : 'flex-1'} px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
                 >
                   {isSaving ? (
                     <>
@@ -336,7 +378,7 @@ const EditProfile = () => {
                   ) : (
                     <>
                       <Save size={18} />
-                      <span>Lưu thay đổi</span>
+                      <span>{isFirstTimeSetup ? 'Hoàn tất' : 'Lưu thay đổi'}</span>
                     </>
                   )}
                 </button>
