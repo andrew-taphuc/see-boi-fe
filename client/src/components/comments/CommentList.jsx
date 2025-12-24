@@ -81,16 +81,73 @@ const CommentList = ({ postId }) => {
   const handleAddComment = async (
     content,
     isAnonymous = false,
-    parentId = null
+    parentId = null,
+    images = []
   ) => {
     try {
-      const response = await axiosInstance.post(`/post/${postId}/comment`, {
-        content,
-        isAnonymous,
-        parentId,
-      });
+      let response;
 
+      if (parentId) {
+        // REPLY: Dùng endpoint /comment/{id}/reply
+        if (images && images.length > 0) {
+          // Reply với ảnh - dùng FormData
+          const formData = new FormData();
+          formData.append("content", content);
+          formData.append("isAnonymous", isAnonymous.toString());
+
+          images.forEach((file) => {
+            formData.append("images", file);
+          });
+
+          console.log(
+            `📤 Replying to comment ${parentId} with ${images.length} images`
+          );
+          response = await axiosInstance.post(
+            `/comment/${parentId}/reply`,
+            formData
+          );
+        } else {
+          // Reply không có ảnh - dùng JSON
+          console.log(`📤 Replying to comment ${parentId} (no images)`);
+          response = await axiosInstance.post(`/comment/${parentId}/reply`, {
+            content,
+            isAnonymous,
+          });
+        }
+      } else {
+        // ROOT COMMENT: Dùng endpoint /post/{id}/comment
+        if (images && images.length > 0) {
+          // Comment gốc với ảnh - dùng FormData
+          const formData = new FormData();
+          formData.append("content", content);
+          formData.append("isAnonymous", isAnonymous.toString());
+
+          images.forEach((file) => {
+            formData.append("images", file);
+          });
+
+          console.log(`📤 Adding root comment with ${images.length} images`);
+          response = await axiosInstance.post(
+            `/post/${postId}/comment`,
+            formData
+          );
+        } else {
+          // Comment gốc không có ảnh - dùng JSON
+          console.log(`📤 Adding root comment (no images)`);
+          response = await axiosInstance.post(`/post/${postId}/comment`, {
+            content,
+            isAnonymous,
+          });
+        }
+      }
+
+      console.log("📦 Response:", response.data);
       const newComment = response.data.comment || response.data;
+
+      if (images && images.length > 0) {
+        console.log("📸 Comment with images:", newComment);
+        console.log("📸 Images:", newComment.images);
+      }
 
       if (parentId) {
         // If it's a reply, add to the parent comment's replies array
@@ -259,13 +316,40 @@ const CommentList = ({ postId }) => {
     socket.on("deleteComment", (deletedCommentId) => {
       console.log("Comment deleted via socket:", deletedCommentId);
 
-      setComments((prev) =>
-        prev.filter(
-          (c) => c.id !== deletedCommentId && c._id !== deletedCommentId
-        )
-      );
+      setComments((prev) => {
+        // Check if deleted comment is a root comment
+        const isRootComment = prev.some(
+          (c) => c.id === deletedCommentId || c._id === deletedCommentId
+        );
+
+        if (isRootComment) {
+          // Remove root comment
+          return prev.filter(
+            (c) => c.id !== deletedCommentId && c._id !== deletedCommentId
+          );
+        } else {
+          // Remove reply from parent's replies array
+          return prev.map((c) => {
+            if (c.replies && c.replies.length > 0) {
+              const filteredReplies = c.replies.filter(
+                (r) => r.id !== deletedCommentId && r._id !== deletedCommentId
+              );
+              if (filteredReplies.length !== c.replies.length) {
+                return {
+                  ...c,
+                  replies: filteredReplies,
+                  _count: {
+                    ...c._count,
+                    replies: (c._count?.replies || 0) - 1,
+                  },
+                };
+              }
+            }
+            return c;
+          });
+        }
+      });
       setTotalComments((prev) => Math.max(0, prev - 1));
-      setDisplayedCount((prev) => Math.max(10, prev - 1));
     });
 
     // Cleanup on unmount

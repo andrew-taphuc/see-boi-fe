@@ -145,9 +145,14 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
   };
 
   // Handle reply submission
-  const handleReplySubmit = async (content, isAnonymous) => {
+  const handleReplySubmit = async (
+    content,
+    isAnonymous,
+    parentId,
+    images = []
+  ) => {
     try {
-      await onReply(content, isAnonymous, comment.id || comment._id);
+      await onReply(content, isAnonymous, comment.id || comment._id, images);
       setIsReplying(false);
     } catch (error) {
       console.error("Error replying:", error);
@@ -250,6 +255,20 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
                   <p className="text-gray-800 text-sm whitespace-pre-wrap break-words">
                     {comment.content}
                   </p>
+
+                  {/* Hiển thị ảnh nếu có */}
+                  {comment.images && comment.images.length > 0 && (
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {comment.images.map((image, index) => (
+                        <img
+                          key={index}
+                          src={image.url || image}
+                          alt={`Comment image ${index + 1}`}
+                          className="w-full h-auto rounded-lg object-cover max-h-48"
+                        />
+                      ))}
+                    </div>
+                  )}
 
                   {/* Voting and Reply buttons */}
                   <div className="flex items-center gap-4 mt-2">
@@ -372,6 +391,7 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
             placeholder="Viết phản hồi..."
             buttonText="Trả lời"
             onCancel={() => setIsReplying(false)}
+            parentId={comment.id || comment._id}
           />
         </div>
       )}
