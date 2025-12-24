@@ -6,6 +6,7 @@ import axiosInstance from '@utils/axiosInstance';
 import FollowButton from '../components/userProfile/FollowButton';
 import TiptapViewer from '@components/richtext/TiptapViewer';
 import CommentList from '@components/comments/CommentList';
+import { useAuth } from '@context/AuthContext';
 
 const PostDetail = () => {
   const { id } = useParams();
