@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Send, ArrowLeft } from 'lucide-react';
-import SocialHeader from '@components/socialMedia/SocialHeader';
+import ThemedHeader from '@components/common/ThemedHeader';
 import axiosInstance from '@utils/axiosInstance';
 import TiptapEditor from '@components/richtext/TiptapEditor';
 import PollForm from '@components/posts/PollForm';
@@ -145,7 +145,7 @@ const CreatePost = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <SocialHeader />
+      <ThemedHeader variant="social" />
 
       <div className="pt-14 max-w-3xl mx-auto px-4 py-6">
         <div className="flex items-center gap-3 mb-4">

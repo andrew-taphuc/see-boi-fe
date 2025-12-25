@@ -1,5 +1,5 @@
 import React from 'react';
-import SocialHeader from '@components/socialMedia/SocialHeader';
+import ThemedHeader from '@components/common/ThemedHeader';
 import LeftSidebar from '@components/socialMedia/content-left/LeftSidebar';
 import CenterContent from '@components/socialMedia/content-center/CenterContent';
 import RightSidebar from '@components/socialMedia/content-right/RightSidebar';
@@ -8,10 +8,10 @@ const SocialMedia = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <SocialHeader />
+      <ThemedHeader variant="social" />
 
       {/* Main Content */}
-      <div className="pt-14 max-w-screen-2xl mx-auto">
+      <div className="pt-16 max-w-screen-2xl mx-auto">
         <div className="flex gap-4 p-4">
           {/* Left Sidebar */}
           <LeftSidebar />
