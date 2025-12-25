@@ -5,10 +5,9 @@ import {
   Share2,
   ThumbsUp,
   MessageSquare,
-  Heart,
+  // Heart, // Not used in the code
   Bookmark,
 } from "lucide-react";
-import SocialHeader from "@components/socialMedia/SocialHeader";
 import axiosInstance from "@utils/axiosInstance";
 import FollowButton from "../components/userProfile/FollowButton";
 import TiptapViewer from "@components/richtext/TiptapViewer";
@@ -116,7 +115,7 @@ const PostDetail = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, currentUser]); // Added currentUser dependency
+  }, [id, currentUser]);
 
   // Check follow status khi user hoặc currentUser thay đổi
   useEffect(() => {
@@ -186,7 +185,8 @@ const PostDetail = () => {
       setIsLiked(previousLikeState);
       setLikeCount(previousLikeCount);
       showError("Lỗi kết nối mạng");
-      console.error("Error toggling like:", err);
+      // rename "err" to "error"
+      console.error("Error toggling like:", error);
     } finally {
       setIsLikeProcessing(false);
     }
@@ -225,10 +225,10 @@ const PostDetail = () => {
             showError(result.error || "Có lỗi xảy ra");
           }
         }
-      } catch (err) {
+      } catch (error) {
         setIsBookmarked(previousBookmarkState);
         showError("Lỗi kết nối mạng");
-        console.error("Error toggling bookmark:", err);
+        console.error("Error toggling bookmark:", error);
       } finally {
         setIsBookmarkProcessing(false);
       }
@@ -245,31 +245,23 @@ const PostDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <ThemedHeader variant="social" />
-        <div className="pt-16 flex items-center justify-center min-h-screen">
-          <p className="text-gray-600">Đang tải bài viết...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600">Đang tải bài viết...</p>
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <ThemedHeader variant="social" />
-        <div className="pt-16 flex items-center justify-center min-h-screen">
-          <p className="text-gray-600">{errorMsg || 'Không tìm thấy bài viết'}</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600">{errorMsg || 'Không tìm thấy bài viết'}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <ThemedHeader variant="social" />
-
-      <div className="pt-16 max-w-4xl mx-auto px-4 py-6">
+    <>
+      <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
@@ -422,7 +414,7 @@ const PostDetail = () => {
         postId={parseInt(id)}
         onBookmarkSuccess={handleBookmarkSuccess}
       />
-    </div>
+    </>
   );
 };
 

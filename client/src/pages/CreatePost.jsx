@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Send, ArrowLeft } from 'lucide-react';
-import ThemedHeader from '@components/common/ThemedHeader';
 import axiosInstance from '@utils/axiosInstance';
 import TiptapEditor from '@components/richtext/TiptapEditor';
 import PollForm from '@components/posts/PollForm';
@@ -22,7 +21,7 @@ const CreatePost = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const isDirty = useMemo(() => {
+  useMemo(() => {
     const hasPollContent = isPoll && pollOptions.some((o) => (o || '').trim());
     return (
       !!title.trim() ||
@@ -75,7 +74,7 @@ const CreatePost = () => {
     if (imageFile) {
       const formData = new FormData();
       formData.append('image', imageFile);
-      
+
       // Thêm các field khác vào FormData
       if (payload.title) formData.append('title', payload.title);
       if (payload.contentJson) formData.append('contentJson', JSON.stringify(payload.contentJson));
@@ -83,7 +82,7 @@ const CreatePost = () => {
       formData.append('type', payload.type);
       formData.append('visibility', payload.visibility);
       formData.append('isDraft', payload.isDraft.toString());
-      
+
       if (payload.poll) {
         formData.append('poll', JSON.stringify(payload.poll));
       }
@@ -126,7 +125,7 @@ const CreatePost = () => {
     setIsSubmitting(true);
     try {
       const payload = buildPayload(draft);
-      
+
       // Không cần set Content-Type header, axiosInstance sẽ tự động xử lý FormData
       const res = await axiosInstance.post('/post', payload);
       // Sau khi tạo xong: điều hướng về chi tiết bài viết
@@ -142,127 +141,121 @@ const CreatePost = () => {
     navigate(-1);
   };
 
-
   return (
-    <div className="min-h-screen bg-gray-100">
-      <ThemedHeader variant="social" />
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      <div className="flex items-center gap-3 mb-4">
+        <button
+          onClick={tryLeave}
+          className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+        >
+          <ArrowLeft size={18} />
+          <span>Quay lại</span>
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900">Đăng bài viết</h1>
+      </div>
 
-      <div className="pt-14 max-w-3xl mx-auto px-4 py-6">
-        <div className="flex items-center gap-3 mb-4">
-          <button
-            onClick={tryLeave}
-            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-          >
-            <ArrowLeft size={18} />
-            <span>Quay lại</span>
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">Đăng bài viết</h1>
+      <div className="bg-white rounded-xl shadow-md p-5 relative">
+        {/* Privacy Button ở góc trên phải */}
+        <div className="absolute top-5 right-5">
+          <PrivacyButton value={visibility} onChange={setVisibility} />
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-5 relative">
-          {/* Privacy Button ở góc trên phải */}
-          <div className="absolute top-5 right-5">
-            <PrivacyButton value={visibility} onChange={setVisibility} />
+        {!!errorMsg && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {errorMsg}
           </div>
+        )}
 
-          {!!errorMsg && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {errorMsg}
-            </div>
-          )}
+        <div className="mb-3">
+          <input
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full px-3 py-2 border-none outline-none text-2xl font-bold text-gray-900 focus:outline-none"
+            placeholder="Nhập tiêu đề"
+          />
+        </div>
 
+        <ImageUpload
+          imageUrl={imagePreview}
+          onImageChange={(file) => {
+            setImageFile(file);
+            // Tạo preview URL
+            if (file) {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                setImagePreview(reader.result);
+              };
+              reader.readAsDataURL(file);
+            }
+          }}
+          onImageRemove={() => {
+            setImageFile(null);
+            setImagePreview(null);
+          }}
+        />
 
-          <div className="mb-3">
-            <input
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border-none outline-none text-2xl font-bold text-gray-900 focus:outline-none"
-              placeholder="Nhập tiêu đề"
-            />
-          </div>
-
-          <ImageUpload
-            imageUrl={imagePreview}
-            onImageChange={(file) => {
-              setImageFile(file);
-              // Tạo preview URL
-              if (file) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                  setImagePreview(reader.result);
-                };
-                reader.readAsDataURL(file);
-              }
+        <div className="mb-3">
+          <TiptapEditor
+            valueJson={contentJson}
+            onChange={({ json, text }) => {
+              setContentJson(json);
+              setContentText(text || '');
             }}
-            onImageRemove={() => {
-              setImageFile(null);
-              setImagePreview(null);
+            onPollSuggestion={() => {
+              setIsPoll(true);
+              setErrorMsg('');
             }}
           />
+        </div>
 
-          <div className="mb-3">
-            <TiptapEditor
-              valueJson={contentJson}
-              onChange={({ json, text }) => {
-                setContentJson(json);
-                setContentText(text || '');
-              }}
-              onPollSuggestion={() => {
-                setIsPoll(true);
-                setErrorMsg('');
-              }}
-            />
-          </div>
+        {isPoll && (
+          <PollForm
+            pollOptions={pollOptions}
+            onPollOptionsChange={setPollOptions}
+            pollExpiresAt={pollExpiresAt}
+            onPollExpiresAtChange={setPollExpiresAt}
+            onCancel={() => {
+              setIsPoll(false);
+              setPollOptions(['', '']);
+              setPollExpiresAt('');
+            }}
+          />
+        )}
 
-          {isPoll && (
-            <PollForm
-              pollOptions={pollOptions}
-              onPollOptionsChange={setPollOptions}
-              pollExpiresAt={pollExpiresAt}
-              onPollExpiresAtChange={setPollExpiresAt}
-              onCancel={() => {
-                setIsPoll(false);
-                setPollOptions(['', '']);
-                setPollExpiresAt('');
-              }}
-            />
-          )}
-
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={tryLeave}
-              className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors text-sm"
-            >
-              Hủy
-            </button>
-            <button
-              type="button"
-              disabled={isSubmitting}
-              onClick={() => submitPost({ draft: true })}
-              className={`px-4 py-2 rounded-lg text-sm ${
-                isSubmitting
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-gray-500 text-white hover:bg-gray-600'
-              }`}
-            >
-              Lưu nháp
-            </button>
-            <button
-              type="button"
-              disabled={isSubmitting}
-              onClick={() => submitPost({ draft: false })}
-              className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 ${
-                isSubmitting
-                  ? 'bg-blue-400 text-white cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
-            >
-              {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}
-              <span>Đăng</span>
-            </button>
-          </div>
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={tryLeave}
+            className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors text-sm"
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => submitPost({ draft: true })}
+            className={`px-4 py-2 rounded-lg text-sm ${
+              isSubmitting
+                ? 'bg-gray-400 text-white cursor-not-allowed'
+                : 'bg-gray-500 text-white hover:bg-gray-600'
+            }`}
+          >
+            Lưu nháp
+          </button>
+          <button
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => submitPost({ draft: false })}
+            className={`px-4 py-2 rounded-lg text-sm flex items-center gap-2 ${
+              isSubmitting
+                ? 'bg-blue-400 text-white cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+          >
+            {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}
+            <span>Đăng</span>
+          </button>
         </div>
       </div>
     </div>
@@ -270,5 +263,4 @@ const CreatePost = () => {
 };
 
 export default CreatePost;
-
 

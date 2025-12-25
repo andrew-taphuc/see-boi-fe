@@ -18,6 +18,7 @@ import EditProfile from "@pages/EditProfile";
 import SavedPosts from "@pages/SavedPosts";
 import ProtectedRoute from "@components/common/ProtectedRoute";
 import TarotLayout from "@layouts/TarotLayout";
+import SocialLayout from "@layouts/SocialLayout";
 
 const AppRoutes = () => {
   return (
@@ -114,60 +115,42 @@ const AppRoutes = () => {
           </MainLayout>
         }
       />
-      <Route
-        path="/socialmedia"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
+      <Route element={<SocialLayout />}>
+        <Route
+          path="/socialmedia"
+          element={
+            <ProtectedRoute>
               <SocialMedia />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/post/create"
-        element={
-          <MainLayout>
-            <CreatePost />
-          </MainLayout>
-        }
-      />
-      <Route
-        path="/post/:id"
-        element={
-          <MainLayout>
-            <PostDetail />
-          </MainLayout>
-        }
-      />
-      <Route
-        path="/user/:id"
-        element={
-          <MainLayout>
-            <UserProfile />
-          </MainLayout>
-        }
-      />
-      <Route
-        path="/user/edit"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/post/create"
+          element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/post/:id" element={<PostDetail />} />
+        <Route path="/user/:id" element={<UserProfile />} />
+        <Route
+          path="/user/edit"
+          element={
+            <ProtectedRoute>
               <EditProfile />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/saved-posts"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/saved-posts"
+          element={
+            <ProtectedRoute>
               <SavedPosts />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
     </Routes>
   );
 };

@@ -4,15 +4,15 @@ import { useNotification } from "@context/NotificationContext";
 import { useSocket } from "@context/SocketContext";
 import { useNavigate } from "react-router-dom";
 
-const NotificationBell = () => {
+const NotificationBell = ({ bellColor }) => {
   const navigate = useNavigate();
   const { notifications, unreadCount, markAsRead, markAllAsRead } =
     useNotification();
   const { isConnected } = useSocket();
   const [isOpen, setIsOpen] = useState(false);
-  const [hasNewNotification, setHasNewNotification] = useState(false);
-  const prevUnreadCountRef = useRef(unreadCount);
   const dropdownRef = useRef(null);
+  const [hasPulse, setHasPulse] = useState(false);
+  const prevUnreadCountRef = useRef(unreadCount);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -26,20 +26,16 @@ const NotificationBell = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Watch for unread count changes to trigger animations
+  // Pulse badge 3 beats when new notification arrives
   useEffect(() => {
-    // Only trigger if unread count increased (new notification)
     if (unreadCount > prevUnreadCountRef.current) {
-      console.log("🔔 New notification detected. Unread count:", unreadCount);
-
-      // Trigger animation (wrapped in setTimeout to avoid setState in effect warning)
-      setTimeout(() => {
-        setHasNewNotification(true);
-        setTimeout(() => setHasNewNotification(false), 3000);
-      }, 0);
+      setHasPulse(true);
+      const timer = setTimeout(() => setHasPulse(false), 2800); // ~3 pulse cycles
+      return () => clearTimeout(timer);
     }
-
-    // Update previous count
+    if (unreadCount === 0) {
+      setHasPulse(false);
+    }
     prevUnreadCountRef.current = unreadCount;
   }, [unreadCount]);
 
@@ -99,38 +95,42 @@ const NotificationBell = () => {
     setIsOpen(false);
   };
 
+  const shakeKeyframes = `
+    @keyframes bell-shake {
+      0% { transform: rotate(0deg); }
+      15% { transform: rotate(-15deg); }
+      30% { transform: rotate(15deg); }
+      45% { transform: rotate(-10deg); }
+      60% { transform: rotate(10deg); }
+      75% { transform: rotate(-5deg); }
+      100% { transform: rotate(0deg); }
+    }
+  `;
+
   return (
     <div className="relative" ref={dropdownRef}>
+      <style>{shakeKeyframes}</style>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2 hover:bg-gray-100 rounded-full transition-all duration-300 ${
-          hasNewNotification ? "animate-bounce" : ""
-        }`}
+        className="relative p-2 rounded-full transition-colors duration-200 hover:bg-white/10"
         title={isConnected ? "Thông báo (Đang kết nối)" : "Thông báo (Offline)"}
       >
         <Bell
           size={20}
-          className={`transition-colors duration-300 ${
-            hasNewNotification ? "text-purple-600" : "text-gray-600"
-          }`}
+          className="transition-colors duration-200"
+          style={{
+            color: bellColor || "#6b7280",
+            animation: hasPulse ? "bell-shake 0.8s ease-in-out 3" : "none",
+            transformOrigin: "center 20%",
+          }}
         />
         {unreadCount > 0 && (
           <span
-            className={`absolute top-1 right-1 bg-red-500 rounded-full flex items-center justify-center ${
-              hasNewNotification ? "w-5 h-5 animate-pulse" : "w-4 h-4"
-            } transition-all duration-300`}
+            className={`absolute top-1.25 right-2 bg-red-500 rounded-full flex items-center justify-center w-2 h-2 ${
+              hasPulse ? 'animate-pulse' : ''
+            }`}
           >
-            {unreadCount > 99 ? (
-              <span className="text-white text-[10px] font-bold">99+</span>
-            ) : unreadCount > 9 ? (
-              <span className="text-white text-[10px] font-bold">
-                {unreadCount}
-              </span>
-            ) : (
-              <span className="text-white text-[10px] font-bold">
-                {unreadCount}
-              </span>
-            )}
+            {/* badge không hiển thị số */}
           </span>
         )}
         {!isConnected && (

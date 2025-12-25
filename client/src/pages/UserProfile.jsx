@@ -14,8 +14,6 @@ import {
   Camera,
   Bookmark,
 } from "lucide-react";
-import SocialHeader from "@components/socialMedia/SocialHeader";
-import ThemedHeader from "@components/common/ThemedHeader";
 import FollowButton from "@components/userProfile/FollowButton";
 import FollowListModal from "@components/userProfile/FollowListModal";
 import AvatarUploadModal from "@components/AvatarUploadModal";
@@ -285,13 +283,10 @@ const UserProfile = () => {
 
   if (isLoadingMe) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <ThemedHeader variant="social" />
-        <div className="pt-16 flex items-center justify-center min-h-screen">
-          <div className="flex items-center gap-2 text-gray-600">
-            <Loader2 className="animate-spin" size={18} />
-            <span>Đang tải thông tin cá nhân...</span>
-          </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center gap-2 text-gray-600">
+          <Loader2 className="animate-spin" size={18} />
+          <span>Đang tải thông tin cá nhân...</span>
         </div>
       </div>
     );
@@ -299,22 +294,17 @@ const UserProfile = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <ThemedHeader variant="social" />
-        <div className="pt-16 flex items-center justify-center min-h-screen">
-          <p className="text-gray-600">
-            {errorMsg || "Không tìm thấy người dùng"}
-          </p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600">
+          {errorMsg || "Không tìm thấy người dùng"}
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <ThemedHeader variant="social" />
-      
-      <div className="pt-16 max-w-4xl mx-auto px-4 py-6">
+    <>
+    <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Profile Header Card */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
           <div className="p-6">
@@ -520,32 +510,32 @@ const UserProfile = () => {
         </div>
       </div>
 
-      {/* Follow List Modal */}
-      <FollowListModal
-        isOpen={followModalOpen}
-        onClose={() => setFollowModalOpen(false)}
-        userId={user?.id}
-        initialTab={followModalInitialTab}
-      />
+    {/* Follow List Modal */}
+    <FollowListModal
+      isOpen={followModalOpen}
+      onClose={() => setFollowModalOpen(false)}
+      userId={user?.id}
+      initialTab={followModalInitialTab}
+    />
 
-      {/* Avatar Upload Modal */}
-      {isOwnProfile && (
-        <AvatarUploadModal
-          isOpen={isAvatarModalOpen}
-          onClose={() => setIsAvatarModalOpen(false)}
-          currentAvatarUrl={user?.avatarUrl}
-          onSuccess={handleAvatarUpdateSuccess}
-        />
-      )}
-
-      {/* Avatar View Modal */}
-      <AvatarViewModal
-        isOpen={isAvatarViewModalOpen}
-        onClose={() => setIsAvatarViewModalOpen(false)}
-        avatarUrl={user?.avatarUrl}
-        userName={user?.userName || user?.fullName}
+    {/* Avatar Upload Modal */}
+    {isOwnProfile && (
+      <AvatarUploadModal
+        isOpen={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+        currentAvatarUrl={user?.avatarUrl}
+        onSuccess={handleAvatarUpdateSuccess}
       />
-    </div>
+    )}
+
+    {/* Avatar View Modal */}
+    <AvatarViewModal
+      isOpen={isAvatarViewModalOpen}
+      onClose={() => setIsAvatarViewModalOpen(false)}
+      avatarUrl={user?.avatarUrl}
+      userName={user?.userName || user?.fullName}
+    />
+    </>
   );
 };
 

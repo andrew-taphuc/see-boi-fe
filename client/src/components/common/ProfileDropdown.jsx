@@ -25,10 +25,10 @@ const ProfileDropdown = ({
   }, [])
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative flex items-center h-full" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-9 h-9 rounded-full border-2 border-purple-500 overflow-hidden hover:opacity-80 transition-opacity"
+        className="w-11 h-11 rounded-full border-2 border-purple-500 overflow-hidden hover:opacity-80 transition-opacity flex items-center justify-center"
       >
         <div
           className="w-full h-full bg-cover bg-center"
@@ -37,11 +37,11 @@ const ProfileDropdown = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+        <div className="absolute right-0 mt-85 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
           <div className="p-3 border-b border-gray-200">
             <div className="flex items-center gap-3">
               <div
-                className="w-10 h-10 rounded-full border-2 border-purple-500 bg-cover bg-center flex-shrink-0"
+                className="w-12 h-12 rounded-full border-2 border-purple-500 bg-cover bg-center flex-shrink-0"
                 style={{ backgroundImage: `url(${avatarUrl})` }}
               />
               <div className="min-w-0">

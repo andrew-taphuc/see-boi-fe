@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
-import ThemedHeader from '@components/common/ThemedHeader';
 import axiosInstance from '@utils/axiosInstance';
 import { getDefaultAvatar } from '@constants/defaultAvatars';
 
@@ -185,23 +184,17 @@ const EditProfile = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <ThemedHeader variant="social" />
-        <div className="pt-16 flex items-center justify-center min-h-screen">
-          <div className="flex items-center gap-2 text-gray-600">
-            <Loader2 className="animate-spin" size={18} />
-            <span>Đang tải thông tin...</span>
-          </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center gap-2 text-gray-600">
+          <Loader2 className="animate-spin" size={18} />
+          <span>Đang tải thông tin...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <ThemedHeader variant="social" />
-
-      <div className="pt-14 max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-6 flex items-center gap-4">
             <button
@@ -385,8 +378,8 @@ const EditProfile = () => {
               </div>
             </form>
           </div>
-        </div>
       </div>
+    </div>
   );
 };
 

@@ -20,7 +20,7 @@ const TuviLayout = ({ children }) => {
       {/* Nội dung chính */}
       <div className="relative z-10 w-full flex flex-col min-h-screen">
         <ThemedHeader variant="tuvi" />
-        <main className="flex-1 pt-10">{children}</main>
+        <main className="flex-1 pt-20">{children}</main>
 
         <TuviFooter />
       </div>
