@@ -3,9 +3,10 @@ import { MessageSquare, ChevronDown, ArrowUpDown } from "lucide-react";
 import CommentItem from "./CommentItem";
 import CommentInput from "./CommentInput";
 import axiosInstance from "@utils/axiosInstance";
-import { getSocket } from "@utils/socket";
+import { useSocket } from "@/context/SocketContext";
 
 const CommentList = ({ postId }) => {
+  const { socket, joinPostRoom, leavePostRoom } = useSocket();
   const [comments, setComments] = useState([]);
   const [totalComments, setTotalComments] = useState(0); // Tổng tất cả comments (gốc + reply) - hiển thị trên UI
   const [totalRootComments, setTotalRootComments] = useState(0); // Tổng comment gốc - dùng cho pagination
@@ -228,16 +229,13 @@ const CommentList = ({ postId }) => {
 
   // Socket.io real-time updates
   useEffect(() => {
-    if (!postId) return;
-
-    const socket = getSocket();
-    socket.connect();
+    if (!postId || !socket) return;
 
     // Join post room
-    socket.emit("joinPost", postId);
+    joinPostRoom(postId);
 
     // Listen for new comments
-    socket.on("newComment", (newComment) => {
+    const handleNewComment = (newComment) => {
       console.log("New comment received via socket:", newComment);
 
       // Get current user from localStorage
@@ -297,10 +295,10 @@ const CommentList = ({ postId }) => {
           setDisplayedCount((prev) => prev + 1);
         }
       }
-    });
+    };
 
     // Listen for updated comments
-    socket.on("updateComment", (updatedComment) => {
+    const handleUpdateComment = (updatedComment) => {
       console.log("Comment updated via socket:", updatedComment);
 
       setComments((prev) =>
@@ -310,10 +308,10 @@ const CommentList = ({ postId }) => {
             : c
         )
       );
-    });
+    };
 
     // Listen for deleted comments
-    socket.on("deleteComment", (deletedCommentId) => {
+    const handleDeleteComment = (deletedCommentId) => {
       console.log("Comment deleted via socket:", deletedCommentId);
 
       setComments((prev) => {
@@ -350,16 +348,20 @@ const CommentList = ({ postId }) => {
         }
       });
       setTotalComments((prev) => Math.max(0, prev - 1));
-    });
+    };
+
+    socket.on("newComment", handleNewComment);
+    socket.on("updateComment", handleUpdateComment);
+    socket.on("deleteComment", handleDeleteComment);
 
     // Cleanup on unmount
     return () => {
-      socket.emit("leavePost", postId);
-      socket.off("newComment");
-      socket.off("updateComment");
-      socket.off("deleteComment");
+      leavePostRoom(postId);
+      socket.off("newComment", handleNewComment);
+      socket.off("updateComment", handleUpdateComment);
+      socket.off("deleteComment", handleDeleteComment);
     };
-  }, [postId]);
+  }, [postId, socket, joinPostRoom, leavePostRoom]);
 
   // Debug log
   useEffect(() => {
