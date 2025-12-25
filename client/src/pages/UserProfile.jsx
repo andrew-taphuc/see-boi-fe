@@ -15,6 +15,7 @@ import {
   Bookmark,
 } from "lucide-react";
 import SocialHeader from "@components/socialMedia/SocialHeader";
+import ThemedHeader from "@components/common/ThemedHeader";
 import FollowButton from "@components/userProfile/FollowButton";
 import FollowListModal from "@components/userProfile/FollowListModal";
 import AvatarUploadModal from "@components/AvatarUploadModal";
@@ -285,8 +286,8 @@ const UserProfile = () => {
   if (isLoadingMe) {
     return (
       <div className="min-h-screen bg-gray-100">
-        <SocialHeader />
-        <div className="pt-14 flex items-center justify-center min-h-screen">
+        <ThemedHeader variant="social" />
+        <div className="pt-16 flex items-center justify-center min-h-screen">
           <div className="flex items-center gap-2 text-gray-600">
             <Loader2 className="animate-spin" size={18} />
             <span>Đang tải thông tin cá nhân...</span>
@@ -299,8 +300,8 @@ const UserProfile = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-100">
-        <SocialHeader />
-        <div className="pt-14 flex items-center justify-center min-h-screen">
+        <ThemedHeader variant="social" />
+        <div className="pt-16 flex items-center justify-center min-h-screen">
           <p className="text-gray-600">
             {errorMsg || "Không tìm thấy người dùng"}
           </p>
@@ -311,9 +312,9 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <SocialHeader />
-
-      <div className="pt-14 max-w-4xl mx-auto px-4 py-6">
+      <ThemedHeader variant="social" />
+      
+      <div className="pt-16 max-w-4xl mx-auto px-4 py-6">
         {/* Profile Header Card */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
           <div className="p-6">

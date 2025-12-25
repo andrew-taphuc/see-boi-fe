@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import Header from "@components/nhantuong/Header";
+import ThemedHeader from "@components/common/ThemedHeader";
+import NhanTuongClassicHeader from "@components/nhantuong/Header";
 import HeroSection from "@components/nhantuong/HeroSection";
 import ButtonInfo from "@assets/nhantuong/button_info.svg";
 import Hook from "@assets/nhantuong/hook.svg";
@@ -211,7 +212,7 @@ const NhanTuong = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 pt-14">
         <div
           style={{
             backgroundImage: `linear-gradient(rgba(45, 10, 10, 0.1), rgba(45, 10, 10, 0.3)), url(${ImageBackground})`,
@@ -220,10 +221,15 @@ const NhanTuong = () => {
             backgroundRepeat: "no-repeat",
           }}
         >
-          <Header />
+          <ThemedHeader variant="nhantuong" />
+          <div className="pt-14 md:pt-16">
+            <NhanTuongClassicHeader />
+          </div>
           <HeroSection />
         </div>
-        <FaceAnalysisForm />
+        <div className="pt-4">
+          <FaceAnalysisForm />
+        </div>
         <Features />
         <div
           style={{

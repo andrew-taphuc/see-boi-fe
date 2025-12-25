@@ -5,6 +5,8 @@ import MainLayout from "@layouts/MainLayout";
 import LandingPage from "@pages/LandingPage";
 import TuVi from "@pages/TuVi";
 import Tarot from "@pages/Tarot";
+import TarotCardDetail from "@pages/TarotCardDetail";
+import TarotCardList from "@pages/TarotCardList";
 import NhanTuong from "@pages/nhantuong/NhanTuong";
 import GioiThieu from "@pages/nhantuong/GioiThieu";
 import KetQua from "@pages/nhantuong/KetQua";
@@ -15,6 +17,7 @@ import UserProfile from "@pages/UserProfile";
 import EditProfile from "@pages/EditProfile";
 import SavedPosts from "@pages/SavedPosts";
 import ProtectedRoute from "@components/common/ProtectedRoute";
+import TarotLayout from "@layouts/TarotLayout";
 
 const AppRoutes = () => {
   return (
@@ -64,11 +67,27 @@ const AppRoutes = () => {
         }
       />
       <Route
+        path="/tarot/card/:id"
+        element={
+          <TarotLayout>
+            <TarotCardDetail />
+          </TarotLayout>
+        }
+      />
+      <Route
+        path="/tarot/card"
+        element={
+          <TarotLayout>
+            <TarotCardList />
+          </TarotLayout>
+        }
+      />
+      <Route
         path="/tarot"
         element={
-          <MainLayout>
+          <TarotLayout>
             <Tarot />
-          </MainLayout>
+          </TarotLayout>
         }
       />
       <Route

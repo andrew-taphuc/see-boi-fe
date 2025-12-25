@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@context/AuthContext';
 import { Save, Loader2, ArrowLeft } from 'lucide-react';
-import SocialHeader from '@components/socialMedia/SocialHeader';
+import ThemedHeader from '@components/common/ThemedHeader';
 import axiosInstance from '@utils/axiosInstance';
 import { getDefaultAvatar } from '@constants/defaultAvatars';
 
@@ -186,8 +186,8 @@ const EditProfile = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100">
-        <SocialHeader />
-        <div className="pt-14 flex items-center justify-center min-h-screen">
+        <ThemedHeader variant="social" />
+        <div className="pt-16 flex items-center justify-center min-h-screen">
           <div className="flex items-center gap-2 text-gray-600">
             <Loader2 className="animate-spin" size={18} />
             <span>Đang tải thông tin...</span>
@@ -199,7 +199,7 @@ const EditProfile = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <SocialHeader />
+      <ThemedHeader variant="social" />
 
       <div className="pt-14 max-w-3xl mx-auto px-4 py-8">
           {/* Header */}

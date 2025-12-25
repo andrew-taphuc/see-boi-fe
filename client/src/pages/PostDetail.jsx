@@ -246,8 +246,8 @@ const PostDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100">
-        <SocialHeader />
-        <div className="pt-14 flex items-center justify-center min-h-screen">
+        <ThemedHeader variant="social" />
+        <div className="pt-16 flex items-center justify-center min-h-screen">
           <p className="text-gray-600">Đang tải bài viết...</p>
         </div>
       </div>
@@ -257,11 +257,9 @@ const PostDetail = () => {
   if (!post) {
     return (
       <div className="min-h-screen bg-gray-100">
-        <SocialHeader />
-        <div className="pt-14 flex items-center justify-center min-h-screen">
-          <p className="text-gray-600">
-            {errorMsg || "Không tìm thấy bài viết"}
-          </p>
+        <ThemedHeader variant="social" />
+        <div className="pt-16 flex items-center justify-center min-h-screen">
+          <p className="text-gray-600">{errorMsg || 'Không tìm thấy bài viết'}</p>
         </div>
       </div>
     );
@@ -269,9 +267,9 @@ const PostDetail = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <SocialHeader />
+      <ThemedHeader variant="social" />
 
-      <div className="pt-14 max-w-4xl mx-auto px-4 py-6">
+      <div className="pt-16 max-w-4xl mx-auto px-4 py-6">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}

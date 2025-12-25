@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "@components/TuviPage/TuviNavbar";
 import TuviFooter from "@components/TuviPage/TuviFooter";
+import ThemedHeader from "@components/common/ThemedHeader";
 import bgImage from "@assets/tuvi-bg.jpg";
 
 const TuviLayout = ({ children }) => {
@@ -19,9 +19,8 @@ const TuviLayout = ({ children }) => {
 
       {/* Nội dung chính */}
       <div className="relative z-10 w-full flex flex-col min-h-screen">
-        <Navbar />
-
-        <main className="flex-1">{children}</main>
+        <ThemedHeader variant="tuvi" />
+        <main className="flex-1 pt-10">{children}</main>
 
         <TuviFooter />
       </div>
