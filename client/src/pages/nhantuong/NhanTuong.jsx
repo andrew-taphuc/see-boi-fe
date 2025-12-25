@@ -11,7 +11,7 @@ import FaceAnalysisForm from "@components/nhantuong/FaceAnalysisForm";
 import Features from "@components/nhantuong/Features";
 import FAQ from "@components/nhantuong/FAQ";
 import Footer from "@components/nhantuong/Footer";
-import ImageBackground from "@assets/nhantuong/bg.jpg";
+import ImageBackground from "@assets/nhantuong/bg7.jpg";
 import ImageBackground2 from "@assets/nhantuong/pattern7.png";
 import BackToTop from "@assets/nhantuong/gps-navigation.png";
 import BtnBackground from "@assets/nhantuong/btn.svg";
@@ -61,10 +61,10 @@ const NhanTuong = () => {
   };
 
   const NavButton = ({ href, label }) => (
-    <a href={href} className="relative flex flex-col items-center gap-2 group">
-      <div className="relative w-36 h-36">
+    <a href={href} className="relative flex flex-col items-center gap-1 group">
+      <div className="relative w-23 h-23">
         <img src={ButtonInfo} alt={label} className="w-full h-full" />
-        <p className="absolute inset-0 flex items-center justify-center text-yellow-900 text-xl font-medium">
+        <p className="absolute inset-0 flex items-center justify-center text-yellow-900 text-base font-medium">
           {label}
         </p>
       </div>
@@ -191,7 +191,7 @@ const NhanTuong = () => {
       </div>
 
       {/* Left Navigation - Fixed Position - Desktop Only */}
-      <div className="hidden md:flex fixed left-30 top-45 flex-col gap-6 z-40">
+      <div className="hidden md:flex fixed left-15 top-20 flex-col gap-6 z-40">
         {navigationButtons.left.map((btn, idx) => (
           <NavButton key={idx} {...btn} />
         ))}
@@ -201,7 +201,7 @@ const NhanTuong = () => {
       </div>
 
       {/* Right Navigation - Fixed Position - Desktop Only */}
-      <div className="hidden md:flex fixed right-30 top-45 flex-col gap-6 z-40">
+      <div className="hidden md:flex fixed right-15 top-20 flex-col gap-6 z-40">
         {navigationButtons.right.map((btn, idx) => (
           <NavButton key={idx} {...btn} />
         ))}
@@ -214,7 +214,7 @@ const NhanTuong = () => {
       <div className="relative z-10">
         <div
           style={{
-            backgroundImage: `linear-gradient(rgba(45, 10, 10, 0.5), rgba(45, 10, 10, 0.7)), url(${ImageBackground})`,
+            backgroundImage: `linear-gradient(rgba(45, 10, 10, 0.1), rgba(45, 10, 10, 0.3)), url(${ImageBackground})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
