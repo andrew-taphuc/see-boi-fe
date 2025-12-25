@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "@components/TuviPage/TuviNavbar";
 import TuviFooter from "@components/TuviPage/TuviFooter";
-import bgImage from "@assets/TuViBackground.jpg";
+import bgImage from "@assets/tuvi-bg.jpg";
 
 const TuviLayout = ({ children }) => {
   return (
