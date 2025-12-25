@@ -1,0 +1,548 @@
+[
+  {
+    "id": 1,
+    "card_name": "The Fool",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-fool",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/0.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 2,
+    "card_name": "The Magician",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-magician",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/1.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 3,
+    "card_name": "The High Priestess",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-high-priestess",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/2.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 4,
+    "card_name": "The Empress",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-empress",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/3.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 5,
+    "card_name": "The Emperor",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-emperor",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/4.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 6,
+    "card_name": "The Hierophant",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-hierophant",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/5.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 7,
+    "card_name": "The Lovers",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-lovers",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/6.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 8,
+    "card_name": "The Chariot",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-chariot",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/7.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 9,
+    "card_name": "Strength",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/strength",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/8.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 10,
+    "card_name": "The Hermit",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-hermit",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/9.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 11,
+    "card_name": "Wheel of Fortune",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/wheel-of-fortune",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/10.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 12,
+    "card_name": "Justice",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/justice",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/11.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 13,
+    "card_name": "The Hanged Man",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-hanged-man",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/12.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 14,
+    "card_name": "Death",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/death",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/13.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 15,
+    "card_name": "Temperance",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/temperance",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/14.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 16,
+    "card_name": "The Devil",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-devil",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/15.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 17,
+    "card_name": "The Tower",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-tower",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/16.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 18,
+    "card_name": "The Star",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-star",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/17.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 19,
+    "card_name": "The Moon",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-moon",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/18.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 20,
+    "card_name": "The Sun",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-sun",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/19.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 21,
+    "card_name": "Judgement",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/judgement",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/20.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 22,
+    "card_name": "The World",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/the-world",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/21.mp4",
+    "type": "Major Arcana"
+  },
+  {
+    "id": 23,
+    "card_name": "Ace of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/ace-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-1.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 24,
+    "card_name": "Two of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/two-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-2.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 25,
+    "card_name": "Three of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/three-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-3.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 26,
+    "card_name": "Four of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/four-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-4.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 27,
+    "card_name": "Five of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/five-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-5.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 28,
+    "card_name": "Six of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/six-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-6.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 29,
+    "card_name": "Seven of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/seven-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-7.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 30,
+    "card_name": "Eight of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/eight-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-8.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 31,
+    "card_name": "Nine of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/nine-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-9.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 32,
+    "card_name": "Ten of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/ten-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-10.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 33,
+    "card_name": "Page of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/page-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-11.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 34,
+    "card_name": "Knight of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/knight-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-12.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 35,
+    "card_name": "Queen of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/queen-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-13.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 36,
+    "card_name": "King of Wands",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/king-of-wands",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Wands-14.mp4",
+    "type": "Wands"
+  },
+  {
+    "id": 37,
+    "card_name": "Ace of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/ace-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-1.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 38,
+    "card_name": "Two of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/two-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-2.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 39,
+    "card_name": "Three of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/three-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-3.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 40,
+    "card_name": "Four of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/four-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-4.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 41,
+    "card_name": "Five of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/five-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-5.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 42,
+    "card_name": "Six of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/six-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-6.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 43,
+    "card_name": "Seven of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/seven-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-7.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 44,
+    "card_name": "Eight of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/eight-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-8.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 45,
+    "card_name": "Nine of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/nine-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-9.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 46,
+    "card_name": "Ten of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/ten-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-10.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 47,
+    "card_name": "Page of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/page-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-11.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 48,
+    "card_name": "Knight of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/knight-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-12.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 49,
+    "card_name": "Queen of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/queen-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-13.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 50,
+    "card_name": "King of Cups",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/king-of-cups",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Cups-14.mp4",
+    "type": "Cups"
+  },
+  {
+    "id": 51,
+    "card_name": "Ace of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/ace-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-1.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 52,
+    "card_name": "Two of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/two-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-2.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 53,
+    "card_name": "Three of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/three-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-3.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 54,
+    "card_name": "Four of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/four-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-4.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 55,
+    "card_name": "Five of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/five-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-5.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 56,
+    "card_name": "Six of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/six-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-6.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 57,
+    "card_name": "Seven of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/seven-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-7.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 58,
+    "card_name": "Eight of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/eight-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-8.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 59,
+    "card_name": "Nine of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/nine-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-9.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 60,
+    "card_name": "Ten of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/ten-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-10.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 61,
+    "card_name": "Page of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/page-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-11.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 62,
+    "card_name": "Knight of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/knight-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-12.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 63,
+    "card_name": "Queen of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/queen-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-13.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 64,
+    "card_name": "King of Swords",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/king-of-swords",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Swords-14.mp4",
+    "type": "Swords"
+  },
+  {
+    "id": 65,
+    "card_name": "Ace of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/ace-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-1.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 66,
+    "card_name": "Two of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/two-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-2.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 67,
+    "card_name": "Three of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/three-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-3.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 68,
+    "card_name": "Four of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/four-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-4.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 69,
+    "card_name": "Five of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/five-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-5.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 70,
+    "card_name": "Six of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/six-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-6.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 71,
+    "card_name": "Seven of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/seven-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-7.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 72,
+    "card_name": "Eight of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/eight-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-8.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 73,
+    "card_name": "Nine of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/nine-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-9.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 74,
+    "card_name": "Ten of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/ten-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-10.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 75,
+    "card_name": "Page of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/page-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-11.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 76,
+    "card_name": "Knight of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/knight-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-12.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 77,
+    "card_name": "Queen of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/queen-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-13.mp4",
+    "type": "Pentacles"
+  },
+  {
+    "id": 78,
+    "card_name": "King of Pentacles",
+    "card_url": "https://tarotoo.com/tarot-card-meanings/king-of-pentacles",
+    "video_mp4": "https://tarotoo.com/wp-content/uploads/Pentacles-14.mp4",
+    "type": "Pentacles"
+  }
+]
