@@ -108,6 +108,15 @@ const TuviHistoryModal = ({ isOpen, onClose, onSelectChart }) => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4">
                     {/* Thông tin chính */}
                     <div className="md:col-span-2">
+                      {/* Hiển thị tên */}
+                      {chart.name && (
+                        <div className="mb-3">
+                          <h3 className="text-lg font-bold text-red-900 font-['Playfair_Display']">
+                            {chart.name}
+                          </h3>
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs font-bold text-white bg-red-800 px-2 py-1 rounded">
                           {chart.isLunar ? "ÂM LỊCH" : "DƯƠNG LỊCH"}

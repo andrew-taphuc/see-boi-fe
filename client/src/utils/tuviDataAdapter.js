@@ -98,7 +98,7 @@ export const adaptBackendToFrontend = (backendData, userInfo) => {
 
   // 1. Tạo phần Thiên Bàn (thông tin tổng quan)
   const thienBan = {
-    hoTen: userInfo?.name || "Chưa có tên",
+    hoTen: input?.name || userInfo?.name || "Chưa có tên",
     ngaySinh: input?.birthDate || "",
     amLich: input?.isLunar ? "Âm lịch" : "Dương lịch",
     gioSinh: `${userInfo?.hour || input?.birthHour || 0} giờ ${
