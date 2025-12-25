@@ -13,6 +13,7 @@ import PostDetail from "@pages/PostDetail";
 import CreatePost from "@pages/CreatePost";
 import UserProfile from "@pages/UserProfile";
 import EditProfile from "@pages/EditProfile";
+import SavedPosts from "@pages/SavedPosts";
 import ProtectedRoute from "@components/common/ProtectedRoute";
 
 const AppRoutes = () => {
@@ -134,6 +135,16 @@ const AppRoutes = () => {
           <ProtectedRoute>
             <MainLayout>
               <EditProfile />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/saved-posts"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <SavedPosts />
             </MainLayout>
           </ProtectedRoute>
         }
