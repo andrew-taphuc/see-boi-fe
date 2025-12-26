@@ -379,7 +379,7 @@ const EditProfile = () => {
             </form>
           </div>
       </div>
-    </div>
+    
   );
 };
 
