@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   MoreVertical,
@@ -27,6 +27,63 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
     comment.voteCounts || { upvotes: 0, downvotes: 0, total: 0 }
   );
   const [userVote, setUserVote] = useState(null); // 'up', 'down', or null
+
+  // Initialize userVote from backend on mount
+  useEffect(() => {
+    const commentId = comment.id || comment._id;
+
+    // Priority 1: Check if backend provides userVote field
+    if (comment.userVote) {
+      // Normalize backend value (UP/DOWN -> up/down)
+      const normalizedVote = comment.userVote.toLowerCase();
+      setUserVote(normalizedVote);
+      // Sync to localStorage
+      if (currentUser?.id) {
+        const key = `vote_${currentUser.id}_${commentId}`;
+        localStorage.setItem(key, normalizedVote);
+      }
+      return;
+    }
+
+    // Priority 2: Check if backend provides hasUpvoted/hasDownvoted
+    if (comment.hasUpvoted) {
+      setUserVote("up");
+      if (currentUser?.id) {
+        const key = `vote_${currentUser.id}_${commentId}`;
+        localStorage.setItem(key, "up");
+      }
+      return;
+    }
+
+    if (comment.hasDownvoted) {
+      setUserVote("down");
+      if (currentUser?.id) {
+        const key = `vote_${currentUser.id}_${commentId}`;
+        localStorage.setItem(key, "down");
+      }
+      return;
+    }
+
+    // Priority 3: Fallback to localStorage
+    if (currentUser?.id) {
+      const key = `vote_${currentUser.id}_${commentId}`;
+      const savedVote = localStorage.getItem(key);
+      if (savedVote === "up" || savedVote === "down") {
+        setUserVote(savedVote);
+      } else {
+        setUserVote(null);
+      }
+    } else {
+      setUserVote(null);
+    }
+  }, [
+    comment.id,
+    comment._id,
+    comment.userVote,
+    comment.hasUpvoted,
+    comment.hasDownvoted,
+    currentUser?.id,
+  ]);
 
   // Normalize user IDs for comparison
   const normalizeId = (user) => {
@@ -107,13 +164,18 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
 
   // Handle upvote/downvote
   const handleVote = async (voteType) => {
-    try {
-      const endpoint = voteType === "up" ? "upvote" : "downvote";
-      await axiosInstance.post(`/comment/${comment.id}/${endpoint}`);
+    const commentId = comment.id || comment._id;
 
-      // Update local vote state
+    try {
+      // Check if this is an un-vote (clicking the same vote type again)
       if (userVote === voteType) {
-        // Un-vote
+        // UN-VOTE: Call DELETE /comment/:id/vote to remove vote
+        // Backend will handle XP:
+        // - Remove upvote → -3 XP for comment owner
+        // - Remove downvote → +2 XP for comment owner
+        await axiosInstance.delete(`/comment/${commentId}/vote`);
+
+        // Update local vote state
         setUserVote(null);
         setVotes((prev) => ({
           ...prev,
@@ -121,8 +183,23 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
             prev[voteType === "up" ? "upvotes" : "downvotes"] - 1,
           total: prev.total + (voteType === "up" ? -1 : 1),
         }));
+
+        // Remove from localStorage
+        if (currentUser?.id) {
+          const key = `vote_${currentUser.id}_${commentId}`;
+          localStorage.removeItem(key);
+        }
       } else {
-        // New vote or change vote
+        // NEW VOTE or CHANGE VOTE: Call POST /comment/:id/upvote or /comment/:id/downvote
+        // Backend will handle XP automatically:
+        // - New upvote → +3 XP
+        // - New downvote → -2 XP
+        // - Change UP→DOWN → -5 XP (-3 remove upvote, -2 downvote)
+        // - Change DOWN→UP → +5 XP (+2 remove downvote, +3 upvote)
+        const endpoint = voteType === "up" ? "upvote" : "downvote";
+        await axiosInstance.post(`/comment/${commentId}/${endpoint}`);
+
+        // Update local vote state
         setUserVote(voteType);
         const oldVote = userVote;
         setVotes((prev) => {
@@ -137,6 +214,12 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
           newVotes.total += voteType === "up" ? 1 : -1;
           return newVotes;
         });
+
+        // Save to localStorage
+        if (currentUser?.id) {
+          const key = `vote_${currentUser.id}_${commentId}`;
+          localStorage.setItem(key, voteType);
+        }
       }
     } catch (error) {
       console.error("Error voting:", error);
