@@ -7,6 +7,7 @@ import {
   MessageSquare,
   // Heart, // Not used in the code
   Bookmark,
+  Eye,
 } from "lucide-react";
 import axiosInstance from "@utils/axiosInstance";
 import FollowButton from "../components/userProfile/FollowButton";
@@ -36,6 +37,13 @@ const PostDetail = () => {
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
   const [isBookmarkProcessing, setIsBookmarkProcessing] = useState(false);
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
+
+  // View tracking state
+  const [viewStats, setViewStats] = useState({
+    totalViews: 0,
+    uniqueViews: 0,
+    anonymousViews: 0,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -97,6 +105,21 @@ const PostDetail = () => {
           minute: "2-digit",
         });
         setFormattedDate(formatted);
+
+        // Fetch view statistics
+        try {
+          const viewsRes = await axiosInstance.get(`/post/${postId}/views`);
+          if (!cancelled && viewsRes?.data) {
+            setViewStats({
+              totalViews: viewsRes.data.totalViews || 0,
+              uniqueViews: viewsRes.data.uniqueViews || 0,
+              anonymousViews: viewsRes.data.anonymousViews || 0,
+            });
+          }
+        } catch (viewErr) {
+          console.error("Error fetching view stats:", viewErr);
+          // Don't show error to user, just keep views at 0
+        }
       } catch (e) {
         if (cancelled) return;
         const status = e?.response?.status;
@@ -254,7 +277,7 @@ const PostDetail = () => {
   if (!post) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-600">{errorMsg || 'Không tìm thấy bài viết'}</p>
+        <p className="text-gray-600">{errorMsg || "Không tìm thấy bài viết"}</p>
       </div>
     );
   }
@@ -312,6 +335,13 @@ const PostDetail = () => {
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
                     <span>{formattedDate}</span>
+                    {/* View count */}
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <Eye size={16} />
+                      <span>
+                        {viewStats.totalViews.toLocaleString()} lượt xem
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
