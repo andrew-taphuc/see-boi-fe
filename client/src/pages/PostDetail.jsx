@@ -354,10 +354,10 @@ const PostDetail = () => {
           </div>
 
           {/* Thread Cover Image */}
-          {post.image && (
+          {post.thumbnailUrl && (
             <div className="w-full overflow-hidden">
               <img
-                src={post.image}
+                src={post.thumbnailUrl}
                 alt={post.title}
                 className="w-full h-auto object-cover"
               />
