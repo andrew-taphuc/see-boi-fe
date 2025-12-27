@@ -1,0 +1,81 @@
+.header__logo {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  z-index: 101; /* Tăng cao hơn wrapper để đảm bảo logo luôn ở trên */
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+.logo-tt {
+  position: relative;
+  z-index: 3;
+  width: auto;
+  height: auto;
+  max-width: 150px;
+  display: block;
+  position: relative;
+}
+
+.logo-symbol-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.logo-symbol {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  z-index: 2;
+  transform-origin: center center;
+}
+
+.star {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  z-index: 1;
+  animation: rotateInfiniteReverse 10s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes rotateInfiniteReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .logo-tt {
+    max-width: 120px;
+  }
+  
+  .logo-symbol-wrap {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .logo-symbol {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .star {
+    width: 50px;
+    height: 50px;
+  }
+}
+

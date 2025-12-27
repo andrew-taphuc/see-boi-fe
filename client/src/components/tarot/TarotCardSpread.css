@@ -1,0 +1,78 @@
+.tarot-card-spread-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: visible;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: transparent;
+  touch-action: pan-y;
+  min-height: 100vh;
+  padding-top: 0;
+}
+
+.tarot-card-spread-container-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.tarot-card-spread-rotate-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.tarot-card-spread-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 130px;
+  height: 227px;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  pointer-events: auto;
+}
+
+.tarot-card-spread-card-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  background: #1a0d2e;
+  transition: transform 0.1s ease-out;
+}
+
+.tarot-card-spread-card-inner:hover {
+  transform: scale(1.05);
+  z-index: 1000;
+}
+
+.tarot-card-spread-card-back {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tarot-card-spread-card {
+    width: 110px;
+    height: 192px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tarot-card-spread-card {
+    width: 90px;
+    height: 157px;
+  }
+}

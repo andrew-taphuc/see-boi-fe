@@ -1,0 +1,31 @@
+.tarot-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 250px; /* Giới hạn chiều cao chỉ đến hết menu */
+  z-index: 60;
+  pointer-events: none;
+}
+
+.tarot-header__logo-wrapper {
+  position: absolute;
+  top: 5.5rem; /* 88px - thêm padding phía trên logo */
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto !important;
+  z-index: 100; /* Tăng cao hơn menu (z-index: 60) để logo luôn ở trên */
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tarot-header {
+    height: 220px; /* Giảm chiều cao trên mobile */
+  }
+  
+  .tarot-header__logo-wrapper {
+    top: 5rem; /* 80px - giảm một chút trên mobile */
+  }
+}
+
