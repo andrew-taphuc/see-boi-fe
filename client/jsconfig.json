@@ -10,7 +10,8 @@
       "@assets/*": ["src/assets/*"],
       "@layouts/*": ["src/layouts/*"],
       "@data/*": ["src/data/*"],
-      "@constants/*": ["src/constants/*"]
+      "@constants/*": ["src/constants/*"],
+      "@tarot/*": ["src/components/tarot/*"]
     }
   },
   "include": ["src"]

@@ -1,0 +1,114 @@
+.tarot-flip-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  perspective: 2000px;
+  cursor: pointer;
+}
+
+.tarot-flip-card-wrapper {
+  position: relative;
+  width: 300px;
+  height: 500px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tarot-flip-card-wrapper.flipped {
+  transform: rotateY(180deg);
+}
+
+.tarot-flip-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.card-back {
+  background: #1a0d2e;
+  transform: rotateY(0deg);
+}
+
+.card-back-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-front {
+  background: #1a0d2e;
+  transform: rotateY(180deg);
+}
+
+.card-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-name {
+  color: #d9b193;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: rgba(26, 13, 46, 0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(217, 177, 147, 0.3);
+  transition: all 0.3s ease;
+}
+
+.tarot-flip-card-wrapper:hover {
+  transform: scale(1.05);
+}
+
+.tarot-flip-card-wrapper.flipped:hover {
+  transform: rotateY(180deg) scale(1.05);
+}
+
+/* Add glow effect */
+.tarot-flip-card-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  background: radial-gradient(circle, rgba(217, 177, 147, 0.4) 0%, rgba(138, 43, 226, 0.2) 50%, transparent 80%);
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  filter: blur(10px);
+}
+
+.tarot-flip-card-wrapper:hover::before {
+  opacity: 0.6;
+}
+
+.tarot-flip-card-wrapper.flip-disabled {
+  cursor: default !important;
+  pointer-events: none;
+}
+
+.tarot-flip-card-wrapper.flip-disabled:hover {
+  transform: none;
+}
+
+.tarot-flip-card-wrapper.flip-disabled.flipped:hover {
+  transform: rotateY(180deg);
+}
+

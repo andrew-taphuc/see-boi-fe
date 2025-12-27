@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TarotMenu.css';
-import './TarotFonts.css';
+import '../common/TarotFonts.css';
 
 const TarotMenu = ({ isLogoHovered: isLogoHoveredProp, currentPath = '' }) => {
   const navigate = useNavigate();

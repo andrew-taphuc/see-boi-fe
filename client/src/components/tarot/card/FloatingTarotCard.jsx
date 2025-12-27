@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './FloatingTarotCard.css';
 
-const FloatingTarotCard = ({ cards, cardBackImage = "https://tarotoo.com/wp-content/themes/tarotootheme/assets/card-back/card-back-usual.jpg.webp" }) => {
+const FloatingTarotCard = ({ cards, cardBackImage = "https://tarotoo.com/wp-content/themes/tarotootheme/assets/card-back/card-back-usual.jpg.webp", inline = false }) => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const videoRef = useRef(null);
@@ -30,7 +30,7 @@ const FloatingTarotCard = ({ cards, cardBackImage = "https://tarotoo.com/wp-cont
 
   return (
     <div 
-      className={`floating-card-container ${isLoaded ? 'loaded' : ''}`}
+      className={`floating-card-container ${inline ? 'inline' : ''} ${isLoaded ? 'loaded' : ''}`}
     >
       <div className="floating-card-wrapper">
         <div className="floating-card">

@@ -4,8 +4,9 @@
   left: 0;
   right: 0;
   height: 250px; /* Giới hạn chiều cao chỉ đến hết menu */
-  z-index: 60;
+  z-index: 1500;
   pointer-events: none;
+  overflow: visible; /* Đảm bảo menu có thể hiển thị transition */
 }
 
 .tarot-header__logo-wrapper {
@@ -14,7 +15,7 @@
   left: 50%;
   transform: translateX(-50%);
   pointer-events: auto !important;
-  z-index: 100; /* Tăng cao hơn menu (z-index: 60) để logo luôn ở trên */
+  z-index: 1501; /* Tăng cao hơn header để logo luôn ở trên */
   cursor: pointer;
 }
 

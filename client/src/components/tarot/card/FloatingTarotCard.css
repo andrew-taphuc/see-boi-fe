@@ -7,6 +7,7 @@
   opacity: 0;
   transform: translate(-50%, -50%) scale(0);
   transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
 }
 
 .floating-card-container.loaded {
@@ -14,23 +15,83 @@
   transform: translate(-50%, -50%) scale(1);
 }
 
+/* Variant for inline flow (not fixed) */
+.floating-card-container.inline {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: scale(0);
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+}
+
+.floating-card-container.inline.loaded {
+  transform: scale(1);
+}
+
 .floating-card-wrapper {
   position: relative;
-  width: 300px;
-  height: 500px;
+  width: 250px;
+  height: 420px;
   transform-style: preserve-3d;
   transform: rotateY(90deg);
-  animation: float 4s ease-in-out infinite;
+  animation: float 3s ease-in-out infinite;
   animation-fill-mode: both;
-  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+/* Shadow effect bên dưới lá bài với màu tím sáng */
+.floating-card-container::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 40px;
+  background: radial-gradient(ellipse, rgba(167, 139, 250, 0.8) 0%, rgba(192, 132, 252, 0.6) 25%, rgba(167, 139, 250, 0.4) 50%, rgba(192, 132, 252, 0.2) 70%, transparent 85%);
+  border-radius: 50%;
+  z-index: 0;
+  filter: blur(18px);
+  animation: shadowFloat 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.floating-card-container.inline::after {
+  bottom: -50px;
+}
+
+@keyframes shadowFloat {
+  0%, 100% {
+    opacity: 0.85;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.15);
+  }
+}
+
+/* Responsive sizing for inline mode */
+@media (max-width: 768px) {
+  .floating-card-wrapper {
+    width: 200px;
+    height: 330px;
+  }
+
+  .floating-card-container::after {
+    width: 160px;
+    height: 30px;
+    bottom: -40px;
+  }
 }
 
 @keyframes float {
   0%, 100% {
-    transform: rotateY(90deg) translateY(0px) !important;
+    transform: rotateY(90deg) translateY(0px);
   }
   50% {
-    transform: rotateY(90deg) translateY(-25px) !important;
+    transform: rotateY(90deg) translateY(-20px);
   }
 }
 
@@ -116,5 +177,18 @@
   }
 }
 
-/* No hover effects - card only rotates */
+/* Hover effect for clickable card */
+.floating-card-wrapper:hover {
+  animation: float 3s ease-in-out infinite, hoverScale 0.3s ease forwards;
+}
+
+@keyframes hoverScale {
+  to {
+    transform: rotateY(90deg) scale(1.05);
+  }
+}
+
+.floating-card-wrapper {
+  pointer-events: auto;
+}
 
