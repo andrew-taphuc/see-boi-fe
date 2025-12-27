@@ -364,6 +364,22 @@ const PostDetail = () => {
             </div>
           )}
 
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="px-6 py-3 border-b border-gray-200">
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map(({ tag }) => (
+                  <span
+                    key={tag.id}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm"
+                  >
+                    #{tag.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Article Content */}
           <article className="p-6 border-b border-gray-200">
             <div className="prose max-w-none">

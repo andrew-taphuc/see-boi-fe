@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 /**
  * Component hiển thị danh sách bài viết của user
@@ -23,15 +23,30 @@ const UserPostsList = ({ posts, formatDateTime }) => {
           <div className="flex gap-4">
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-                {post.title || '(Không có tiêu đề)'}
+                {post.title || "(Không có tiêu đề)"}
               </h3>
+
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {post.tags.map(({ tag }) => (
+                    <span
+                      key={tag.id}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                    >
+                      #{tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               {(post.contentText || post.content) && (
                 <p className="text-gray-600 text-sm mb-2 line-clamp-2">
                   {post.contentText || post.content}
                 </p>
               )}
               <p className="text-xs text-gray-500">
-                {post.createdAt ? formatDateTime(post.createdAt) : ''}
+                {post.createdAt ? formatDateTime(post.createdAt) : ""}
               </p>
             </div>
             {/* Thumbnail preview */}
