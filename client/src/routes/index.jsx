@@ -4,9 +4,16 @@ import TuviResultPage from "../pages/TuviResultPage";
 import MainLayout from "@layouts/MainLayout";
 import LandingPage from "@pages/LandingPage";
 import TuVi from "@pages/TuVi";
-import Tarot from "@pages/Tarot";
-import TarotCardDetail from "@pages/TarotCardDetail";
-import TarotCardList from "@pages/TarotCardList";
+import Tarot from "@pages/tarot/Tarot";
+import TarotSpread from "@pages/tarot/TarotSpread";
+import TarotCardDetail from "@pages/tarot/TarotCardDetail";
+import TarotCardList from "@pages/tarot/TarotCardList";
+import TarotYesNo from "@pages/tarot/TarotYesNo";
+import TarotLove from "@pages/tarot/TarotLove";
+import TarotLoveSimple from "@pages/tarot/TarotLoveSimple";
+import TarotLoveDeep from "@pages/tarot/TarotLoveDeep";
+import TarotDaily from "@pages/tarot/TarotDaily";
+import TarotOneCard from "@pages/tarot/TarotOneCard";
 import NhanTuong from "@pages/nhantuong/NhanTuong";
 import GioiThieu from "@pages/nhantuong/GioiThieu";
 import KetQua from "@pages/nhantuong/KetQua";
@@ -88,6 +95,62 @@ const AppRoutes = () => {
         element={
           <TarotLayout>
             <Tarot />
+          </TarotLayout>
+        }
+      />
+      <Route
+        path="/tarot/spread"
+        element={
+          <TarotLayout>
+            <TarotSpread />
+          </TarotLayout>
+        }
+      />
+      <Route
+        path="/tarot/yes-no"
+        element={
+          <TarotLayout>
+            <TarotYesNo />
+          </TarotLayout>
+        }
+      />
+      <Route
+        path="/tarot/love"
+        element={
+          <TarotLayout>
+            <TarotLove />
+          </TarotLayout>
+        }
+      />
+      <Route
+        path="/tarot/love-simple"
+        element={
+          <TarotLayout>
+            <TarotLoveSimple />
+          </TarotLayout>
+        }
+      />
+      <Route
+        path="/tarot/love-deep"
+        element={
+          <TarotLayout>
+            <TarotLoveDeep />
+          </TarotLayout>
+        }
+      />
+      <Route
+        path="/tarot/daily"
+        element={
+          <TarotLayout>
+            <TarotDaily />
+          </TarotLayout>
+        }
+      />
+      <Route
+        path="/tarot/one-card"
+        element={
+          <TarotLayout>
+            <TarotOneCard />
           </TarotLayout>
         }
       />

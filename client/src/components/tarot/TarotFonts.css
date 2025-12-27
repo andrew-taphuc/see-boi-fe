@@ -1,0 +1,64 @@
+@font-face {
+  src: url("../../assets/fonts/PlayfairDisplay.ttf") format('truetype');
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  src: url("../../assets/fonts/Lexend.ttf") format('truetype');
+  font-family: 'Lexend';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* Áp dụng font cho nội dung trang tarot (chỉ cho phần children, không bao gồm header) */
+.tarot-page > div.pt-16,
+.tarot-page > div.pt-16 *,
+.tarot-page > div.pt-16 *::before,
+.tarot-page > div.pt-16 *::after {
+  font-family: 'Lexend', 'Playfair Display', sans-serif !important;
+}
+
+/* Sử dụng Playfair Display cho các tiêu đề trong nội dung tarot */
+.tarot-page > div.pt-16 h1,
+.tarot-page > div.pt-16 h2,
+.tarot-page > div.pt-16 h3,
+.tarot-page > div.pt-16 h4,
+.tarot-page > div.pt-16 h5,
+.tarot-page > div.pt-16 h6,
+.tarot-page > div.pt-16 button,
+.tarot-page > div.pt-16 .link {
+  font-family: 'Playfair Display', serif !important;
+}
+
+/* Áp dụng cho các component tarot */
+.tarot-menu,
+.tarot-menu * {
+  font-family: 'Lexend', 'Playfair Display', sans-serif !important;
+}
+
+.tarot-menu .link {
+  font-family: 'Playfair Display', serif !important;
+}
+
+/* Ngăn overscroll và đảm bảo không lộ nền trắng */
+.tarot-page {
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  min-height: 100vh;
+  height: 100%;
+  background-color: #1a0d2e;
+  overflow-x: hidden;
+}
+
+/* Ngăn bounce effect trên iOS và Android */
+.tarot-page * {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+

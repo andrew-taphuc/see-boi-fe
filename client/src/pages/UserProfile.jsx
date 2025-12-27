@@ -528,13 +528,13 @@ const UserProfile = () => {
       />
     )}
 
-    {/* Avatar View Modal */}
-    <AvatarViewModal
-      isOpen={isAvatarViewModalOpen}
-      onClose={() => setIsAvatarViewModalOpen(false)}
-      avatarUrl={user?.avatarUrl}
-      userName={user?.userName || user?.fullName}
-    />
+      {/* Avatar View Modal */}
+      <AvatarViewModal
+        isOpen={isAvatarViewModalOpen}
+        onClose={() => setIsAvatarViewModalOpen(false)}
+        avatarUrl={user?.avatarUrl}
+        userName={user?.userName || user?.fullName}
+      />
     </>
   );
 };

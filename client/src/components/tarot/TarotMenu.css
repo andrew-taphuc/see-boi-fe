@@ -1,0 +1,266 @@
+.tarot-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 250px; /* Giới hạn chiều cao chỉ đến hết menu items */
+  z-index: 60;
+  pointer-events: none; /* Luôn giữ pointer-events: none cho container */
+  opacity: 0;
+  transform: translateY(-100%);
+  /* Sử dụng CSS transition để menu xuất hiện/biến mất mượt mà */
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  font-family: 'Lexend', 'Playfair Display', sans-serif !important;
+}
+
+.tarot-menu.visible {
+  opacity: 1;
+  transform: translateY(0);
+  /* Không bật pointer-events cho container, chỉ cho nav-items */
+  pointer-events: none !important;
+}
+
+.tarot-menu.hidden {
+  opacity: 0;
+  transform: translateY(-100%);
+  /* pointer-events-none khi menu ẩn để tránh chặn các tương tác */
+  pointer-events: none !important;
+}
+
+/* Navigation items sắp xếp theo hình cung */
+.nav-item {
+  position: absolute;
+  pointer-events: auto !important;
+  font-family: 'Lexend', 'Playfair Display', sans-serif !important;
+}
+
+/* Đảm bảo các link và button trong menu có thể tương tác khi menu visible */
+.tarot-menu.visible .nav-item,
+.tarot-menu.visible .nav-item *,
+.tarot-menu.visible .link-animation,
+.tarot-menu.visible a {
+  pointer-events: auto !important;
+}
+
+/* Vị trí các nút dựa trên logo */
+/* Logo ở top: 5.5rem (88px) - có padding phía trên */
+/* Giảm khoảng cách giữa menu và logo */
+.nav-item {
+  top: 140px; /* giảm khoảng cách từ logo xuống menu */
+}
+
+/* Love Tarot: tâm icon cách tâm logo 100px về bên trái */
+.nav-item.left {
+  left: calc(50% - 100px + 5px); /* tâm icon ở 50% - 100px */
+}
+
+/* Yes/No: tâm icon cách tâm logo 200px về bên trái */
+.nav-item.left-center {
+  left: calc(50% - 230px + 15px); /* tâm icon ở 50% - 200px */
+  top: 165px; /* thấp hơn 20px so với các nút giữa */
+}
+
+/* Daily Tarot: tâm icon cách tâm logo 100px về bên phải */
+.nav-item.right-center {
+  left: calc(50% + 100px - 65px); /* tâm icon ở 50% + 100px */
+}
+
+/* One Card: tâm icon cách tâm logo 200px về bên phải */
+.nav-item.right {
+  left: calc(50% + 230px - 75px); /* tâm icon ở 50% + 200px */
+  top: 165px; /* thấp hơn 20px so với các nút giữa */
+}
+
+/* Link animation */
+.link-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #d9b193;
+  transition: all 0.3s ease;
+  position: relative;
+  font-family: 'Lexend', 'Playfair Display', sans-serif !important;
+}
+
+.link-animation:hover {
+  transform: scale(1.1);
+}
+
+.link {
+  position: relative;
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'Playfair Display', serif !important;
+}
+
+.link .basic,
+.link .hover {
+  transition: opacity 0.3s ease;
+}
+
+.link .hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.link-animation:hover .link .basic {
+  opacity: 0;
+}
+
+.link-animation:hover .link .hover {
+  opacity: 1;
+}
+
+/* Icon container */
+.icon {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.icon .base {
+  z-index: 1;
+}
+
+.icon .el,
+.icon .el-a,
+.icon .el-b,
+.icon .el-c {
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.link-animation:hover .icon .el,
+.link-animation:hover .icon .el-a,
+.link-animation:hover .icon .el-b,
+.link-animation:hover .icon .el-c {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Love type specific */
+.icon .tail {
+  position: absolute;
+  z-index: 1;
+  animation: tailMove 2s ease-in-out infinite;
+}
+
+.icon .arrowhead {
+  position: absolute;
+  z-index: 3;
+  animation: arrowMove 2s ease-in-out infinite;
+}
+
+@keyframes tailMove {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(-5px) translateY(-5px);
+  }
+}
+
+@keyframes arrowMove {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(5px) translateY(5px);
+  }
+}
+
+/* Three type specific */
+.icon .shine {
+  position: absolute;
+  z-index: 3;
+  animation: shine 2s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Psychic Chat button */
+.psychic-chat-wrapper {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.psychic-chat-button {
+  display: inline-block;
+  padding: 12px 32px;
+  background: rgba(217, 177, 147, 0.2);
+  border: 2px solid #d9b193;
+  border-radius: 30px;
+  color: #d9b193;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  font-family: 'Playfair Display', serif !important;
+}
+
+.psychic-chat-button:hover {
+  background: rgba(217, 177, 147, 0.3);
+  border-color: #d9b193;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(217, 177, 147, 0.5);
+}
+
+.psychic-chat-button span {
+  display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tarot-menu {
+    height: 220px; /* Giảm chiều cao trên mobile */
+  }
+  
+  .nav-item {
+    font-size: 14px;
+  }
+  
+  .link {
+    font-size: 14px;
+  }
+  
+  .icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .psychic-chat-button {
+    padding: 10px 24px;
+    font-size: 12px;
+  }
+}
+
