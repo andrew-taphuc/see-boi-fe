@@ -34,6 +34,16 @@ const UserPostsList = ({ posts, formatDateTime }) => {
                 {post.createdAt ? formatDateTime(post.createdAt) : ''}
               </p>
             </div>
+            {/* Thumbnail preview */}
+            {post.thumbnailUrl && (
+              <div className="flex-shrink-0">
+                <img
+                  src={post.thumbnailUrl}
+                  alt={post.title || "Post thumbnail"}
+                  className="w-24 h-24 object-cover rounded-lg"
+                />
+              </div>
+            )}
           </div>
         </Link>
       ))}
@@ -42,4 +52,3 @@ const UserPostsList = ({ posts, formatDateTime }) => {
 };
 
 export default UserPostsList;
-

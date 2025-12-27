@@ -6,6 +6,7 @@ import TiptapEditor from '@components/richtext/TiptapEditor';
 import PollForm from '@components/posts/PollForm';
 import PrivacyButton from '@components/posts/PrivacyButton';
 import ImageUpload from '@components/posts/ImageUpload';
+import MultiImageUpload from '@components/common/MultiImageUpload';
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -16,8 +17,13 @@ const CreatePost = () => {
   const [isPoll, setIsPoll] = useState(false);
   const [pollOptions, setPollOptions] = useState(['', '']);
   const [pollExpiresAt, setPollExpiresAt] = useState(''); // yyyy-MM-ddThh:mm (local)
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  // Thumbnail (ảnh đại diện)
+  const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
+
+  // Content images (ảnh trong bài viết)
+  const [contentImages, setContentImages] = useState([]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -29,9 +35,10 @@ const CreatePost = () => {
       visibility !== 'PUBLIC' ||
       hasPollContent ||
       !!pollExpiresAt ||
-      !!imageFile
+      !!thumbnail ||
+      contentImages.length > 0
     );
-  }, [title, contentText, visibility, isPoll, pollOptions, pollExpiresAt, imageFile]);
+  }, [title, contentText, visibility, isPoll, pollOptions, pollExpiresAt, thumbnail, contentImages]);
 
   const normalizePollOptions = () => {
     const normalized = pollOptions.map((o) => (o || '').trim());
@@ -70,10 +77,19 @@ const CreatePost = () => {
       };
     }
 
-    // Nếu có ảnh, tạo FormData để gửi file
-    if (imageFile) {
+    // Nếu có thumbnail hoặc content images, tạo FormData
+    if (thumbnail || contentImages.length > 0) {
       const formData = new FormData();
-      formData.append('image', imageFile);
+
+      // Thêm thumbnail
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
+      }
+
+      // Thêm content images
+      contentImages.forEach((file) => {
+        formData.append("images", file);
+      });
 
       // Thêm các field khác vào FormData
       if (payload.title) formData.append('title', payload.title);
@@ -176,24 +192,42 @@ const CreatePost = () => {
           />
         </div>
 
-        <ImageUpload
-          imageUrl={imagePreview}
-          onImageChange={(file) => {
-            setImageFile(file);
-            // Tạo preview URL
-            if (file) {
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                setImagePreview(reader.result);
-              };
-              reader.readAsDataURL(file);
-            }
-          }}
-          onImageRemove={() => {
-            setImageFile(null);
-            setImagePreview(null);
-          }}
-        />
+        {/* Thumbnail Upload */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ảnh đại diện (Thumbnail)
+          </label>
+          <ImageUpload
+            imageUrl={thumbnailPreview}
+            onImageChange={(file) => {
+              setThumbnail(file);
+              // Tạo preview URL
+              if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setThumbnailPreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+              }
+            }}
+            onImageRemove={() => {
+              setThumbnail(null);
+              setThumbnailPreview(null);
+            }}
+          />
+        </div>
+
+        {/* Content Images Upload */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ảnh trong bài viết (tối đa 10 ảnh)
+          </label>
+          <MultiImageUpload
+            images={contentImages}
+            onImagesChange={setContentImages}
+            maxImages={10}
+          />
+        </div>
 
         <div className="mb-3">
           <TiptapEditor
@@ -263,4 +297,3 @@ const CreatePost = () => {
 };
 
 export default CreatePost;
-
