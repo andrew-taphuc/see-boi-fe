@@ -87,8 +87,8 @@ const ThemedHeader = ({ variant = 'default' }) => {
   // Tăng chiều rộng header: tăng px-6 -> px-10 (padding ngang) và max-w-7xl -> max-w-[1440px], center bằng mx-auto, tăng h-14 -> h-20 (chiều cao)
   return (
     <header
-      className="fixed top-0 w-full z-50 shadow-md"
-      style={{ background: config.gradient, color: config.textColor }}
+      className="fixed top-0 w-full shadow-md"
+      style={{ background: config.gradient, color: config.textColor, zIndex: 1500 }}
     >
       <div className="relative flex items-center px-10 h-16  ">
         {/* Left text link */}

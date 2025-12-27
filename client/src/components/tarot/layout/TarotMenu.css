@@ -4,27 +4,32 @@
   left: 0;
   right: 0;
   height: 250px; /* Giới hạn chiều cao chỉ đến hết menu items */
-  z-index: 60;
+  z-index: 1500;
   pointer-events: none; /* Luôn giữ pointer-events: none cho container */
-  opacity: 0;
-  transform: translateY(-100%);
-  /* Sử dụng CSS transition để menu xuất hiện/biến mất mượt mà */
-  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  /* Đảm bảo transition luôn được áp dụng */
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  will-change: opacity, transform;
   font-family: 'Lexend', 'Playfair Display', sans-serif !important;
 }
 
+/* Trạng thái visible - menu hiển thị đầy đủ */
 .tarot-menu.visible {
   opacity: 1;
   transform: translateY(0);
   /* Không bật pointer-events cho container, chỉ cho nav-items */
   pointer-events: none !important;
+  /* Đảm bảo transition hoạt động */
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
+/* Trạng thái hidden - menu ẩn với hiệu ứng mờ dần và dịch lên trên */
 .tarot-menu.hidden {
   opacity: 0;
-  transform: translateY(-100%);
+  transform: translateY(-20px);
   /* pointer-events-none khi menu ẩn để tránh chặn các tương tác */
   pointer-events: none !important;
+  /* Đảm bảo transition hoạt động */
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
 /* Navigation items sắp xếp theo hình cung */

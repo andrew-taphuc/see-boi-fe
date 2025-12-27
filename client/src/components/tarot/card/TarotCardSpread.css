@@ -31,7 +31,7 @@
   top: 0;
   left: 0;
   width: 130px;
-  height: 227px;
+  height: 217px; /* 130 / (300/500) = 216.67 ≈ 217 */
   transform-origin: center center;
   will-change: transform, opacity;
   transition: transform 0.3s ease-out, opacity 0.3s ease-out;
@@ -66,13 +66,13 @@
 @media (max-width: 768px) {
   .tarot-card-spread-card {
     width: 110px;
-    height: 192px;
+    height: 183px; /* 110 / (300/500) = 183.33 ≈ 183 */
   }
 }
 
 @media (max-width: 480px) {
   .tarot-card-spread-card {
     width: 90px;
-    height: 157px;
+    height: 150px; /* 90 / (300/500) = 150 */
   }
 }
