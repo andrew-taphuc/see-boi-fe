@@ -17,6 +17,7 @@ import TarotOneCard from "@pages/tarot/TarotOneCard";
 import NhanTuong from "@pages/nhantuong/NhanTuong";
 import GioiThieu from "@pages/nhantuong/GioiThieu";
 import KetQua from "@pages/nhantuong/KetQua";
+import TestFaceAnalysis from "@pages/nhantuong/TestFaceAnalysis";
 import SocialMedia from "@pages/SocialMedia";
 import PostDetail from "@pages/PostDetail";
 import CreatePost from "@pages/CreatePost";
@@ -175,6 +176,14 @@ const AppRoutes = () => {
         element={
           <MainLayout>
             <KetQua />
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/nhantuong/test"
+        element={
+          <MainLayout>
+            <TestFaceAnalysis />
           </MainLayout>
         }
       />
