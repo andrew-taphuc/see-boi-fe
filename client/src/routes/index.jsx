@@ -21,6 +21,7 @@ import TestFaceAnalysis from "@pages/nhantuong/TestFaceAnalysis";
 import SocialMedia from "@pages/SocialMedia";
 import PostDetail from "@pages/PostDetail";
 import CreatePost from "@pages/CreatePost";
+import EditPost from "@pages/EditPost";
 import UserProfile from "@pages/UserProfile";
 import EditProfile from "@pages/EditProfile";
 import SavedPosts from "@pages/SavedPosts";
@@ -201,6 +202,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/post/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditPost />
             </ProtectedRoute>
           }
         />

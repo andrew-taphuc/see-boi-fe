@@ -8,6 +8,7 @@ import {
   // Heart, // Not used in the code
   Bookmark,
   Eye,
+  Edit,
 } from "lucide-react";
 import axiosInstance from "@utils/axiosInstance";
 import FollowButton from "../components/userProfile/FollowButton";
@@ -346,6 +347,16 @@ const PostDetail = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                {/* Edit button - chỉ hiện cho chủ bài viết */}
+                {currentUser && post.userId === currentUser.id && (
+                  <button
+                    onClick={() => navigate(`/post/${id}/edit`)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    title="Chỉnh sửa bài viết"
+                  >
+                    <Edit size={20} className="text-gray-600" />
+                  </button>
+                )}
                 <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                   <Share2 size={20} className="text-gray-600" />
                 </button>

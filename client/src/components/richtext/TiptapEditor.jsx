@@ -11,6 +11,7 @@ import CustomImage from './extensions/CustomImage';
 import CustomLink from './extensions/CustomLink';
 import BubbleMenuToolbar from './BubbleMenuToolbar';
 import SlashCommandMenu from './SlashCommandMenu';
+import axiosInstance from '@utils/axiosInstance';
 import './TiptapEditor.css';
 
 const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph' }] };
@@ -24,6 +25,8 @@ const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph' }] };
  */
 const TiptapEditor = ({ valueJson, onChange, onPollSuggestion, onMentionSuggestion }) => {
   const containerRef = useRef(null);
+  const isInternalUpdateRef = useRef(false);
+  const previousValueJsonRef = useRef(valueJson);
 
   const editor = useEditor({
     extensions: [
@@ -54,14 +57,55 @@ const TiptapEditor = ({ valueJson, onChange, onPollSuggestion, onMentionSuggesti
     ],
     content: valueJson ?? EMPTY_DOC,
     onUpdate: ({ editor }) => {
+      // Đánh dấu đây là update từ bên trong editor
+      isInternalUpdateRef.current = true;
       onChange?.({ json: editor.getJSON(), text: editor.getText() });
+      // Reset flag sau một tick
+      setTimeout(() => {
+        isInternalUpdateRef.current = false;
+      }, 0);
     },
   });
 
-  // Sync external value -> editor (khi mở modal reset)
+  // Sync external value -> editor (chỉ khi valueJson thay đổi từ bên ngoài)
   useEffect(() => {
     if (!editor) return;
-    editor.commands.setContent(valueJson ?? EMPTY_DOC);
+    
+    // Chỉ sync nếu:
+    // 1. Không phải update từ bên trong editor
+    // 2. valueJson thực sự thay đổi (so sánh với giá trị trước)
+    const currentContentJson = JSON.stringify(editor.getJSON());
+    const newValueJson = valueJson ?? EMPTY_DOC;
+    const newValueJsonString = JSON.stringify(newValueJson);
+    const previousValueJsonString = JSON.stringify(previousValueJsonRef.current);
+    
+    // Nếu là update từ bên trong, không sync
+    if (isInternalUpdateRef.current) {
+      previousValueJsonRef.current = valueJson;
+      return;
+    }
+    
+    // Nếu valueJson thực sự thay đổi từ bên ngoài và khác với content hiện tại
+    if (newValueJsonString !== previousValueJsonString && newValueJsonString !== currentContentJson) {
+      // Lưu vị trí cursor hiện tại
+      const { from, to } = editor.state.selection;
+      
+      // Set content mới
+      editor.commands.setContent(newValueJson, false);
+      
+      // Khôi phục vị trí cursor nếu có thể
+      try {
+        const docSize = editor.state.doc.content.size;
+        const safeFrom = Math.min(from, docSize);
+        const safeTo = Math.min(to, docSize);
+        editor.commands.setTextSelection({ from: safeFrom, to: safeTo });
+      } catch (e) {
+        // Nếu không thể khôi phục, đặt cursor ở cuối
+        editor.commands.focus('end');
+      }
+    }
+    
+    previousValueJsonRef.current = valueJson;
   }, [editor, valueJson]);
 
   // Helper function để check URL
@@ -115,7 +159,7 @@ const TiptapEditor = ({ valueJson, onChange, onPollSuggestion, onMentionSuggesti
   useEffect(() => {
     if (!editor) return;
 
-    const handleDrop = (e) => {
+    const handleDrop = async (e) => {
       e.preventDefault();
       e.stopPropagation();
       
@@ -132,28 +176,84 @@ const TiptapEditor = ({ valueJson, onChange, onPollSuggestion, onMentionSuggesti
 
       if (!coordinates) return;
 
-      // Set cursor tại vị trí drop
-      editor.commands.setTextSelection(coordinates.pos);
+      const dropPos = coordinates.pos;
       
+      // Xử lý từng ảnh
       for (const file of imageFiles) {
         if (file.size > 5 * 1024 * 1024) {
           alert(`Ảnh ${file.name} vượt quá 5MB`);
           continue;
         }
 
-        // Tạo data URL để preview (chỉ UI, chưa upload)
+        // Set cursor tại vị trí drop
+        editor.commands.setTextSelection(dropPos);
+
+        // Tạo data URL để preview tạm thời
         const reader = new FileReader();
-        reader.onloadend = () => {
+        reader.onloadend = async () => {
           try {
             const dataUrl = reader.result;
             if (!dataUrl || typeof dataUrl !== 'string') {
               throw new Error('Invalid data URL');
             }
-            // Insert ảnh vào vị trí drop với data URL
+            
+            // Insert ảnh vào vị trí drop với data URL tạm thời
             editor.chain().focus().setImage({ src: dataUrl }).run();
+
+            // Upload ảnh lên server
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await axiosInstance.post('/upload/image', formData);
+            const imageUrl = response.data?.url || response.data?.imageUrl || response.data;
+
+            if (!imageUrl || typeof imageUrl !== 'string') {
+              throw new Error('Không nhận được link ảnh từ server');
+            }
+
+            // Tìm node ảnh vừa chèn tại vị trí dropPos
+            const { state } = editor;
+            const { doc } = state;
+            let imagePos = null;
+
+            // Tìm node ảnh gần vị trí dropPos nhất có src là dataUrl
+            doc.descendants((node, pos) => {
+              if (node.type.name === 'image' && node.attrs.src === dataUrl) {
+                if (imagePos === null || Math.abs(pos - dropPos) < Math.abs(imagePos - dropPos)) {
+                  imagePos = pos;
+                }
+              }
+            });
+
+            if (imagePos !== null) {
+              // Cập nhật src của ảnh với link thật
+              editor.commands.setNodeSelection(imagePos);
+              editor.chain().setImage({ src: imageUrl }).run();
+            }
           } catch (error) {
-            console.error('Error inserting image:', error);
-            alert(`Chèn ảnh ${file.name} thất bại`);
+            console.error('Error uploading image:', error);
+            
+            // Xóa ảnh đã chèn nếu upload thất bại
+            const { state } = editor;
+            const { doc } = state;
+            let imagePosToDelete = null;
+
+            // Tìm node ảnh có data URL gần vị trí dropPos nhất
+            doc.descendants((node, pos) => {
+              if (node.type.name === 'image' && node.attrs.src && node.attrs.src.startsWith('data:')) {
+                if (imagePosToDelete === null || Math.abs(pos - dropPos) < Math.abs(imagePosToDelete - dropPos)) {
+                  imagePosToDelete = pos;
+                }
+              }
+            });
+
+            if (imagePosToDelete !== null) {
+              editor.commands.setNodeSelection(imagePosToDelete);
+              editor.commands.deleteNode('image');
+            }
+
+            const errorMsg = error?.response?.data?.message || error?.message || `Upload ảnh ${file.name} thất bại. Vui lòng thử lại.`;
+            alert(errorMsg);
           }
         };
         reader.onerror = () => {
