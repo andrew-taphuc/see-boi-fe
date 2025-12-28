@@ -13,6 +13,7 @@ import {
   PenSquare,
   Camera,
   Bookmark,
+  Tag,
 } from "lucide-react";
 import FollowButton from "@components/userProfile/FollowButton";
 import FollowListModal from "@components/userProfile/FollowListModal";
@@ -55,17 +56,11 @@ const UserProfile = () => {
   }, [currentUser, resolvedId]);
 
   const fetchPostsByUserId = async (userId) => {
-    const res = await axiosInstance.get("/post");
-    const all = Array.isArray(res.data) ? res.data : [];
-    const filtered = all.filter((p) => {
-      if (p?.userId != null) return Number(p.userId) === Number(userId);
-      if (p?.user?.id != null) return Number(p.user.id) === Number(userId);
-      return false;
-    });
-    filtered.sort(
-      (a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0)
-    );
-    return filtered;
+    // Sử dụng API backend /post/:userId/posts để lấy posts với visibility logic đúng
+    const res = await axiosInstance.get(`/post/${userId}/posts`);
+    const posts = Array.isArray(res.data) ? res.data : [];
+    // Backend đã sort theo createdAt DESC rồi, không cần sort lại
+    return posts;
   };
 
   useEffect(() => {
@@ -432,14 +427,21 @@ const UserProfile = () => {
                             <span>Cài đặt</span>
                           </Link>
                         </div>
-                        {/* Hàng dưới: Bài viết đã lưu - căn phải */}
-                        <div className="flex justify-end">
+                        {/* Hàng dưới: Bài viết đã lưu + Tags đang theo dõi - căn phải */}
+                        <div className="flex justify-end gap-2">
                           <Link
                             to="/saved-posts"
                             className="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg hover:bg-yellow-100 transition-colors"
                           >
                             <Bookmark size={18} />
                             <span>Bài viết đã lưu</span>
+                          </Link>
+                          <Link
+                            to="/following-tags"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            <Tag size={18} />
+                            <span>Tags theo dõi</span>
                           </Link>
                         </div>
                       </>
@@ -562,4 +564,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-

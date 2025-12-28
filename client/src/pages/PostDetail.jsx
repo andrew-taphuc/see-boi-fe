@@ -9,6 +9,9 @@ import {
   Bookmark,
   Eye,
   Edit,
+  Trash2,
+  Lock,
+  Users,
 } from "lucide-react";
 import axiosInstance from "@utils/axiosInstance";
 import FollowButton from "../components/userProfile/FollowButton";
@@ -18,6 +21,7 @@ import { useAuth } from "@context/AuthContext";
 import { toggleLike, toggleBookmark } from "@utils/postService";
 import { useToast } from "@context/ToastContext";
 import BookmarkModal from "@components/socialMedia/BookmarkModal";
+import PollDisplay from "@components/posts/PollDisplay";
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -45,6 +49,10 @@ const PostDetail = () => {
     uniqueViews: 0,
     anonymousViews: 0,
   });
+
+  // Delete confirmation state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,12 +84,6 @@ const PostDetail = () => {
 
         setPost(p);
         setUser(p?.user || null);
-
-        // Debug: Log để kiểm tra response từ backend
-        console.log("Post data:", p);
-        console.log("Current user:", currentUser);
-        console.log("Likes array:", p?.likes);
-        console.log("Bookmarks array:", p?.bookmarks);
 
         // Initialize like and bookmark states
         // Check if current user has liked the post by checking the likes array
@@ -170,6 +172,29 @@ const PostDetail = () => {
       cancelled = true;
     };
   }, [user?.id, currentUser?.id]);
+
+  // Refetch post data (e.g., after voting)
+  const refetchPost = async () => {
+    try {
+      const postId = parseInt(id);
+      const res = await axiosInstance.get(`/post/${postId}`);
+      const p = res.data;
+
+      // Parse contentJson nếu là string
+      if (p?.contentJson && typeof p.contentJson === "string") {
+        try {
+          p.contentJson = JSON.parse(p.contentJson);
+        } catch (e) {
+          console.error("Error parsing contentJson:", e);
+          p.contentJson = null;
+        }
+      }
+
+      setPost(p);
+    } catch (error) {
+      console.error("Failed to refetch post:", error);
+    }
+  };
 
   // Handle like toggle
   const handleLikeToggle = async () => {
@@ -267,6 +292,30 @@ const PostDetail = () => {
     setIsBookmarked(true);
   };
 
+  // Handle delete post
+  const handleDeletePost = async () => {
+    if (isDeleting) return;
+
+    setIsDeleting(true);
+    try {
+      await axiosInstance.delete(`/post/${id}`);
+      success("Đã xóa bài viết thành công");
+      setShowDeleteModal(false);
+      // Redirect về trang UserProfile của user sau khi xóa
+      setTimeout(() => {
+        navigate(`/user/${post.userId}`);
+      }, 500);
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      showError(
+        err?.response?.data?.message ||
+          "Không thể xóa bài viết. Vui lòng thử lại."
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -347,19 +396,36 @@ const PostDetail = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* Edit button - chỉ hiện cho chủ bài viết */}
+                {/* Visibility badge và Edit/Delete buttons - chỉ hiện cho chủ bài viết */}
                 {currentUser && post.userId === currentUser.id && (
-                  <button
-                    onClick={() => navigate(`/post/${id}/edit`)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                    title="Chỉnh sửa bài viết"
-                  >
-                    <Edit size={20} className="text-gray-600" />
-                  </button>
+                  <>
+                    {/* Visibility Badge */}
+                    <div
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
+                      ${post.visibility === 'PUBLIC' ? 'bg-green-50 text-green-700' : ''}
+                      ${post.visibility === 'FOLLOWERS' ? 'bg-blue-50 text-blue-700' : ''}
+                      ${post.visibility === 'PRIVATE' ? 'bg-gray-100 text-gray-700' : ''}"
+                    >
+                      {post.visibility === "PUBLIC" && (<><Eye size={16} /><span>Công khai</span></>)}
+                      {post.visibility === "FOLLOWERS" && (<><Users size={16} /><span>Người theo dõi</span></>)}
+                      {post.visibility === "PRIVATE" && (<><Lock size={16} /><span>Chỉ mình tôi</span></>)}
+                    </div>
+                    <button
+                      onClick={() => navigate(`/post/${id}/edit`)}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      title="Chỉnh sửa bài viết"
+                    >
+                      <Edit size={20} className="text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteModal(true)}
+                      className="p-2 hover:bg-red-50 rounded-full transition-colors"
+                      title="Xóa bài viết"
+                    >
+                      <Trash2 size={20} className="text-red-600" />
+                    </button>
+                  </>
                 )}
-                <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <Share2 size={20} className="text-gray-600" />
-                </button>
               </div>
             </div>
           </div>
@@ -380,36 +446,65 @@ const PostDetail = () => {
             <div className="px-6 py-3 border-b border-gray-200">
               <div className="flex flex-wrap gap-2">
                 {post.tags.map(({ tag }) => (
-                  <span
+                  <button
                     key={tag.id}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      navigate(`/tag/${tag.id}`);
+                    }}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm hover:shadow-lg transition-shadow cursor-pointer"
                   >
                     #{tag.name}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Article Content */}
+          {/* Article Content hoặc Poll */}
           <article className="p-6 border-b border-gray-200">
-            <div className="prose max-w-none">
-              {post?.contentJson && typeof post.contentJson === "object" ? (
-                <TiptapViewer contentJson={post.contentJson} />
-              ) : post?.contentText || post?.content ? (
-                <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
-                  {(post.contentText || post.content || "")
-                    .split("\n")
-                    .map((paragraph, index) => (
-                      <p key={index} className="mb-4">
-                        {paragraph}
-                      </p>
-                    ))}
-                </div>
-              ) : (
+            {/* Hiển thị nội dung (cho cả POLL và NORMAL) */}
+            {(post?.contentJson && typeof post.contentJson === "object") ||
+            post?.contentText ||
+            post?.content ? (
+              <div className="prose max-w-none mb-6">
+                {post?.contentJson && typeof post.contentJson === "object" ? (
+                  <TiptapViewer contentJson={post.contentJson} />
+                ) : (
+                  <div className="text-gray-800 leading-relaxed whitespace-pre-line text-base">
+                    {(post.contentText || post.content || "")
+                      .split("\n")
+                      .map((paragraph, index) => (
+                        <p key={index} className="mb-4">
+                          {paragraph}
+                        </p>
+                      ))}
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            {/* Hiển thị Poll nếu có */}
+            {post.type === "POLL" && post.poll && (
+              <PollDisplay
+                pollId={post.poll.id}
+                expiresAt={post.poll.expiresAt}
+                options={post.poll.options || []}
+                userVotedOptionId={post.poll.userVotedOptionId || null}
+                onVoteSuccess={refetchPost}
+              />
+            )}
+
+            {/* Hiển thị thông báo nếu không có content và không có poll */}
+            {!(
+              (post?.contentJson && typeof post.contentJson === "object") ||
+              post?.contentText ||
+              post?.content
+            ) &&
+              !(post.type === "POLL" && post.poll) && (
                 <div className="text-gray-500 italic">Không có nội dung</div>
               )}
-            </div>
           </article>
 
           {/* Actions */}
@@ -463,6 +558,44 @@ const PostDetail = () => {
           <CommentList postId={parseInt(id)} />
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Xác nhận xóa bài viết
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Bạn có chắc chắn muốn xóa bài viết này? Hành động này không thể
+              hoàn tác.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isDeleting}
+                className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleDeletePost}
+                disabled={isDeleting}
+                className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    Đang xóa...
+                  </>
+                ) : (
+                  "Xóa bài viết"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bookmark Modal */}
       <BookmarkModal

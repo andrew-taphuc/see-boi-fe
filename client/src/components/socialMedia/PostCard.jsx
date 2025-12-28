@@ -227,6 +227,27 @@ const PostCard = ({ post, onUpdate }) => {
         )}
       </Link>
 
+      {/* Tags */}
+      {post.tags && post.tags.length > 0 && (
+        <div className="px-4 py-2 border-t border-gray-100">
+          <div className="flex flex-wrap gap-2">
+            {post.tags.map(({ tag }) => (
+              <button
+                key={tag.id}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate(`/tag/${tag.id}`);
+                }}
+                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors cursor-pointer"
+              >
+                #{tag.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="p-4 border-t border-gray-200">
         <div className="flex items-center justify-around">

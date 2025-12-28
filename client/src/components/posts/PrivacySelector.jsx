@@ -1,11 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Eye, Users, Lock, UserX } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { Eye, Users, Lock } from "lucide-react";
 
 const VISIBILITY_OPTIONS = [
-  { value: 'PUBLIC', label: 'Công khai', icon: Eye, color: 'text-green-600' },
-  { value: 'FOLLOWERS', label: 'Người theo dõi', icon: Users, color: 'text-blue-600' },
-  { value: 'PRIVATE', label: 'Chỉ mình tôi', icon: Lock, color: 'text-gray-600' },
-  { value: 'ANONYMOUS', label: 'Ẩn danh', icon: UserX, color: 'text-purple-600' },
+  { value: "PUBLIC", label: "Công khai", icon: Eye, color: "text-green-600" },
+  {
+    value: "FOLLOWERS",
+    label: "Người theo dõi",
+    icon: Users,
+    color: "text-blue-600",
+  },
+  {
+    value: "PRIVATE",
+    label: "Chỉ mình tôi",
+    icon: Lock,
+    color: "text-gray-600",
+  },
 ];
 
 /**
@@ -27,15 +36,17 @@ const PrivacySelector = ({ value, onChange }) => {
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
-  const selectedOption = VISIBILITY_OPTIONS.find((opt) => opt.value === value) || VISIBILITY_OPTIONS[0];
+  const selectedOption =
+    VISIBILITY_OPTIONS.find((opt) => opt.value === value) ||
+    VISIBILITY_OPTIONS[0];
   const Icon = selectedOption.icon;
 
   const handleSelect = (optionValue) => {
@@ -57,9 +68,14 @@ const PrivacySelector = ({ value, onChange }) => {
               onClick={() => handleSelect(option.value)}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
                 isSelected
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
-              } ${option.value !== VISIBILITY_OPTIONS[VISIBILITY_OPTIONS.length - 1].value ? 'border-b border-gray-100' : ''}`}
+                  ? "bg-blue-50 text-blue-700 font-medium"
+                  : "text-gray-700 hover:bg-gray-50"
+              } ${
+                option.value !==
+                VISIBILITY_OPTIONS[VISIBILITY_OPTIONS.length - 1].value
+                  ? "border-b border-gray-100"
+                  : ""
+              }`}
             >
               <OptionIcon size={18} className={option.color} />
               <span className="flex-1 text-left">{option.label}</span>
@@ -85,4 +101,3 @@ const PrivacySelector = ({ value, onChange }) => {
 };
 
 export default PrivacySelector;
-

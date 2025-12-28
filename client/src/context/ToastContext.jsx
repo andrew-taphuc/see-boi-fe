@@ -16,7 +16,7 @@ export const ToastProvider = ({ children }) => {
   const addToast = useCallback((message, type = 'info', duration = 3000) => {
     const id = Date.now() + Math.random();
     const toast = { id, message, type };
-    
+
     setToasts((prev) => [...prev, toast]);
 
     if (duration > 0) {
@@ -48,8 +48,16 @@ export const ToastProvider = ({ children }) => {
     return addToast(message, 'warning', duration);
   }, [addToast]);
 
+  // Thêm showToast helper để tương thích với code cũ
+  const showToast = useCallback(
+    (message, type = "info", duration) => {
+      return addToast(message, type, duration);
+    },
+    [addToast]
+  );
+
   return (
-    <ToastContext.Provider value={{ success, error, info, warning, toasts, removeToast }}>
+    <ToastContext.Provider value={{ success, error, info, warning, showToast, toasts, removeToast }}>
       {children}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </ToastContext.Provider>
@@ -101,4 +109,3 @@ const Toast = ({ toast, onClose }) => {
 };
 
 export default ToastProvider;
-

@@ -159,3 +159,101 @@ export const toggleBookmark = async (
     return await bookmarkPost(postId, collectionId);
   }
 };
+
+/**
+ * Get all draft posts of current user
+ * @returns {Promise} Response data containing array of draft posts
+ */
+export const getMyDrafts = async () => {
+  try {
+    const response = await axiosInstance.get("/post/drafts/me");
+    return { success: true, data: response.data };
+  } catch (error) {
+    const status = error?.response?.status;
+    const message =
+      error?.response?.data?.message || "Lỗi khi tải danh sách bài viết nháp";
+
+    if (status === 401) {
+      return {
+        success: false,
+        error: "Vui lòng đăng nhập để xem bài viết nháp",
+        needsAuth: true,
+      };
+    }
+
+    return { success: false, error: message };
+  }
+};
+
+/**
+ * Publish a draft post to become a public post
+ * @param {number} postId - ID of the draft post to publish
+ * @returns {Promise} Response data containing the published post
+ */
+export const publishDraft = async (postId) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/post/${postId}/publish`,
+      { isDraft: false },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { success: true, data: response.data };
+  } catch (error) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || "Lỗi khi đăng bài viết";
+
+    if (status === 403) {
+      return {
+        success: false,
+        error: "Bạn không có quyền đăng bài viết này",
+      };
+    } else if (status === 404) {
+      return { success: false, error: "Bài viết không tồn tại" };
+    } else if (status === 401) {
+      return {
+        success: false,
+        error: "Vui lòng đăng nhập để đăng bài viết",
+        needsAuth: true,
+      };
+    }
+
+    return { success: false, error: message };
+  }
+};
+
+/**
+ * Delete a draft post
+ * @param {number} postId - ID of the draft post to delete
+ * @returns {Promise} Response data
+ */
+export const deleteDraft = async (postId) => {
+  try {
+    const response = await axiosInstance.delete(`/post/${postId}`);
+    return { success: true, data: response.data };
+  } catch (error) {
+    const status = error?.response?.status;
+    const message =
+      error?.response?.data?.message || "Lỗi khi xóa bài viết nháp";
+
+    if (status === 403) {
+      return {
+        success: false,
+        error: "Bạn không có quyền xóa bài viết này",
+      };
+    } else if (status === 404) {
+      return { success: false, error: "Bài viết không tồn tại" };
+    } else if (status === 401) {
+      return {
+        success: false,
+        error: "Vui lòng đăng nhập",
+        needsAuth: true,
+      };
+    }
+
+    return { success: false, error: message };
+  }
+};
