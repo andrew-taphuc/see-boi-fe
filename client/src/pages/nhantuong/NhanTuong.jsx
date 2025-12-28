@@ -212,7 +212,7 @@ const NhanTuong = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 pt-16">
+      <div className="relative z-10 pt-">
         <div
           style={{
             backgroundImage: `linear-gradient(rgba(45, 10, 10, 0.1), rgba(45, 10, 10, 0.3)), url(${ImageBackground})`,

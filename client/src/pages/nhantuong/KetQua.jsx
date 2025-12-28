@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@components/nhantuong/Header";
 import ImageBackground from "@assets/nhantuong/bg.jpg";
 import ButtonInfo from "@assets/nhantuong/button_info.svg";
@@ -9,9 +10,140 @@ import MenuIcon from "@assets/nhantuong/menu.svg";
 import CloseIcon from "@assets/nhantuong/close2.svg";
 import BtnBackground from "@assets/nhantuong/btn.svg";
 import BackToTop from "@assets/nhantuong/gps-navigation.png";
+import FaceImageWithLandmarks from "@components/nhantuong/FaceImageWithLandmarks";
+import { calculateZodiacSign, calculateLunarYear, calculateMenh } from "@utils/astrologyUtils";
+import physiognomyService from "@utils/physiognomyService";
 
 const KetQua = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [resultData, setResultData] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    // Lấy data từ location.state
+    if (location.state) {
+      setResultData(location.state);
+    } else {
+      // Nếu không có data, redirect về trang nhân tướng
+      navigate('/nhantuong');
+    }
+  }, [location, navigate]);
+
+  // Format ngày sinh để hiển thị
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  // Tính tuổi từ ngày sinh
+  const calculateAge = (dateString) => {
+    if (!dateString) return '';
+    const today = new Date();
+    const birthDate = new Date(dateString);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Chuyển đổi gender từ API format sang hiển thị
+  const formatGender = (gender) => {
+    if (!gender) return '';
+    return gender === 'MALE' ? 'Nam' : gender === 'FEMALE' ? 'Nữ' : gender;
+  };
+
+  if (!resultData) {
+    return (
+      <div className="min-h-screen bg-[#2d0a0a] flex items-center justify-center">
+        <div className="text-yellow-300 text-xl">Đang tải...</div>
+      </div>
+    );
+  }
+
+  const { previewResult, interpretResult, personalInfo, originalImageFile } = resultData;
+  const { report, landmarks, image_base64 } = previewResult || {};
+  const interpret = interpretResult?.interpret || null;
+
+  // Hàm xử lý lưu kết quả
+  const handleSave = async () => {
+    if (!previewResult || !personalInfo) {
+      setSaveError("Thiếu dữ liệu để lưu");
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError(null);
+    setSaveSuccess(false);
+
+    try {
+      // Bước 1: Upload ảnh và lấy URL
+      let imageUrl = image_base64;
+      
+      // Nếu có file gốc, upload file
+      if (originalImageFile) {
+        const uploadResult = await physiognomyService.uploadImage(originalImageFile);
+        console.log('Upload result:', uploadResult);
+        // Thử nhiều cách lấy URL từ response
+        imageUrl = uploadResult?.url || uploadResult?.data?.url || uploadResult?.data?.imageUrl || uploadResult?.imageUrl || imageUrl;
+        console.log('Image URL after upload:', imageUrl);
+      } else if (image_base64 && image_base64.startsWith('data:image')) {
+        // Nếu là base64, convert sang File và upload
+        const response = await fetch(image_base64);
+        const blob = await response.blob();
+        const file = new File([blob], 'face-image.jpg', { type: blob.type });
+        const uploadResult = await physiognomyService.uploadImage(file);
+        console.log('Upload result (from base64):', uploadResult);
+        // Thử nhiều cách lấy URL từ response
+        imageUrl = uploadResult?.url || uploadResult?.data?.url || uploadResult?.data?.imageUrl || uploadResult?.imageUrl || imageUrl;
+        console.log('Image URL after upload (from base64):', imageUrl);
+      }
+      
+      // Đảm bảo imageUrl không null
+      if (!imageUrl) {
+        throw new Error('Không thể lấy URL ảnh sau khi upload');
+      }
+
+      // Bước 2: Chuẩn bị data để lưu
+      // Lấy từ interpret trước, nếu không có thì lấy từ preview
+      const saveData = {
+        name: personalInfo.name,
+        birthday: personalInfo.birthday,
+        gender: personalInfo.gender,
+        report: report || previewResult.report,
+        interpret: interpret || interpretResult?.interpret,
+        landmarks: landmarks || previewResult.landmarks,
+        imageUrl
+      };
+
+      // Bước 3: Gọi API save
+      const result = await physiognomyService.save(saveData);
+      
+      setSaveSuccess(true);
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error saving result:", error);
+      setSaveError(error.message || "Có lỗi xảy ra khi lưu kết quả");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Tính toán các thông tin tử vi
+  const zodiacSign = personalInfo?.birthday ? calculateZodiacSign(personalInfo.birthday) : "N/A";
+  const lunarYear = personalInfo?.birthday ? calculateLunarYear(personalInfo.birthday) : "N/A";
+  const menh = personalInfo?.birthday ? calculateMenh(personalInfo.birthday) : "N/A";
 
   const analysisTags = [
     { label: "Năm nay:", value: "Giáp Thân" },
@@ -181,126 +313,287 @@ const KetQua = () => {
                 <div className="space-y-8">
                   {/* Header Section */}
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
-                    <h1 className="text-2xl md:text-3xl font-light text-yellow-300">
-                      Kết quả phân tích khuôn mặt
+                    <h1 className="text-2xl md:text-3xl font-bold text-yellow-300">
+                      <b>Kết quả phân tích khuôn mặt</b>
                     </h1>
-                    <button className="flex items-center gap-2 text-yellow-300 border border-yellow-400/60 px-4 py-2 rounded-lg hover:bg-yellow-400/10 transition-colors whitespace-nowrap">
-                      <span className="text-sm">Luận Giải Mẫu</span>
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </button>
+
                   </div>
 
                   {/* User Info Card */}
-                  <div className="flex gap-4 md:gap-6 bg-red-900/30 rounded-xl p-4 md:p-6 border border-yellow-600/20">
-                    {/* Avatar Column */}
-                    <div className="flex-shrink-0">
-                      <img
-                        src="https://via.placeholder.com/150"
-                        alt="Avatar"
-                        className="w-40 h-46 md:w-48 md:h-48 rounded-lg object-cover border-2 border-yellow-500/40 shadow-lg"
-                      />
+                  <div className="flex flex-col md:flex-row gap-6 md:gap-8 bg-red-900/60 rounded-xl p-6 md:p-8 border border-yellow-600/20">
+                    {/* Avatar Column - Larger */}
+                    <div className="flex-shrink-0 w-full md:w-80 lg:w-96">
+                      {image_base64 ? (
+                        <div className="w-full">
+                          <FaceImageWithLandmarks
+                            imageSrc={image_base64}
+                            landmarks={landmarks}
+                          />
+                        </div>
+                      ) : (
+                        <img
+                          src="https://via.placeholder.com/150"
+                          alt="Avatar"
+                          className="w-full h-auto rounded-lg object-cover border-2 border-yellow-500/40 shadow-lg"
+                        />
+                      )}
                     </div>
 
-                    {/* Info Column */}
-                    <div className="flex-1 flex flex-col justify-between space-y-2">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-1 md:gap-4 text-sm">
+                    {/* Info Column - Larger */}
+                    <div className="flex-1 flex flex-col justify-between space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-base md:text-lg">
                         {[
-                          { label: "Họ và tên", value: "Bùi Quang Hưng" },
-                          { label: "Giới tính", value: "Nam" },
-                          { label: "Ngày sinh", value: "26-08-2004" },
-                          { label: "Tuổi", value: "21" },
+                          { label: "Họ và tên", value: personalInfo?.name || "N/A" },
+                          { label: "Giới tính", value: formatGender(personalInfo?.gender) },
+                          { label: "Ngày sinh", value: formatDate(personalInfo?.birthday) },
+                          { label: "Tuổi", value: personalInfo?.birthday ? calculateAge(personalInfo.birthday) : "N/A" },
+                          { label: "Cung hoàng đạo", value: zodiacSign },
+                          { label: "Năm sinh âm lịch", value: lunarYear },
+                          { label: "Mệnh", value: menh },
                         ].map((info, idx) => (
-                          <div key={idx}>
-                            <span className="text-yellow-400 font-medium">
+                          <div key={idx} className="space-y-2">
+                            <span className="text-yellow-400 font-semibold text-lg md:text-xl block">
                               {info.label}
                             </span>
-                            <p className="text-yellow-100/90 mt-1 font-light">
+                            <p className="text-yellow-100/90 font-medium text-base md:text-lg">
                               {info.value}
                             </p>
                           </div>
                         ))}
                       </div>
 
-                      <div className="hidden md:flex md:flex-col md:gap-2 md:pt-2">
-                        <button className="border border-yellow-400/60 text-yellow-300 px-6 py-2 rounded-full text-sm hover:bg-yellow-400/10 transition-colors w-fit">
-                          Đổi ảnh luận giải
+                      <div className="flex flex-col items-center gap-3 md:pt-4">
+                        <button 
+                          onClick={() => navigate('/nhantuong')}
+                          className="border border-yellow-400/60 text-yellow-300 px-6 py-3 rounded-full text-base md:text-lg hover:bg-yellow-400/10 transition-colors w-fit font-bold"
+                        >
+                          <b>Đổi ảnh luận giải</b>
                         </button>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Analysis Tags Section */}
-                  <div>
-                    <h3 className="text-lg md:text-xl font-semibold text-yellow-300 mb-4">
-                      Phân tích khuôn mặt chi tiết
-                    </h3>
-                    <div className="flex flex-wrap gap-3 mb-6">
-                      {analysisTags.map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 rounded-full text-xs border border-yellow-500/40 text-yellow-100/90"
-                        >
-                          <span className="text-yellow-400">{tag.label}</span>{" "}
-                          {tag.value}
-                        </span>
-                      ))}
                     </div>
                   </div>
 
                   {/* Analysis Sections */}
-                  <div className="space-y-4">
-                    {analysisData.map((section) => (
-                      <div
-                        key={section.num}
-                        className="bg-red-900/20 rounded-xl p-4 md:p-6 border border-yellow-600/20"
-                      >
-                        <h4 className="text-base md:text-lg font-semibold text-yellow-300 mb-3">
-                          <span className="text-yellow-500">{section.num}</span>{" "}
-                          - {section.title}
+                  <div className="space-y-6">
+                    {/* Phần 1: Tổng quan mệnh cục */}
+                    {interpret && interpret['tong-quan'] && (
+                      <div className="bg-red-900/70 rounded-xl p-4 md:p-6 border border-yellow-600/20">
+                        <h4 className="text-xl md:text-2xl font-semibold text-yellow-300 mb-4">
+                          <span className="text-yellow-500">I.</span> Tổng quan mệnh cục
                         </h4>
-                        <p className="text-yellow-100/80 text-sm mb-2">
-                          {section.desc}
-                        </p>
-                        {section.italic && (
-                          <p className="text-yellow-100/70 text-sm italic mb-3">
-                            {section.italic}
-                          </p>
-                        )}
-                        <button className="flex items-center gap-2 text-yellow-400 text-sm hover:text-yellow-300 transition-colors">
-                          <svg
-                            className="w-4 h-4"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                            <path
-                              fillRule="evenodd"
-                              d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span>{section.note}</span>
-                        </button>
+                        <div className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                          {interpret['tong-quan']}
+                        </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* Phần 2: Luận giải chi tiết */}
+                    {interpret && (
+                      <div className="bg-red-900/70 rounded-xl p-4 md:p-6 border border-yellow-600/20">
+                        <h4 className="text-xl md:text-2xl font-semibold text-yellow-300 mb-4">
+                          <span className="text-yellow-500">II.</span> Luận giải chi tiết
+                        </h4>
+                        <div className="space-y-5">
+                          {/* Tam Đình */}
+                          {interpret.tam_dinh && (
+                            <div className="space-y-3">
+                              <h5 className="text-yellow-400 font-bold text-base md:text-lg">
+                                Tam Đình
+                              </h5>
+                              {interpret.tam_dinh.thuong_dinh && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Thượng Đình:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.tam_dinh.thuong_dinh}
+                                  </p>
+                                </div>
+                              )}
+                              {interpret.tam_dinh.trung_dinh && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Trung Đình:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.tam_dinh.trung_dinh}
+                                  </p>
+                                </div>
+                              )}
+                              {(interpret.tam_dinh.ha_dinh || interpret.tam_dinh.tam_dinh) && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Hạ Đình:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.tam_dinh.ha_dinh || interpret.tam_dinh.tam_dinh}
+                                  </p>
+                                </div>
+                              )}
+                              {interpret.tam_dinh.tong_quan && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30 mt-3">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Tổng quan Tam Đình:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.tam_dinh.tong_quan}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Ngũ Quan */}
+                          {interpret.ngu_quan && (
+                            <div className="space-y-3">
+                              <h5 className="text-yellow-400 font-bold text-base md:text-lg">
+                                Ngũ Quan
+                              </h5>
+                              {interpret.ngu_quan.long_may && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Lông Mày:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.ngu_quan.long_may}
+                                  </p>
+                                </div>
+                              )}
+                              {interpret.ngu_quan.mat && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Mắt:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.ngu_quan.mat}
+                                  </p>
+                                </div>
+                              )}
+                              {interpret.ngu_quan.mui && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Mũi:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.ngu_quan.mui}
+                                  </p>
+                                </div>
+                              )}
+                              {interpret.ngu_quan.tai && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Tai:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.ngu_quan.tai}
+                                  </p>
+                                </div>
+                              )}
+                              {interpret.ngu_quan.mieng_cam && (
+                                <div className="pl-4 border-l-2 border-yellow-500/30">
+                                  <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                    Miệng & Cằm:
+                                  </p>
+                                  <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                    {interpret.ngu_quan.mieng_cam}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Ấn Đường */}
+                          {interpret.an_duong && (
+                            <div className="space-y-3">
+                              <h5 className="text-yellow-400 font-bold text-base md:text-lg">
+                                Ấn Đường
+                              </h5>
+                              <div className="pl-4 border-l-2 border-yellow-500/30">
+                                {interpret.an_duong.mo_ta && (
+                                  <div className="mb-2">
+                                    <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                      Mô tả:
+                                    </p>
+                                    <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                      {interpret.an_duong.mo_ta}
+                                    </p>
+                                  </div>
+                                )}
+                                {interpret.an_duong.y_nghia && (
+                                  <div className="mb-2">
+                                    <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                      Ý nghĩa:
+                                    </p>
+                                    <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                      {interpret.an_duong.y_nghia}
+                                    </p>
+                                  </div>
+                                )}
+                                {interpret.an_duong.danh_gia && (
+                                  <div>
+                                    <p className="text-yellow-300/90 font-bold text-base md:text-lg mb-1">
+                                      Đánh giá:
+                                    </p>
+                                    <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed whitespace-pre-line">
+                                      {interpret.an_duong.danh_gia}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Phần 3: Lời khuyên */}
+                    {interpret && interpret.loi_khuyen && Array.isArray(interpret.loi_khuyen) && interpret.loi_khuyen.length > 0 && (
+                      <div className="bg-red-900/70 rounded-xl p-4 md:p-6 border border-yellow-600/20">
+                        <h4 className="text-xl md:text-2xl font-semibold text-yellow-300 mb-4">
+                          <span className="text-yellow-500">III.</span> Lời khuyên
+                        </h4>
+                        <ul className="space-y-3">
+                          {interpret.loi_khuyen.map((khuyen, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                              <span className="text-yellow-500 font-bold text-xl mt-0.5">•</span>
+                              <p className="text-yellow-100/80 text-base md:text-lg leading-relaxed flex-1">
+                                {khuyen}
+                              </p>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Hiển thị thông báo nếu chưa có dữ liệu interpret */}
+                    {!interpret && (
+                      <div className="bg-red-900/70 rounded-xl p-4 md:p-6 border border-yellow-600/20">
+                        <p className="text-yellow-100/70 text-sm md:text-base text-center">
+                          Đang tải dữ liệu luận giải...
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Bottom Buttons */}
-                  <div className="flex items-center justify-center gap-4 pt-6 border-t border-yellow-600/20">
-                    <button className="w-48 md:w-auto border border-yellow-400/60 text-yellow-300 px-8 py-3 rounded-full hover:bg-yellow-400/10 transition-colors">
-                      Đổi ảnh luận giải
+                  <div className="flex flex-col items-center gap-4 pt-6 border-t border-yellow-600/20">
+                    {saveError && (
+                      <div className="text-red-400 text-sm text-center">
+                        {saveError}
+                      </div>
+                    )}
+                    {saveSuccess && (
+                      <div className="text-green-400 text-sm text-center">
+                        Lưu kết quả thành công!
+                      </div>
+                    )}
+                    <button
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="border border-yellow-400/70 text-yellow-200 font-bold px-6 py-3 rounded-full text-base md:text-lg hover:bg-yellow-400/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      type="button"
+                    >
+                      {isSaving ? "Đang lưu..." : "Lưu kết quả luận giải"}
                     </button>
                   </div>
                 </div>
