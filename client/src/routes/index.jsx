@@ -31,6 +31,12 @@ import MyFollowingTagsPage from "@pages/MyFollowingTagsPage";
 import ProtectedRoute from "@components/common/ProtectedRoute";
 import TarotLayout from "@layouts/TarotLayout";
 import SocialLayout from "@layouts/SocialLayout";
+import AdminLayout from "@layouts/AdminLayout";
+import Dashboard from "@pages/admin/Dashboard";
+import UserManagement from "@pages/admin/UserManagement";
+import ReportManagement from "@pages/admin/ReportManagement";
+import PostCommentManagement from "@pages/admin/PostCommentManagement";
+import AdminProfile from "@pages/admin/AdminProfile";
 
 const AppRoutes = () => {
   return (
@@ -248,6 +254,50 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <MyFollowingTagsPage />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+      
+      {/* Admin Routes */}
+      <Route element={<AdminLayout />}>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute>
+              <UserManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/reports"
+          element={
+            <ProtectedRoute>
+              <ReportManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/posts"
+          element={
+            <ProtectedRoute>
+              <PostCommentManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/profile"
+          element={
+            <ProtectedRoute>
+              <AdminProfile />
             </ProtectedRoute>
           }
         />
