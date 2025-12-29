@@ -12,6 +12,8 @@ import {
   Trash2,
   Lock,
   Users,
+  Flag,
+  MoreVertical,
 } from "lucide-react";
 import axiosInstance from "@utils/axiosInstance";
 import FollowButton from "../components/userProfile/FollowButton";
@@ -22,6 +24,7 @@ import { toggleLike, toggleBookmark } from "@utils/postService";
 import { useToast } from "@context/ToastContext";
 import BookmarkModal from "@components/socialMedia/BookmarkModal";
 import PollDisplay from "@components/posts/PollDisplay";
+import ReportModal from "@components/common/ReportModal";
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -53,6 +56,10 @@ const PostDetail = () => {
   // Delete confirmation state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Report modal state
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showPostMenu, setShowPostMenu] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -426,6 +433,40 @@ const PostDetail = () => {
                     </button>
                   </>
                 )}
+
+                {/* Report button - chỉ hiện cho người không phải tác giả */}
+                {currentUser && post.userId !== currentUser.id && (
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowPostMenu(!showPostMenu)}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      title="Tùy chọn"
+                    >
+                      <MoreVertical size={20} className="text-gray-600" />
+                    </button>
+
+                    {showPostMenu && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-30"
+                          onClick={() => setShowPostMenu(false)}
+                        />
+                        <div className="absolute right-0 top-10 z-40 bg-white border border-gray-200 rounded-lg shadow-xl overflow-visible min-w-[120px] max-h-none">
+                          <button
+                            onClick={() => {
+                              setShowReportModal(true);
+                              setShowPostMenu(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            <Flag size={16} />
+                            Báo cáo
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -603,6 +644,13 @@ const PostDetail = () => {
         onClose={() => setShowBookmarkModal(false)}
         postId={parseInt(id)}
         onBookmarkSuccess={handleBookmarkSuccess}
+      />
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        postId={parseInt(id)}
       />
     </>
   );

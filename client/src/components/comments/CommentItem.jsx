@@ -10,10 +10,12 @@ import {
   ThumbsDown,
   Reply,
   ChevronDown,
+  Flag,
 } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import axiosInstance from "@utils/axiosInstance";
 import CommentInput from "./CommentInput";
+import ReportModal from "@components/common/ReportModal";
 
 const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
   const { currentUser } = useAuth();
@@ -23,6 +25,7 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [showAllReplies, setShowAllReplies] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [votes, setVotes] = useState(
     comment.voteCounts || { upvotes: 0, downvotes: 0, total: 0 }
   );
@@ -459,6 +462,39 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
                 )}
               </div>
             )}
+
+            {/* Menu for non-author (Report button) */}
+            {!isAuthor && currentUser && !isEditing && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                >
+                  <MoreVertical size={16} className="text-gray-600" />
+                </button>
+
+                {showMenu && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setShowMenu(false)}
+                    />
+                    <div className="absolute right-0 top-8 z-40 bg-white border border-gray-200 rounded-lg shadow-xl overflow-visible min-w-[120px] max-h-none">
+                      <button
+                        onClick={() => {
+                          setShowReportModal(true);
+                          setShowMenu(false);
+                        }}
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <Flag size={16} />
+                        Báo cáo
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -515,6 +551,13 @@ const CommentItem = ({ comment, onEdit, onDelete, onReply, level = 0 }) => {
           )}
         </>
       )}
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        commentId={comment.id || comment._id}
+      />
     </>
   );
 };

@@ -6,11 +6,13 @@ import {
   Share2,
   Bookmark,
   MoreHorizontal,
+  Flag,
 } from "lucide-react";
 import { toggleLike, toggleBookmark } from "@utils/postService";
 import { useAuth } from "@context/AuthContext";
 import { useToast } from "@context/ToastContext";
 import BookmarkModal from "./BookmarkModal";
+import ReportModal from "@components/common/ReportModal";
 
 const PostCard = ({ post, onUpdate }) => {
   const navigate = useNavigate();
@@ -33,6 +35,8 @@ const PostCard = ({ post, onUpdate }) => {
   const [isLikeProcessing, setIsLikeProcessing] = useState(false);
   const [isBookmarkProcessing, setIsBookmarkProcessing] = useState(false);
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showPostMenu, setShowPostMenu] = useState(false);
 
   // Format time ago
   const getTimeAgo = (timestamp) => {
@@ -193,9 +197,43 @@ const PostCard = ({ post, onUpdate }) => {
             <p className="text-xs text-gray-500">{timeAgo}</p>
           </div>
         </div>
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <MoreHorizontal size={20} className="text-gray-600" />
-        </button>
+        {currentUser && post.userId !== currentUser.id && (
+          <div className="relative">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowPostMenu(!showPostMenu);
+              }}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <MoreHorizontal size={20} className="text-gray-600" />
+            </button>
+
+            {showPostMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-30"
+                  onClick={() => setShowPostMenu(false)}
+                />
+                <div className="absolute right-0 top-10 z-40 bg-white border border-gray-200 rounded-lg shadow-xl overflow-visible min-w-[120px] max-h-none">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowReportModal(true);
+                      setShowPostMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Flag size={16} />
+                    Báo cáo
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -302,6 +340,13 @@ const PostCard = ({ post, onUpdate }) => {
         onClose={() => setShowBookmarkModal(false)}
         postId={post.id}
         onBookmarkSuccess={handleBookmarkSuccess}
+      />
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        postId={post.id}
       />
     </article>
   );
