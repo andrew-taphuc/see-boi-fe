@@ -1,12 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Eye, Users, Lock, UserX, X } from 'lucide-react';
-import PrivacySelector from './PrivacySelector';
+import React, { useState, useRef, useEffect } from "react";
+import { Eye, Users, Lock, X } from "lucide-react";
+import PrivacySelector from "./PrivacySelector";
 
 const VISIBILITY_OPTIONS = [
-  { value: 'PUBLIC', label: 'Công khai', icon: Eye, color: 'text-green-600' },
-  { value: 'FOLLOWERS', label: 'Người theo dõi', icon: Users, color: 'text-blue-600' },
-  { value: 'PRIVATE', label: 'Chỉ mình tôi', icon: Lock, color: 'text-gray-600' },
-  { value: 'ANONYMOUS', label: 'Ẩn danh', icon: UserX, color: 'text-purple-600' },
+  { value: "PUBLIC", label: "Công khai", icon: Eye, color: "text-green-600" },
+  {
+    value: "FOLLOWERS",
+    label: "Người theo dõi",
+    icon: Users,
+    color: "text-blue-600",
+  },
+  {
+    value: "PRIVATE",
+    label: "Chỉ mình tôi",
+    icon: Lock,
+    color: "text-gray-600",
+  },
 ];
 
 /**
@@ -34,15 +43,17 @@ const PrivacyButton = ({ value, onChange }) => {
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
-  const selectedOption = VISIBILITY_OPTIONS.find((opt) => opt.value === value) || VISIBILITY_OPTIONS[0];
+  const selectedOption =
+    VISIBILITY_OPTIONS.find((opt) => opt.value === value) ||
+    VISIBILITY_OPTIONS[0];
   const Icon = selectedOption.icon;
 
   return (
@@ -64,7 +75,9 @@ const PrivacyButton = ({ value, onChange }) => {
         >
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-900">Quyền riêng tư</h3>
+              <h3 className="text-sm font-semibold text-gray-900">
+                Quyền riêng tư
+              </h3>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -84,4 +97,3 @@ const PrivacyButton = ({ value, onChange }) => {
 };
 
 export default PrivacyButton;
-

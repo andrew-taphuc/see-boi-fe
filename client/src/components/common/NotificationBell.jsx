@@ -84,6 +84,7 @@ const NotificationBell = ({ bellColor }) => {
       if (
         notification.type === "POST_LIKE" ||
         notification.type === "POST_COMMENT" ||
+        notification.type === "COMMENT_LIKE" ||
         notification.type === "NEW_POST"
       ) {
         navigate(`/post/${targetId}`);

@@ -1,9 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { BarChart3 } from "lucide-react";
 
 /**
  * Component hiển thị danh sách bài viết của user
  */
 const UserPostsList = ({ posts, formatDateTime }) => {
+  const navigate = useNavigate();
   if (posts.length === 0) {
     return (
       <div className="text-center py-12">
@@ -22,20 +24,34 @@ const UserPostsList = ({ posts, formatDateTime }) => {
         >
           <div className="flex gap-4">
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
-                {post.title || "(Không có tiêu đề)"}
-              </h3>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 flex-1">
+                  {post.title || "(Không có tiêu đề)"}
+                </h3>
+                {/* Poll Badge */}
+                {post.type === "POLL" && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm flex-shrink-0">
+                    <BarChart3 size={12} />
+                    Poll
+                  </span>
+                )}
+              </div>
 
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
                   {post.tags.map(({ tag }) => (
-                    <span
+                    <button
                       key={tag.id}
-                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        navigate(`/tag/${tag.id}`);
+                      }}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-md transition-shadow cursor-pointer"
                     >
                       #{tag.name}
-                    </span>
+                    </button>
                   ))}
                 </div>
               )}

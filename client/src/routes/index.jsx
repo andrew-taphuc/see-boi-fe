@@ -22,9 +22,12 @@ import SocialMedia from "@pages/SocialMedia";
 import PostDetail from "@pages/PostDetail";
 import CreatePost from "@pages/CreatePost";
 import EditPost from "@pages/EditPost";
+import DraftList from "@pages/DraftList";
 import UserProfile from "@pages/UserProfile";
 import EditProfile from "@pages/EditProfile";
 import SavedPosts from "@pages/SavedPosts";
+import TagPage from "@pages/TagPage";
+import MyFollowingTagsPage from "@pages/MyFollowingTagsPage";
 import ProtectedRoute from "@components/common/ProtectedRoute";
 import TarotLayout from "@layouts/TarotLayout";
 import SocialLayout from "@layouts/SocialLayout";
@@ -198,6 +201,14 @@ const AppRoutes = () => {
           }
         />
         <Route
+          path="/drafts"
+          element={
+            <ProtectedRoute>
+              <DraftList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/post/create"
           element={
             <ProtectedRoute>
@@ -228,6 +239,15 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <SavedPosts />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/tag/:id" element={<TagPage />} />
+        <Route
+          path="/following-tags"
+          element={
+            <ProtectedRoute>
+              <MyFollowingTagsPage />
             </ProtectedRoute>
           }
         />

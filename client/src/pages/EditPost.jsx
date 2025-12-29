@@ -50,7 +50,7 @@ const EditPost = () => {
   const [isPoll, setIsPoll] = useState(false);
   const [pollOptions, setPollOptions] = useState(["", ""]);
   const [pollExpiresAt, setPollExpiresAt] = useState(""); // yyyy-MM-ddThh:mm (local)
-  
+
   // Thumbnail: có thể là file (ảnh mới) hoặc URL (ảnh cũ)
   const [thumbnail, setThumbnail] = useState(null); // File object nếu là ảnh mới
   const [thumbnailUrl, setThumbnailUrl] = useState(null); // URL string nếu là ảnh cũ
@@ -113,7 +113,9 @@ const EditPost = () => {
 
         // Pre-fill tags
         if (post.tags && Array.isArray(post.tags)) {
-          const tagIds = post.tags.map((tag) => tag.tagId || tag.id).filter(Boolean);
+          const tagIds = post.tags
+            .map((tag) => tag.tagId || tag.id)
+            .filter(Boolean);
           setSelectedTags(tagIds);
         }
 
@@ -121,7 +123,11 @@ const EditPost = () => {
         if (post.type === "POLL" && post.poll) {
           setIsPoll(true);
           const options = post.poll.options || [];
-          setPollOptions(options.length > 0 ? options : ["", ""]);
+          // Extract optionText từ objects nếu cần
+          const optionTexts = options.map((opt) =>
+            typeof opt === "string" ? opt : opt.optionText || opt.text || ""
+          );
+          setPollOptions(optionTexts.length > 0 ? optionTexts : ["", ""]);
           if (post.poll.expiresAt) {
             // Convert ISO string to local datetime string
             const expiresDate = new Date(post.poll.expiresAt);
@@ -255,6 +261,7 @@ const EditPost = () => {
       payload.tagIds = selectedTags;
     }
 
+    console.log("Payload being sent:", JSON.stringify(payload, null, 2));
     return payload;
   };
 
@@ -307,6 +314,7 @@ const EditPost = () => {
 
       // Update post
       await axiosInstance.patch(`/post/${postId}`, payload);
+      
 
       // Extract image URLs từ contentJson
       const imageUrls = extractImageUrls(contentJson);
@@ -530,4 +538,3 @@ const EditPost = () => {
 };
 
 export default EditPost;
-

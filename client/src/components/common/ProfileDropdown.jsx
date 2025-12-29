@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Settings, FileText, LogOut, User, HelpCircle } from 'lucide-react'
+import { Settings, FileText, LogOut, User, HelpCircle, FileEdit } from 'lucide-react'
 
 const ProfileDropdown = ({
   user,
@@ -41,28 +41,34 @@ const ProfileDropdown = ({
           <div className="p-3 border-b border-gray-200">
             <div className="flex items-center gap-3">
               <div
-                className="w-12 h-12 rounded-full border-2 border-purple-500 bg-cover bg-center flex-shrink-0"
+                className="w-12 h-12 rounded-full border-2 border-purple-500 bg-cover bg-center shrink-0"
                 style={{ backgroundImage: `url(${avatarUrl})` }}
               />
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
                   {displayName}
                 </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {displayEmail}
-                </p>
+                <p className="text-xs text-gray-500 truncate">{displayEmail}</p>
               </div>
             </div>
           </div>
 
           <div className="py-1">
             <Link
-              to={user?.id ? `/user/${user.id}` : '#'}
+              to={user?.id ? `/user/${user.id}` : "#"}
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <User size={18} className="text-gray-500" />
               <span>Trang cá nhân</span>
+            </Link>
+            <Link
+              to="/drafts"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <FileEdit size={18} className="text-gray-500" />
+              <span>Bản nháp</span>
             </Link>
             <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
               <Settings size={18} className="text-gray-500" />
@@ -95,4 +101,3 @@ const ProfileDropdown = ({
 }
 
 export default ProfileDropdown
-
