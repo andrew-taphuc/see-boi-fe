@@ -1,18 +1,4 @@
-@font-face {
-  src: url("../../assets/fonts/PlayfairDisplay.ttf") format('truetype');
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  src: url("../../assets/fonts/Lexend.ttf") format('truetype');
-  font-family: 'Lexend';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
+/* Fonts are loaded via JavaScript in TarotLayout.jsx */
 
 /* Áp dụng font cho nội dung trang tarot (chỉ cho phần children, không bao gồm header) */
 .tarot-page > div.pt-16,

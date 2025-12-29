@@ -4,9 +4,45 @@ import ThemedHeader from '@components/common/ThemedHeader'
 import TarotHeader from '@components/tarot/layout/TarotHeader'
 import TarotFooter from '@components/tarot/layout/TarotFooter'
 import '@components/tarot/common/TarotFonts.css'
+import playfairDisplayFont from '@assets/fonts/PlayfairDisplay.ttf?url'
+import lexendFont from '@assets/fonts/Lexend.ttf?url'
 
 const TarotLayout = ({ children }) => {
   const location = useLocation()
+
+  // Load fonts dynamically
+  useEffect(() => {
+    // Check if fonts are already loaded
+    if (document.getElementById('tarot-fonts')) return
+
+    const style = document.createElement('style')
+    style.id = 'tarot-fonts'
+    style.textContent = `
+      @font-face {
+        src: url("${playfairDisplayFont}") format('truetype');
+        font-family: 'Playfair Display';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+      }
+
+      @font-face {
+        src: url("${lexendFont}") format('truetype');
+        font-family: 'Lexend';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+      }
+    `
+    document.head.appendChild(style)
+
+    return () => {
+      const existingStyle = document.getElementById('tarot-fonts')
+      if (existingStyle) {
+        existingStyle.remove()
+      }
+    }
+  }, [])
 
   // Scroll về đầu trang mỗi khi route thay đổi
   useEffect(() => {
