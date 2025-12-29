@@ -29,13 +29,25 @@ const ThienBanInfo = ({ info, isMobile }) => {
 
   return (
     <div
-      className={`bg-white flex flex-col items-center justify-center p-4 border border-yellow-700/50 relative ${
+      className={`bg-white flex flex-col items-center justify-center p-4 border border-yellow-700/50 relative overflow-hidden ${
         isMobile ? "rounded-lg shadow-md mb-4" : "h-full"
       }`}
     >
       {!isMobile && (
         <div className="absolute inset-0 opacity-5 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Yin_yang_black_and_white_symbol.svg/1200px-Yin_yang_black_and_white_symbol.svg.png')] bg-center bg-no-repeat bg-contain pointer-events-none"></div>
       )}
+
+      {/* Chữ Hán trang trí - Thiên Bàn */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* 天 (Thiên) - Góc trên trái */}
+        <span className="absolute top-2 left-2 text-6xl md:text-8xl font-serif text-red-900/5 select-none">
+          天
+        </span>
+        {/* 盤 (Bàn) - Góc trên phải */}
+        <span className="absolute top-2 right-2 text-6xl md:text-8xl font-serif text-yellow-800/5 select-none">
+          盤
+        </span>
+      </div>
 
       <div className="relative z-10 text-center w-full">
         <h2 className="font-['Playfair_Display'] text-2xl md:text-3xl font-bold text-red-800 uppercase tracking-widest mb-1">
@@ -181,6 +193,7 @@ const TuviResultPage = () => {
 
     try {
       const apiData = {
+        name: formData.name || "Khách",
         birthDate: `${formData.year}-${String(formData.month).padStart(
           2,
           "0"
@@ -209,11 +222,10 @@ const TuviResultPage = () => {
     }
   };
 
-  // Xử lý gọi AI luận giải
+  // Xử lý gọi AI luận giải (tự động lưu nếu chưa lưu)
   const handleRequestAI = async () => {
-    if (!data?.chartId && !chartId) {
-      setAiError("Bạn cần LƯU LÁ SỐ trước khi sử dụng tính năng Luận Giải AI!");
-      alert("⚠️ Vui lòng nhấn nút 'Lưu lá số' trước khi xem Luận Giải AI!");
+    if (!formData) {
+      alert("Không có thông tin để xem luận giải!");
       return;
     }
 
@@ -221,11 +233,39 @@ const TuviResultPage = () => {
     setAiError("");
 
     try {
-      const response = await requestAIInterpretation(data?.chartId || chartId);
+      let currentChartId = data?.chartId || chartId;
+
+      // Nếu chưa lưu, tự động lưu trước
+      if (!isSaved || !currentChartId) {
+        const apiData = {
+          name: formData.name || "Khách",
+          birthDate: `${formData.year}-${String(formData.month).padStart(
+            2,
+            "0"
+          )}-${String(formData.day).padStart(2, "0")}`,
+          birthHour: formData.hour,
+          gender: formData.gender,
+          birthPlace: "",
+          isLunar: formData.calendarType === "am",
+        };
+
+        const saveResponse = await saveTuViChart(apiData);
+        currentChartId = saveResponse.chartId;
+
+        setIsSaved(true);
+        setChartId(currentChartId);
+        setData((prevData) => ({
+          ...prevData,
+          chartId: currentChartId,
+        }));
+      }
+
+      // Gọi API luận giải
+      const response = await requestAIInterpretation(currentChartId);
       setAiInterpretation(response.aiResponse);
       setShowAiPopup(true);
     } catch (error) {
-      console.error("Lỗi khi gọi AI:", error);
+      console.error("Lỗi khi xem luận giải:", error);
       setAiError(
         error.message || "Không thể lấy luận giải AI. Vui lòng thử lại!"
       );
@@ -356,61 +396,21 @@ const TuviResultPage = () => {
             {data.aspects && <AspectsBars aspects={data.aspects} />}
           </div>
 
-          {/* === NÚT LƯU LÁ SỐ (nếu chưa lưu) === */}
-          {!isSaved && formData && (
-            <div className="mt-4 mb-4 text-center">
-              <button
-                onClick={handleSaveChart}
-                disabled={loading}
-                className={`font-bold py-3 px-10 rounded shadow-lg border-2 transform transition-all duration-200 uppercase tracking-widest ${
-                  loading
-                    ? "bg-gray-600 text-gray-300 border-gray-500 cursor-not-allowed opacity-60"
-                    : "bg-blue-700 hover:bg-blue-600 text-white border-blue-500 hover:scale-105 cursor-pointer"
-                }`}
-              >
-                {loading ? "Đang lưu..." : "💾 Lưu lá số"}
-              </button>
-              <p className="text-blue-600 mt-2 text-sm font-serif">
-                Lưu lá số để sử dụng tính năng Luận Giải AI
-              </p>
-            </div>
-          )}
-
-          {/* === THÔNG BÁO ĐÃ LƯU === */}
-          {isSaved && (
-            <div className="mt-4 mb-4 text-center">
-              <p className="text-green-600 font-bold text-lg">
-                ✓ Lá số đã được lưu thành công
-              </p>
-            </div>
-          )}
-
-          {/* NÚT XEM LUẬN GIẢI AI */}
-          <div className="mt-2 mb-4 text-center">
+          {/* NÚT XEM LUẬN GIẢI (TỰ ĐỘNG LƯU VÀ XEM AI) */}
+          <div className="mt-4 mb-4 text-center">
             <button
               onClick={handleRequestAI}
-              disabled={loadingAi || (!data?.chartId && !chartId)}
+              disabled={loadingAi || !formData}
               className={`font-bold py-3 px-10 rounded shadow-lg border-2 transform transition-all duration-200 uppercase tracking-widest font-['Playfair_Display'] ${
-                !data?.chartId && !chartId
+                !formData
                   ? "bg-gray-600 text-gray-300 border-gray-500 cursor-not-allowed opacity-60"
                   : loadingAi
                   ? "bg-red-700 text-yellow-400 border-yellow-500 opacity-50 cursor-not-allowed"
                   : "bg-red-800 hover:bg-red-900 text-yellow-400 border-yellow-600 hover:scale-105 cursor-pointer"
               }`}
-              title={
-                !data?.chartId && !chartId
-                  ? "Vui lòng lưu lá số trước khi sử dụng tính năng này"
-                  : ""
-              }
             >
-              {loadingAi ? "Đang phân tích..." : "Xem Luận Giải thầy Tùng"}
+              {loadingAi ? "Đang xử lý..." : "Xem luận giải"}
             </button>
-            {!data?.chartId && !chartId && (
-              <p className="text-orange-500 mt-2 text-sm font-serif">
-                ⚠️ Bạn cần <strong>Lưu lá số</strong> trước khi sử dụng tính
-                năng AI
-              </p>
-            )}
             {aiError && (
               <p className="text-red-600 mt-2 text-sm font-serif">{aiError}</p>
             )}
