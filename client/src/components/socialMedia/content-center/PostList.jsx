@@ -32,7 +32,10 @@ const PostList = () => {
 
   // Hàm lấy posts từ người mình follow (sử dụng API mới)
   const getFollowingPosts = async (skip = 0, limit = 5) => {
-    if (!currentUser) return [];
+    if (!currentUser) {
+      console.warn("No currentUser found, returning empty posts");
+      return [];
+    }
 
     try {
       // Gọi API following-feed mới từ backend
@@ -44,11 +47,32 @@ const PostList = () => {
       });
 
       // Backend trả về { posts, total, skip, take, hasMore }
-      return response.data.posts || [];
+      const followingPosts = response.data.posts || [];
+      console.log(`Following posts (skip: ${skip}):`, followingPosts);
+      return followingPosts;
     } catch (err) {
       console.error("Error loading following posts:", err);
       return [];
     }
+  };
+
+  // Hàm sắp xếp trending posts theo metric
+  const sortTrendingPosts = (posts, sortBy) => {
+    if (!posts || posts.length === 0) return [];
+    
+    return [...posts].sort((a, b) => {
+      let aValue, bValue;
+      
+      if (sortBy === "views") {
+        aValue = a._count?.views || a.viewsInPeriod || 0;
+        bValue = b._count?.views || b.viewsInPeriod || 0;
+      } else if (sortBy === "likes") {
+        aValue = a._count?.likes || a.likesInPeriod || 0;
+        bValue = b._count?.likes || b.likesInPeriod || 0;
+      }
+      
+      return bValue - aValue; // Sắp xếp giảm dần
+    });
   };
 
   // Hàm load mixed feed theo pattern: Trending Views -> Following -> Trending Likes -> Following
@@ -65,15 +89,19 @@ const PostList = () => {
           getFollowingPosts(5, 5),  // Skip 5, lấy 5 bài tiếp theo
         ]);
 
-      // Kết hợp theo pattern
-      const mixedPosts = [
-        ...trendingViews,
-        ...followingPosts1,
-        ...trendingLikes,
-        ...followingPosts2,
+      // Sắp xếp trending posts theo thứ tự views/likes giảm dần
+      const sortedTrendingViews = sortTrendingPosts(trendingViews, "views");
+      const sortedTrendingLikes = sortTrendingPosts(trendingLikes, "likes");
+
+      // Thêm section metadata cho mỗi post
+      const postsWithSection = [
+        ...sortedTrendingViews.map(post => ({ ...post, section: "trendingViews" })),
+        ...followingPosts1.map(post => ({ ...post, section: "following" })),
+        ...sortedTrendingLikes.map(post => ({ ...post, section: "trendingLikes" })),
+        ...followingPosts2.map(post => ({ ...post, section: "following" })),
       ];
 
-      setPosts(mixedPosts);
+      setPosts(postsWithSection);
     } catch (err) {
       console.error("Error loading mixed feed:", err);
       setError("Không thể tải bài viết. Vui lòng thử lại.");
@@ -155,30 +183,24 @@ const PostList = () => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {posts.map((post, index) => {
-        // Xác định loại section để hiển thị badge
+        // Xác định loại section dựa vào section metadata
         let sectionBadge = null;
-        if (index < 5) {
+        if (post.section === "trendingViews") {
           sectionBadge = (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
               🔥 Trending Views
             </span>
           );
-        } else if (index >= 5 && index < 10) {
+        } else if (post.section === "following") {
           sectionBadge = (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
               👥 Following
             </span>
           );
-        } else if (index >= 10 && index < 15) {
+        } else if (post.section === "trendingLikes") {
           sectionBadge = (
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-pink-100 text-pink-800">
               ❤️ Trending Likes
-            </span>
-          );
-        } else if (index >= 15) {
-          sectionBadge = (
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-              👥 Following
             </span>
           );
         }

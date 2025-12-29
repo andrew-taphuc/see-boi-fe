@@ -26,10 +26,12 @@ const PollDisplay = ({
   const [results, setResults] = useState(null);
   const [voting, setVoting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedOptionId, setSelectedOptionId] = useState(userVotedOptionId);
+  const [hasVotedThisSession, setHasVotedThisSession] = useState(false);
 
   // Derived state từ prop
-  const hasVoted = userVotedOptionId !== null;
-  const votedOptionId = userVotedOptionId;
+  const hasVoted = selectedOptionId !== null;
+  const votedOptionId = selectedOptionId;
 
   const isExpired = expiresAt ? new Date(expiresAt) < new Date() : false;
 
@@ -54,14 +56,14 @@ const PollDisplay = ({
     }
   }, [pollId, hasVoted, isExpired]);
 
+  // Sync selectedOptionId với prop userVotedOptionId khi component mount hoặc prop thay đổi
+  useEffect(() => {
+    setSelectedOptionId(userVotedOptionId);
+  }, [userVotedOptionId]);
+
   const handleVote = async (optionId) => {
     if (!currentUser) {
       showError("Vui lòng đăng nhập để bình chọn");
-      return;
-    }
-
-    if (hasVoted) {
-      showError("Bạn đã bình chọn rồi");
       return;
     }
 
@@ -72,11 +74,43 @@ const PollDisplay = ({
 
     setVoting(true);
     try {
-      await axiosInstance.post(`/poll/${pollId}/vote`, { optionId });
+      const response = await axiosInstance.post(`/poll/${pollId}/vote`, {
+        optionId,
+      });
 
-      showSuccess("Bình chọn thành công!");
+      const { action } = response.data;
 
-      // Gọi callback để parent refetch post data với userVotedOptionId mới
+      // Xử lý theo action từ backend
+      switch (action) {
+        case "vote":
+          // Vote lần đầu
+          setSelectedOptionId(response.data.pollOptionId);
+          setHasVotedThisSession(true);
+          showSuccess("Bình chọn thành công!");
+          break;
+
+        case "change":
+          // Đổi lựa chọn
+          setSelectedOptionId(response.data.pollOptionId);
+          setHasVotedThisSession(true);
+          showSuccess("Đã cập nhật lựa chọn của bạn!");
+          break;
+
+        case "unvote":
+          // Bỏ chọn
+          setSelectedOptionId(null);
+          setHasVotedThisSession(false);
+          showSuccess("Đã hủy bình chọn!");
+          break;
+
+        default:
+          console.warn("Unknown action:", action);
+      }
+
+      // Refresh poll results để cập nhật vote count
+      await fetchResults();
+
+      // Gọi callback để parent refetch post data
       onVoteSuccess?.();
     } catch (error) {
       console.error("Failed to vote:", error);
@@ -117,7 +151,7 @@ const PollDisplay = ({
   }
 
   const totalVotes = results.totalVotes || 0;
-  const showResults = hasVoted || isExpired;
+  const showResults = hasVoted || isExpired || hasVotedThisSession;
 
   return (
     <div className="border-2 border-purple-200 rounded-xl p-6 bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 shadow-sm">
@@ -167,70 +201,79 @@ const PollDisplay = ({
           return (
             <div key={option.id} className="relative">
               {showResults ? (
-                // Results Mode - Show progress bar
-                <div className="relative">
+                // Results Mode - Show progress bar (clickable to change vote)
+                <button
+                  onClick={() => handleVote(option.id)}
+                  disabled={voting || !currentUser || isExpired}
+                  className={`relative w-full overflow-hidden rounded-lg border-2 transition-all cursor-pointer ${
+                    isVoted
+                      ? "border-green-400 bg-white shadow-md hover:shadow-lg"
+                      : "border-gray-300 bg-white hover:border-purple-300 hover:shadow-sm"
+                  } ${voting || !currentUser || isExpired ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  {/* Progress bar background */}
                   <div
-                    className={`relative overflow-hidden rounded-lg border-2 transition-all ${
+                    className={`absolute inset-0 transition-all duration-500 ${
                       isVoted
-                        ? "border-green-400 bg-white shadow-md"
-                        : "border-gray-300 bg-white"
+                        ? "bg-gradient-to-r from-green-100 to-green-50"
+                        : "bg-gradient-to-r from-purple-100 to-pink-50"
                     }`}
-                  >
-                    {/* Progress bar background */}
-                    <div
-                      className={`absolute inset-0 transition-all duration-500 ${
-                        isVoted
-                          ? "bg-gradient-to-r from-green-100 to-green-50"
-                          : "bg-gradient-to-r from-purple-100 to-pink-50"
-                      }`}
-                      style={{ width: `${percentage}%` }}
-                    />
+                    style={{ width: `${percentage}%` }}
+                  />
 
-                    {/* Content */}
-                    <div className="relative px-4 py-3 flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1">
-                        {isVoted && (
-                          <CheckCircle2
-                            size={20}
-                            className="text-green-600 flex-shrink-0"
-                          />
-                        )}
-                        <span
-                          className={`font-medium ${
-                            isVoted ? "text-green-900" : "text-gray-900"
-                          }`}
-                        >
-                          {option.text}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-3 flex-shrink-0">
-                        <span className="text-sm text-gray-600">
-                          {option.votes} phiếu
-                        </span>
-                        <span
-                          className={`text-lg font-bold ${
-                            isVoted ? "text-green-600" : "text-purple-600"
-                          }`}
-                        >
-                          {percentage}%
-                        </span>
-                      </div>
+                  {/* Content */}
+                  <div className="relative px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      {isVoted && (
+                        <CheckCircle2
+                          size={20}
+                          className="text-green-600 flex-shrink-0"
+                        />
+                      )}
+                      <span
+                        className={`font-medium ${
+                          isVoted ? "text-green-900" : "text-gray-900"
+                        }`}
+                      >
+                        {option.text}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="text-sm text-gray-600">
+                        {option.votes} phiếu
+                      </span>
+                      <span
+                        className={`text-lg font-bold ${
+                          isVoted ? "text-green-600" : "text-purple-600"
+                        }`}
+                      >
+                        {percentage}%
+                      </span>
                     </div>
                   </div>
-                </div>
+                </button>
               ) : (
                 // Vote Mode - Show buttons
                 <button
                   onClick={() => handleVote(option.id)}
                   disabled={voting || !currentUser}
                   className={`w-full px-4 py-3 rounded-lg border-2 font-medium text-left transition-all duration-200 ${
-                    voting
+                    isVoted
+                      ? "border-green-500 bg-green-50 hover:border-green-600 hover:bg-green-100"
+                      : voting
                       ? "border-gray-300 bg-gray-100 cursor-not-allowed opacity-60"
                       : "border-purple-300 bg-white hover:border-purple-500 hover:bg-purple-50 hover:shadow-md transform hover:scale-[1.02]"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-900">{option.text}</span>
+                    <div className="flex items-center gap-2">
+                      {isVoted && (
+                        <CheckCircle2 size={18} className="text-green-600" />
+                      )}
+                      <span className={isVoted ? "text-green-900" : "text-gray-900"}>
+                        {option.text}
+                      </span>
+                    </div>
                     {totalVotes > 0 && (
                       <span className="text-xs text-gray-500">
                         {option.votes} phiếu ({percentage}%)

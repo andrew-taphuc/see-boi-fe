@@ -314,7 +314,12 @@ const CreatePost = () => {
       } else if (draftId && !draft) {
         // Publish draft hiện tại
         // Trước tiên update draft với thông tin mới nhất (nếu có thay đổi)
-        await axiosInstance.patch(`/post/${draftId}`, payload);
+        const patchConfig = {};
+        // Nếu payload là FormData (có file mới), không set Content-Type để browser tự set multipart/form-data
+        if (!(payload instanceof FormData)) {
+          patchConfig.headers = { "Content-Type": "application/json" };
+        }
+        await axiosInstance.patch(`/post/${draftId}`, payload, patchConfig);
         // Sau đó publish
         res = await axiosInstance.patch(
           `/post/${draftId}/publish`,
