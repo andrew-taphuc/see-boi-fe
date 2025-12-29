@@ -132,15 +132,81 @@ export const NotificationProvider = ({ children }) => {
       });
     };
 
+    // Handle admin actions (delete/hide post or comment)
+    const handleAdminAction = (data) => {
+      console.log("⚠️ Admin action received:", data);
+
+      // Show browser notification if permission granted
+      if (Notification.permission === "granted") {
+        new Notification("Thông báo từ quản trị viên", {
+          body: data.message,
+          icon: "/logo.png",
+        });
+      }
+
+      // Add to notifications list (will appear in NotificationBell)
+      const adminNotification = {
+        id: Date.now(), // temporary ID
+        type: data.type,
+        content: data.message, // Use 'content' to match notification schema
+        message: data.message,
+        createdAt: data.timestamp,
+        isRead: false,
+      };
+
+      setNotifications((prev) => {
+        const updated = [adminNotification, ...prev];
+        const newUnreadCount = updated.filter((n) => !n.isRead).length;
+        setUnreadCount(newUnreadCount);
+        console.log("📥 Admin notification added to bell. Total unread:", newUnreadCount);
+        return updated;
+      });
+    };
+
+    // Handle report action (when admin resolves user's report)
+    const handleReportAction = (data) => {
+      console.log("📋 Report action received:", data);
+
+      // Show browser notification if permission granted
+      if (Notification.permission === "granted") {
+        new Notification("Báo cáo của bạn đã được xử lý", {
+          body: data.message,
+          icon: "/logo.png",
+        });
+      }
+
+      // Add to notifications list
+      const reportNotification = {
+        id: Date.now(),
+        type: data.type,
+        content: data.message,
+        message: data.message,
+        createdAt: data.timestamp,
+        isRead: false,
+      };
+
+      setNotifications((prev) => {
+        const updated = [reportNotification, ...prev];
+        const newUnreadCount = updated.filter((n) => !n.isRead).length;
+        setUnreadCount(newUnreadCount);
+        console.log("📥 Report notification added to bell. Total unread:", newUnreadCount);
+        return updated;
+      });
+    };
+
     // Listen for all notification types
     socket.on("notification", handleNewNotification);
     socket.on("comment", handleNewNotification);
     socket.on("like", handleNewNotification);
+    socket.on("adminAction", handleAdminAction);
+    socket.on("reportAction", handleReportAction);
 
     return () => {
       socket.off("notification", handleNewNotification);
       socket.off("comment", handleNewNotification);
       socket.off("like", handleNewNotification);
+      socket.off("adminAction", handleAdminAction);
+      socket.off("reportAction", handleReportAction);
     };
   }, [socket, currentUser]);
 

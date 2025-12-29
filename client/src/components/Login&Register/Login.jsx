@@ -40,8 +40,11 @@ const Login = ({ onClose, onSwitchToRegister }) => {
           onClose();
         }
         
-        // Nếu thiếu avatarUrl, birthday hoặc gender, redirect đến trang cập nhật thông tin cá nhân
-        if (!user.avatarUrl || !user.birthday || !user.gender) {
+        // nếu là ADMIN thì chuyển đến trang quản lý admin
+        if (user.role === "ADMIN") {
+          navigate("/admin");
+        } else if (!user.avatarUrl || !user.birthday || !user.gender) {
+          // Nếu thiếu avatarUrl, birthday hoặc gender, redirect đến trang cập nhật thông tin cá nhân
           navigate("/user/edit");
         } else {
           // Redirect đến socialmedia page
