@@ -2,6 +2,7 @@ import React from 'react';
 import LeftSidebar from '@components/socialMedia/content-left/LeftSidebar';
 import CenterContent from '@components/socialMedia/content-center/CenterContent';
 import RightSidebar from '@components/socialMedia/content-right/RightSidebar';
+import SearchBar from '@components/socialMedia/SearchBar';
 
 const SocialMedia = () => {
   return (

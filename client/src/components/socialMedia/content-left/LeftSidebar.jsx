@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Users, Bookmark } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import FollowListModal from "@components/userProfile/FollowListModal";
+import SearchBar from "@components/socialMedia/SearchBar";
 
 const LeftSidebar = () => {
   const { currentUser } = useAuth();
@@ -21,8 +22,7 @@ const LeftSidebar = () => {
               <img
                 src={
                   currentUser?.avatarUrl ||
-                  `https://ui-avatars.com/api/?name=${
-                    currentUser?.userName || "User"
+                  `https://ui-avatars.com/api/?name=${currentUser?.userName || "User"
                   }&background=4267B2&color=fff`
                 }
                 alt={currentUser?.userName}
@@ -64,6 +64,11 @@ const LeftSidebar = () => {
               </div>
             </div>
           </Link>
+
+          {/* Search Bar */}
+          <div className="mb-4">
+            <SearchBar />
+          </div>
 
           {/* Người theo dõi */}
           <button
