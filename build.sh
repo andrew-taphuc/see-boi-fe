@@ -56,6 +56,10 @@ if [ ! -f "package.json" ]; then
     exit 1
 fi
 
+# Thiết lập memory limit cho Node.js (1GB)
+export NODE_OPTIONS="--max-old-space-size=1024"
+echo -e "${BLUE}💾 Đã thiết lập Node.js memory limit: 1024MB${NC}"
+
 echo ""
 echo -e "${BLUE}🔨 Đang build frontend...${NC}"
 echo ""
