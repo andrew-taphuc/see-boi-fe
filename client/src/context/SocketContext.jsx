@@ -11,7 +11,7 @@ export const SocketProvider = ({ children }) => {
 
   // Khởi tạo socket instance một lần duy nhất
   const socket = useMemo(() => {
-    return io(import.meta.env.VITE_SOCKET_URL || "http://localhost:6789", {
+    return io(import.meta.env.VITE_SOCKET_URL || "http://seeboi.xyz:6789", {
       transports: ["websocket", "polling"],
       autoConnect: true,
     });
