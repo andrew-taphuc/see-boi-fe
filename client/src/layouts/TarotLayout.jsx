@@ -2,10 +2,10 @@ import React, { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import ThemedHeader from '@components/common/ThemedHeader'
 import TarotHeader from '@components/tarot/layout/TarotHeader'
-import TarotFooter from '@components/tarot/layout/TarotFooter'
 import '@components/tarot/common/TarotFonts.css'
 import playfairDisplayFont from '@assets/fonts/PlayfairDisplay.ttf?url'
 import lexendFont from '@assets/fonts/Lexend.ttf?url'
+import CommonFooter from '@components/common/CommonFooter'
 
 const TarotLayout = ({ children }) => {
   const location = useLocation()
@@ -83,7 +83,7 @@ const TarotLayout = ({ children }) => {
       <ThemedHeader variant="tarot" />
       <TarotHeader />
       <div className={`flex-grow ${paddingClass}`}>{children}</div>
-      <TarotFooter />
+      <CommonFooter variant="tarot" />
     </div>
   )
 }

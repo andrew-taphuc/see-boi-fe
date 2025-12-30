@@ -35,14 +35,7 @@ const HeroSection = () => {
                   dựa trên tinh hoa huyền học Đông phương kết hợp với trí tuệ
                   nhân tạo và công nghệ thị giác máy tính hiện đại. Chúng tôi
                   mang đến cho bạn trải nghiệm khám phá bản thân một cách khoa
-                  học, sâu sắc và hoàn toàn bảo mật{" "}
-                  <a
-                    href="#"
-                    className="text-yellow-400 underline hover:text-yellow-300 transition-colors"
-                  >
-                    (Xem Chính sách bảo mật)
-                  </a>
-                  .
+                  học, sâu sắc và hoàn toàn bảo mật.
                 </p>
 
                 <p className="hidden md:block">
@@ -55,7 +48,7 @@ const HeroSection = () => {
               </div>
 
               <div className="flex flex-col md:flex-row gap-2 md:gap-4 justify-center items-center pt-2 md:pt-4">
-                <a href="#xem-tuong">
+                <a href="/nhantuong/gioi-thieu">
                   <button className="group flex items-center justify-center gap-1.5 md:gap-2 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-400 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-xs md:text-sm">
                     <span>Xem thêm</span>
                     <svg

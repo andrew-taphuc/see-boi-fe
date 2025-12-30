@@ -10,16 +10,16 @@ import CloseIcon from "@assets/nhantuong/close2.svg";
 import BtnBackground from "@assets/nhantuong/btn.svg";
 
 // Navigation Buttons Configuration
-const navigationButtons = {
-  left: [
-    { href: "/landingpage", label: "Trang chủ" },
-    { href: "/tuvi", label: "Tử vi" },
-  ],
-  right: [
-    { href: "/tarot", label: "Xem Tarot" },
-    { href: "/socialmedia", label: "Social" },
-  ],
-};
+// const navigationButtons = {
+//   left: [
+//     { href: "/landingpage", label: "Trang chủ" },
+//     { href: "/tuvi", label: "Tử vi" },
+//   ],
+//   right: [
+//     { href: "/tarot", label: "Xem Tarot" },
+//     { href: "/socialmedia", label: "Social" },
+//   ],
+// };
 
 // Reusable Navigation Button Component
 const NavButton = ({ href, label }) => (
@@ -47,13 +47,13 @@ const GioiThieu = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const menuItems = [
-    { label: "Nhân tướng", href: "/nhantuong" },
-    { label: "Luận giải", href: "/nhantuong#xem-tuong" },
-    { label: "Tính năng", href: "/nhantuong#tinh-nang" },
-    { label: "Giới thiệu", href: "/nhantuong/gioi-thieu" },
-    { label: "Liên hệ", href: "/nhantuong#nhantuong-footer" },
-  ];
+  // const menuItems = [
+  //   { label: "Nhân tướng", href: "/nhantuong" },
+  //   { label: "Luận giải", href: "/nhantuong#xem-tuong" },
+  //   { label: "Tính năng", href: "/nhantuong#tinh-nang" },
+  //   { label: "Giới thiệu", href: "/nhantuong/gioi-thieu" },
+  //   { label: "Liên hệ", href: "/nhantuong#nhantuong-footer" },
+  // ];
 
   const mobileMenuItems = [
     { label: "Trang chủ", href: "/landingpage" },
@@ -137,8 +137,29 @@ const GioiThieu = () => {
         />
       )}
 
+      {/* Back Button */}
+      <a
+        href="/nhantuong"
+        className="fixed top-4 left-4 md:top-8 md:left-8 z-50 flex items-center gap-2 bg-gradient-to-r from-yellow-600/80 to-yellow-500/80 hover:from-yellow-600 hover:to-yellow-500 backdrop-blur-sm text-white px-4 md:px-5 py-2 md:py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-sm md:text-base border border-yellow-400/30"
+      >
+        <svg
+          className="w-4 h-4 md:w-5 md:h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        <span className="hidden md:inline">Quay lại</span>
+      </a>
+
       {/* Sticky Navigation Bar - Shows on Scroll - Desktop Only */}
-      <div
+      {/* <div
         className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
             ? "translate-y-0 opacity-100"
@@ -173,7 +194,7 @@ const GioiThieu = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="relative z-10">
         <div
@@ -192,14 +213,14 @@ const GioiThieu = () => {
           <div className="container mx-auto px-4 md:px-40 pb-5 md:pb-10">
             <div className="flex gap-8 items-start justify-center">
               {/* Left Column - Navigation Buttons - Desktop Only */}
-              <div className="hidden md:flex flex-col gap-6 sticky top-32 self-start z-40">
+              {/* <div className="hidden md:flex flex-col gap-6 sticky top-32 self-start z-40">
                 {navigationButtons.left.map((btn, idx) => (
                   <NavButton key={idx} {...btn} />
                 ))}
                 <div className="flex justify-center">
                   <img src={Hook} alt="decoration" className="w-20 h-auto" />
                 </div>
-              </div>
+              </div> */}
 
               {/* Center Column - Main Content */}
               <div className="w-full md:max-w-5xl mx-auto">
@@ -479,14 +500,14 @@ const GioiThieu = () => {
               </div>
 
               {/* Right Column - Navigation Buttons - Desktop Only */}
-              <div className="hidden md:flex flex-col gap-6 sticky top-32 self-start z-40">
+              {/* <div className="hidden md:flex flex-col gap-6 sticky top-32 self-start z-40">
                 {navigationButtons.right.map((btn, idx) => (
                   <NavButton key={idx} {...btn} />
                 ))}
                 <div className="flex justify-center">
                   <img src={Hook} alt="decoration" className="w-20 h-auto" />
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="mt-12 pt-6 text-center">
               <div className="text-yellow-100/70 text-xs">

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { isTokenExpired } from './jwtUtils';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://seeboi.xyz:6789",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:6789",
   headers: {
     'Content-Type': 'application/json',
   },
