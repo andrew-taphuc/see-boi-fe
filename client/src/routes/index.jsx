@@ -10,19 +10,21 @@ import AdminLayout from "@layouts/AdminLayout";
 // LandingPage không lazy load vì là trang đầu tiên
 import LandingPage from "@pages/LandingPage";
 
-// Lazy load tất cả các pages khác
+// Tarot pages KHÔNG lazy load
+import Tarot from "@pages/tarot/Tarot";
+import TarotSpread from "@pages/tarot/TarotSpread";
+import TarotCardDetail from "@pages/tarot/TarotCardDetail";
+import TarotCardList from "@pages/tarot/TarotCardList";
+import TarotYesNo from "@pages/tarot/TarotYesNo";
+import TarotLove from "@pages/tarot/TarotLove";
+import TarotLoveSimple from "@pages/tarot/TarotLoveSimple";
+import TarotLoveDeep from "@pages/tarot/TarotLoveDeep";
+import TarotDaily from "@pages/tarot/TarotDaily";
+import TarotOneCard from "@pages/tarot/TarotOneCard";
+
+// Lazy load tất cả các pages khác (trừ tarot/landingpage)
 const TuviResultPage = lazy(() => import("../pages/TuviResultPage"));
 const TuVi = lazy(() => import("@pages/TuVi"));
-const Tarot = lazy(() => import("@pages/tarot/Tarot"));
-const TarotSpread = lazy(() => import("@pages/tarot/TarotSpread"));
-const TarotCardDetail = lazy(() => import("@pages/tarot/TarotCardDetail"));
-const TarotCardList = lazy(() => import("@pages/tarot/TarotCardList"));
-const TarotYesNo = lazy(() => import("@pages/tarot/TarotYesNo"));
-const TarotLove = lazy(() => import("@pages/tarot/TarotLove"));
-const TarotLoveSimple = lazy(() => import("@pages/tarot/TarotLoveSimple"));
-const TarotLoveDeep = lazy(() => import("@pages/tarot/TarotLoveDeep"));
-const TarotDaily = lazy(() => import("@pages/tarot/TarotDaily"));
-const TarotOneCard = lazy(() => import("@pages/tarot/TarotOneCard"));
 const NhanTuong = lazy(() => import("@pages/nhantuong/NhanTuong"));
 const GioiThieu = lazy(() => import("@pages/nhantuong/GioiThieu"));
 const KetQua = lazy(() => import("@pages/nhantuong/KetQua"));
