@@ -13,7 +13,8 @@ const suppressTensorFlowWarnings = () => {
     // Suppress các warning về backend đã được đăng ký
     if (
       message.includes('backend was already registered') ||
-      message.includes('Platform browser has already been set')
+      message.includes('Platform browser has already been set') ||
+      (message.includes('is already registered') && message.includes('for backend'))
     ) {
       return; // Không log warning này
     }
@@ -32,10 +33,15 @@ const getFaceApi = async () => {
   if (faceapi) return faceapi;
   if (faceapiPromise) return faceapiPromise;
   
-  faceapiPromise = import('face-api.js').then(module => {
-    faceapi = module;
+  // @vladmandic/face-api đã có TensorFlow.js bên trong, không cần import riêng
+  // Điều này giúp tránh conflict và warning về kernel đã được đăng ký
+  faceapiPromise = (async () => {
+    // Load @vladmandic/face-api (nó sẽ tự quản lý TensorFlow.js)
+    const faceapiModule = await import('@vladmandic/face-api');
+    // @vladmandic/face-api có thể export default hoặc named exports
+    faceapi = faceapiModule.default || faceapiModule;
     return faceapi;
-  });
+  })();
   
   return faceapiPromise;
 };
@@ -43,20 +49,7 @@ const getFaceApi = async () => {
 let modelsLoaded = false;
 
 /**
- * Kiểm tra xem file model có thể truy cập được không
- */
-const checkModelFileAccess = async (baseUrl, fileName) => {
-  try {
-    const response = await fetch(`${baseUrl}/${fileName}`, { method: 'HEAD' });
-    return response.ok;
-  } catch (error) {
-    return false;
-  }
-};
-
-/**
- * Load face-api.js models
- * Ưu tiên load từ local, nếu không có thì fallback sang CDN
+ * Load face-api.js models từ CDN
  */
 export const loadFaceModels = async () => {
   if (modelsLoaded) {
@@ -65,105 +58,55 @@ export const loadFaceModels = async () => {
 
   // Đảm bảo face-api đã được load
   const faceapiModule = await getFaceApi();
-  const LOCAL_MODEL_URL = '/models';
   const CDN_MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
-  
-  // Kiểm tra xem file models có thể truy cập được không
-  const manifestExists = await checkModelFileAccess(LOCAL_MODEL_URL, 'tiny_face_detector_model-weights_manifest.json');
-  if (!manifestExists) {
-    console.warn('[Face Detection] ⚠ Không tìm thấy file manifest ở local, đang fallback sang CDN...');
-  }
 
-  // Thử load từ local trước (offline)
   try {
-    console.log('[Face Detection] Đang tải models từ local (offline)...');
-    console.log('[Face Detection] Path:', LOCAL_MODEL_URL);
+    console.log('[Face Detection] Đang tải models từ CDN...');
+    console.log('[Face Detection] CDN URL:', CDN_MODEL_URL);
     
-    // Verify file size trước khi load để tránh lỗi tensor
+    // Kiểm tra xem có thể truy cập CDN không (CORS check)
     try {
-      const manifestResponse = await fetch(`${LOCAL_MODEL_URL}/tiny_face_detector_model-weights_manifest.json`);
-      if (!manifestResponse.ok) {
-        throw new Error('Không thể truy cập file manifest');
+      const testResponse = await fetch(`${CDN_MODEL_URL}/tiny_face_detector_model-weights_manifest.json`, { 
+        method: 'HEAD',
+        mode: 'cors',
+        credentials: 'omit'
+      });
+      if (!testResponse.ok) {
+        throw new Error(`CDN không thể truy cập: ${testResponse.status} ${testResponse.statusText}`);
       }
-      const shardResponse = await fetch(`${LOCAL_MODEL_URL}/tiny_face_detector_model-shard1`, { method: 'HEAD' });
-      if (!shardResponse.ok) {
-        throw new Error('Không thể truy cập file shard');
-      }
-      const contentLength = shardResponse.headers.get('content-length');
-      if (contentLength && parseInt(contentLength) < 180000) {
-        console.warn('[Face Detection] ⚠ File shard có vẻ bị hỏng (kích thước:', contentLength, 'bytes), đang fallback sang CDN...');
-        throw new Error('File model bị hỏng hoặc không đầy đủ');
-      }
-    } catch (verifyError) {
-      console.warn('[Face Detection] ⚠ Lỗi khi verify file models:', verifyError.message);
-      throw verifyError;
+      console.log('[Face Detection] ✓ CDN có thể truy cập được (CORS OK)');
+    } catch (corsError) {
+      console.warn('[Face Detection] ⚠ CORS check failed:', corsError.message);
+      console.warn('[Face Detection] Vẫn thử load models (có thể vẫn hoạt động)...');
     }
     
     // Load từng model riêng để dễ debug
-    console.log('[Face Detection] Đang tải Tiny Face Detector...');
-    await faceapiModule.nets.tinyFaceDetector.loadFromUri(LOCAL_MODEL_URL);
+    console.log('[Face Detection] Đang tải Tiny Face Detector từ CDN...');
+    await faceapiModule.nets.tinyFaceDetector.loadFromUri(CDN_MODEL_URL);
     console.log('[Face Detection] ✓ Tiny Face Detector đã tải xong');
     
-    console.log('[Face Detection] Đang tải Face Landmark 68...');
-    await faceapiModule.nets.faceLandmark68Net.loadFromUri(LOCAL_MODEL_URL);
+    console.log('[Face Detection] Đang tải Face Landmark 68 từ CDN...');
+    await faceapiModule.nets.faceLandmark68Net.loadFromUri(CDN_MODEL_URL);
     console.log('[Face Detection] ✓ Face Landmark 68 đã tải xong');
 
     modelsLoaded = true;
-    console.log('[Face Detection] ✓ Models đã được tải từ local (offline)');
+    console.log('[Face Detection] ✓ Models đã được tải từ CDN thành công');
     return true;
-  } catch (localError) {
-    console.warn('[Face Detection] ⚠ Không tìm thấy models ở local, đang fallback sang CDN...');
-    console.warn('[Face Detection] Lỗi local:', localError.message);
-    console.warn('[Face Detection] Stack:', localError.stack);
+  } catch (cdnError) {
+    console.error('[Face Detection] ✗ Không thể tải models từ CDN');
+    console.error('[Face Detection] Lỗi:', cdnError.message);
+    console.error('[Face Detection] Stack:', cdnError.stack);
     
-    // Fallback: thử load từ CDN
-    try {
-      console.log('[Face Detection] Đang tải models từ CDN...');
-      console.log('[Face Detection] CDN URL:', CDN_MODEL_URL);
-      
-      // Kiểm tra xem có thể truy cập CDN không (CORS check)
-      try {
-        const testResponse = await fetch(`${CDN_MODEL_URL}/tiny_face_detector_model-weights_manifest.json`, { 
-          method: 'HEAD',
-          mode: 'cors'
-        });
-        if (!testResponse.ok) {
-          throw new Error(`CDN không thể truy cập: ${testResponse.status} ${testResponse.statusText}`);
-        }
-        console.log('[Face Detection] ✓ CDN có thể truy cập được');
-      } catch (corsError) {
-        console.warn('[Face Detection] ⚠ CORS hoặc network error khi kiểm tra CDN:', corsError.message);
-        // Vẫn thử load, có thể là CORS warning nhưng vẫn load được
-      }
-      
-      // Load từng model riêng để dễ debug
-      console.log('[Face Detection] Đang tải Tiny Face Detector từ CDN...');
-      await faceapiModule.nets.tinyFaceDetector.loadFromUri(CDN_MODEL_URL);
-      console.log('[Face Detection] ✓ Tiny Face Detector đã tải xong từ CDN');
-      
-      console.log('[Face Detection] Đang tải Face Landmark 68 từ CDN...');
-      await faceapiModule.nets.faceLandmark68Net.loadFromUri(CDN_MODEL_URL);
-      console.log('[Face Detection] ✓ Face Landmark 68 đã tải xong từ CDN');
-
-      modelsLoaded = true;
-      console.log('[Face Detection] ✓ Models đã được tải từ CDN (fallback)');
-      console.log('[Face Detection] 💡 Tip: Tải models về local để tải nhanh hơn. Chạy: ./download_face_models.sh');
-      return true;
-    } catch (cdnError) {
-      console.error('[Face Detection] ✗ Không thể tải models từ cả local và CDN');
-      console.error('[Face Detection] Lỗi CDN:', cdnError.message);
-      console.error('[Face Detection] Stack CDN:', cdnError.stack);
-      
-      // Thông báo chi tiết về lỗi
-      if (cdnError.message.includes('CORS') || cdnError.message.includes('Failed to fetch')) {
-        console.error('[Face Detection] ⚠ Có thể là vấn đề CORS hoặc network. Kiểm tra:');
-        console.error('[Face Detection]   1. Content Security Policy (CSP) có block CDN không?');
-        console.error('[Face Detection]   2. Network có chặn external requests không?');
-        console.error('[Face Detection]   3. Mixed content (HTTP/HTTPS) issues?');
-      }
-      
-      return false;
+    // Thông báo chi tiết về lỗi
+    if (cdnError.message.includes('CORS') || cdnError.message.includes('Failed to fetch')) {
+      console.error('[Face Detection] ⚠ Có thể là vấn đề CORS hoặc network. Kiểm tra:');
+      console.error('[Face Detection]   1. Content Security Policy (CSP) có block CDN không?');
+      console.error('[Face Detection]   2. Network có chặn external requests không?');
+      console.error('[Face Detection]   3. Mixed content (HTTP/HTTPS) issues?');
+      console.error('[Face Detection]   4. Kiểm tra console Network tab để xem request có bị block không');
     }
+    
+    return false;
   }
 };
 

@@ -19,4 +19,8 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, './src/hooks'),
     },
   },
+  optimizeDeps: {
+    include: ['@vladmandic/face-api'],
+    exclude: [],
+  },
 })

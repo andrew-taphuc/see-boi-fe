@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run copy-models",
-    "copy-models": "mkdir -p dist/models && cp -r public/models/* dist/models/ 2>/dev/null || true",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -20,8 +19,8 @@
     "@tiptap/extension-underline": "^2.26.0",
     "@tiptap/react": "^2.26.0",
     "@tiptap/starter-kit": "^2.26.0",
+    "@vladmandic/face-api": "^1.7.15",
     "axios": "^1.13.2",
-    "face-api.js": "^0.20.0",
     "lucide-react": "^0.555.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
