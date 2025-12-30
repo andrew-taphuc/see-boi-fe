@@ -1,6 +1,58 @@
-import * as faceapi from 'face-api.js';
+// Suppress TensorFlow.js warnings về backend đã được đăng ký
+// Điều này xảy ra khi module được load nhiều lần do code splitting
+const originalWarn = console.warn;
+const originalError = console.error;
+let isSuppressingWarnings = false;
+
+const suppressTensorFlowWarnings = () => {
+  if (isSuppressingWarnings) return;
+  isSuppressingWarnings = true;
+
+  console.warn = (...args) => {
+    const message = args[0]?.toString() || '';
+    // Suppress các warning về backend đã được đăng ký
+    if (
+      message.includes('backend was already registered') ||
+      message.includes('Platform browser has already been set')
+    ) {
+      return; // Không log warning này
+    }
+    originalWarn.apply(console, args);
+  };
+};
+
+// Suppress warnings trước khi import face-api
+suppressTensorFlowWarnings();
+
+// Dynamic import để tránh load ngay khi module được import
+let faceapi = null;
+let faceapiPromise = null;
+
+const getFaceApi = async () => {
+  if (faceapi) return faceapi;
+  if (faceapiPromise) return faceapiPromise;
+  
+  faceapiPromise = import('face-api.js').then(module => {
+    faceapi = module;
+    return faceapi;
+  });
+  
+  return faceapiPromise;
+};
 
 let modelsLoaded = false;
+
+/**
+ * Kiểm tra xem file model có thể truy cập được không
+ */
+const checkModelFileAccess = async (baseUrl, fileName) => {
+  try {
+    const response = await fetch(`${baseUrl}/${fileName}`, { method: 'HEAD' });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+};
 
 /**
  * Load face-api.js models
@@ -11,16 +63,50 @@ export const loadFaceModels = async () => {
     return true;
   }
 
+  // Đảm bảo face-api đã được load
+  const faceapiModule = await getFaceApi();
   const LOCAL_MODEL_URL = '/models';
   const CDN_MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+  
+  // Kiểm tra xem file models có thể truy cập được không
+  const manifestExists = await checkModelFileAccess(LOCAL_MODEL_URL, 'tiny_face_detector_model-weights_manifest.json');
+  if (!manifestExists) {
+    console.warn('[Face Detection] ⚠ Không tìm thấy file manifest ở local, đang fallback sang CDN...');
+  }
 
   // Thử load từ local trước (offline)
   try {
     console.log('[Face Detection] Đang tải models từ local (offline)...');
-    await Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri(LOCAL_MODEL_URL),
-      faceapi.nets.faceLandmark68Net.loadFromUri(LOCAL_MODEL_URL),
-    ]);
+    console.log('[Face Detection] Path:', LOCAL_MODEL_URL);
+    
+    // Verify file size trước khi load để tránh lỗi tensor
+    try {
+      const manifestResponse = await fetch(`${LOCAL_MODEL_URL}/tiny_face_detector_model-weights_manifest.json`);
+      if (!manifestResponse.ok) {
+        throw new Error('Không thể truy cập file manifest');
+      }
+      const shardResponse = await fetch(`${LOCAL_MODEL_URL}/tiny_face_detector_model-shard1`, { method: 'HEAD' });
+      if (!shardResponse.ok) {
+        throw new Error('Không thể truy cập file shard');
+      }
+      const contentLength = shardResponse.headers.get('content-length');
+      if (contentLength && parseInt(contentLength) < 180000) {
+        console.warn('[Face Detection] ⚠ File shard có vẻ bị hỏng (kích thước:', contentLength, 'bytes), đang fallback sang CDN...');
+        throw new Error('File model bị hỏng hoặc không đầy đủ');
+      }
+    } catch (verifyError) {
+      console.warn('[Face Detection] ⚠ Lỗi khi verify file models:', verifyError.message);
+      throw verifyError;
+    }
+    
+    // Load từng model riêng để dễ debug
+    console.log('[Face Detection] Đang tải Tiny Face Detector...');
+    await faceapiModule.nets.tinyFaceDetector.loadFromUri(LOCAL_MODEL_URL);
+    console.log('[Face Detection] ✓ Tiny Face Detector đã tải xong');
+    
+    console.log('[Face Detection] Đang tải Face Landmark 68...');
+    await faceapiModule.nets.faceLandmark68Net.loadFromUri(LOCAL_MODEL_URL);
+    console.log('[Face Detection] ✓ Face Landmark 68 đã tải xong');
 
     modelsLoaded = true;
     console.log('[Face Detection] ✓ Models đã được tải từ local (offline)');
@@ -28,14 +114,36 @@ export const loadFaceModels = async () => {
   } catch (localError) {
     console.warn('[Face Detection] ⚠ Không tìm thấy models ở local, đang fallback sang CDN...');
     console.warn('[Face Detection] Lỗi local:', localError.message);
+    console.warn('[Face Detection] Stack:', localError.stack);
     
     // Fallback: thử load từ CDN
     try {
       console.log('[Face Detection] Đang tải models từ CDN...');
-      await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(CDN_MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(CDN_MODEL_URL),
-      ]);
+      console.log('[Face Detection] CDN URL:', CDN_MODEL_URL);
+      
+      // Kiểm tra xem có thể truy cập CDN không (CORS check)
+      try {
+        const testResponse = await fetch(`${CDN_MODEL_URL}/tiny_face_detector_model-weights_manifest.json`, { 
+          method: 'HEAD',
+          mode: 'cors'
+        });
+        if (!testResponse.ok) {
+          throw new Error(`CDN không thể truy cập: ${testResponse.status} ${testResponse.statusText}`);
+        }
+        console.log('[Face Detection] ✓ CDN có thể truy cập được');
+      } catch (corsError) {
+        console.warn('[Face Detection] ⚠ CORS hoặc network error khi kiểm tra CDN:', corsError.message);
+        // Vẫn thử load, có thể là CORS warning nhưng vẫn load được
+      }
+      
+      // Load từng model riêng để dễ debug
+      console.log('[Face Detection] Đang tải Tiny Face Detector từ CDN...');
+      await faceapiModule.nets.tinyFaceDetector.loadFromUri(CDN_MODEL_URL);
+      console.log('[Face Detection] ✓ Tiny Face Detector đã tải xong từ CDN');
+      
+      console.log('[Face Detection] Đang tải Face Landmark 68 từ CDN...');
+      await faceapiModule.nets.faceLandmark68Net.loadFromUri(CDN_MODEL_URL);
+      console.log('[Face Detection] ✓ Face Landmark 68 đã tải xong từ CDN');
 
       modelsLoaded = true;
       console.log('[Face Detection] ✓ Models đã được tải từ CDN (fallback)');
@@ -44,6 +152,16 @@ export const loadFaceModels = async () => {
     } catch (cdnError) {
       console.error('[Face Detection] ✗ Không thể tải models từ cả local và CDN');
       console.error('[Face Detection] Lỗi CDN:', cdnError.message);
+      console.error('[Face Detection] Stack CDN:', cdnError.stack);
+      
+      // Thông báo chi tiết về lỗi
+      if (cdnError.message.includes('CORS') || cdnError.message.includes('Failed to fetch')) {
+        console.error('[Face Detection] ⚠ Có thể là vấn đề CORS hoặc network. Kiểm tra:');
+        console.error('[Face Detection]   1. Content Security Policy (CSP) có block CDN không?');
+        console.error('[Face Detection]   2. Network có chặn external requests không?');
+        console.error('[Face Detection]   3. Mixed content (HTTP/HTTPS) issues?');
+      }
+      
       return false;
     }
   }
@@ -62,6 +180,9 @@ export const detectFace = async (imageFile) => {
       throw new Error('Không thể load face detection models');
     }
 
+    // Đảm bảo face-api đã được load
+    const faceapiModule = await getFaceApi();
+
     // Tạo image element từ file
     let image;
     if (imageFile instanceof File) {
@@ -72,17 +193,17 @@ export const detectFace = async (imageFile) => {
         reader.onerror = reject;
         reader.readAsDataURL(imageFile);
       });
-      image = await faceapi.fetchImage(dataUrl);
+      image = await faceapiModule.fetchImage(dataUrl);
     } else if (typeof imageFile === 'string') {
       // Nếu là data URL hoặc URL
-      image = await faceapi.fetchImage(imageFile);
+      image = await faceapiModule.fetchImage(imageFile);
     } else {
       throw new Error('Invalid image file type');
     }
 
     // Detect face với landmarks
-    const detections = await faceapi
-      .detectAllFaces(image, new faceapi.TinyFaceDetectorOptions())
+    const detections = await faceapiModule
+      .detectAllFaces(image, new faceapiModule.TinyFaceDetectorOptions())
       .withFaceLandmarks();
 
     return detections;

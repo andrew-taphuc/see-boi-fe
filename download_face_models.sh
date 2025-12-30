@@ -16,11 +16,11 @@ echo ""
 echo "1. Downloading Tiny Face Detector Model..."
 echo "  - tiny_face_detector_model-weights_manifest.json"
 curl -L -o "$MODEL_DIR/tiny_face_detector_model-weights_manifest.json" \
-  https://raw.githubusercontent.com/justadudewhohacks/face-api.js-models/master/weights/tiny_face_detector_model-weights_manifest.json
+  https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/tiny_face_detector_model-weights_manifest.json
 
 echo "  - tiny_face_detector_model-shard1"
 curl -L -o "$MODEL_DIR/tiny_face_detector_model-shard1" \
-  https://raw.githubusercontent.com/justadudewhohacks/face-api.js-models/master/weights/tiny_face_detector_model-shard1
+  https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/tiny_face_detector_model-shard1
 
 echo "  ✓ Tiny Face Detector Model downloaded"
 echo ""
@@ -29,11 +29,11 @@ echo ""
 echo "2. Downloading Face Landmark 68 Model..."
 echo "  - face_landmark_68_model-weights_manifest.json"
 curl -L -o "$MODEL_DIR/face_landmark_68_model-weights_manifest.json" \
-  https://raw.githubusercontent.com/justadudewhohacks/face-api.js-models/master/weights/face_landmark_68_model-weights_manifest.json
+  https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/face_landmark_68_model-weights_manifest.json
 
 echo "  - face_landmark_68_model-shard1"
 curl -L -o "$MODEL_DIR/face_landmark_68_model-shard1" \
-  https://raw.githubusercontent.com/justadudewhohacks/face-api.js-models/master/weights/face_landmark_68_model-shard1
+  https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/face_landmark_68_model-shard1
 
 echo "  ✓ Face Landmark 68 Model downloaded"
 echo ""
