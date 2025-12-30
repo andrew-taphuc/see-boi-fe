@@ -20,7 +20,43 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['@vladmandic/face-api'],
-    exclude: [],
+    // Loại bỏ face-api khỏi optimizeDeps để nó được code-split tốt hơn
+    // face-api sẽ được load động khi cần (đã được implement trong faceDetection.js)
+    exclude: ['@vladmandic/face-api'],
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Tách React core thành chunk riêng (thường được dùng ở mọi nơi)
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          
+          // Tách face-api thành chunk riêng (chỉ load khi cần nhận diện khuôn mặt)
+          // Lưu ý: face-api là thư viện ML nên kích thước lớn (~1.3MB) là bình thường
+          'face-api': ['@vladmandic/face-api'],
+          
+          // Tách Tiptap editor thành chunk riêng (chỉ load khi tạo/sửa post)
+          'tiptap': [
+            '@tiptap/react',
+            '@tiptap/starter-kit',
+            '@tiptap/extension-character-count',
+            '@tiptap/extension-history',
+            '@tiptap/extension-image',
+            '@tiptap/extension-link',
+            '@tiptap/extension-placeholder',
+            '@tiptap/extension-text-align',
+            '@tiptap/extension-underline',
+          ],
+          
+          // Tách các thư viện khác thành chunks riêng
+          'charts': ['recharts'],
+          'socket': ['socket.io-client'],
+          'utils': ['axios', 'react-markdown'],
+        },
+      },
+    },
+    // Tăng giới hạn cảnh báo lên 1500KB vì face-api là thư viện ML nên kích thước lớn là bình thường
+    // face-api đã được tách riêng và chỉ load khi cần (dynamic import)
+    chunkSizeWarningLimit: 1500,
   },
 })

@@ -1,47 +1,60 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import TuviLayout from "../layouts/TuviLayout";
-import TuviResultPage from "../pages/TuviResultPage";
 import MainLayout from "@layouts/MainLayout";
-import LandingPage from "@pages/LandingPage";
-import TuVi from "@pages/TuVi";
-import Tarot from "@pages/tarot/Tarot";
-import TarotSpread from "@pages/tarot/TarotSpread";
-import TarotCardDetail from "@pages/tarot/TarotCardDetail";
-import TarotCardList from "@pages/tarot/TarotCardList";
-import TarotYesNo from "@pages/tarot/TarotYesNo";
-import TarotLove from "@pages/tarot/TarotLove";
-import TarotLoveSimple from "@pages/tarot/TarotLoveSimple";
-import TarotLoveDeep from "@pages/tarot/TarotLoveDeep";
-import TarotDaily from "@pages/tarot/TarotDaily";
-import TarotOneCard from "@pages/tarot/TarotOneCard";
-import NhanTuong from "@pages/nhantuong/NhanTuong";
-import GioiThieu from "@pages/nhantuong/GioiThieu";
-import KetQua from "@pages/nhantuong/KetQua";
-import TestFaceAnalysis from "@pages/nhantuong/TestFaceAnalysis";
-import SocialMedia from "@pages/SocialMedia";
-import PostDetail from "@pages/PostDetail";
-import CreatePost from "@pages/CreatePost";
-import EditPost from "@pages/EditPost";
-import DraftList from "@pages/DraftList";
-import UserProfile from "@pages/UserProfile";
-import EditProfile from "@pages/EditProfile";
-import SavedPosts from "@pages/SavedPosts";
-import TagPage from "@pages/TagPage";
-import MyFollowingTagsPage from "@pages/MyFollowingTagsPage";
-import SearchResults from "@pages/SearchResults";
 import ProtectedRoute from "@components/common/ProtectedRoute";
 import TarotLayout from "@layouts/TarotLayout";
 import SocialLayout from "@layouts/SocialLayout";
 import AdminLayout from "@layouts/AdminLayout";
-import Dashboard from "@pages/admin/Dashboard";
-import UserManagement from "@pages/admin/UserManagement";
-import ReportManagement from "@pages/admin/ReportManagement";
-import PostCommentManagement from "@pages/admin/PostCommentManagement";
-import AdminProfile from "@pages/admin/AdminProfile";
+
+// LandingPage không lazy load vì là trang đầu tiên
+import LandingPage from "@pages/LandingPage";
+
+// Lazy load tất cả các pages khác
+const TuviResultPage = lazy(() => import("../pages/TuviResultPage"));
+const TuVi = lazy(() => import("@pages/TuVi"));
+const Tarot = lazy(() => import("@pages/tarot/Tarot"));
+const TarotSpread = lazy(() => import("@pages/tarot/TarotSpread"));
+const TarotCardDetail = lazy(() => import("@pages/tarot/TarotCardDetail"));
+const TarotCardList = lazy(() => import("@pages/tarot/TarotCardList"));
+const TarotYesNo = lazy(() => import("@pages/tarot/TarotYesNo"));
+const TarotLove = lazy(() => import("@pages/tarot/TarotLove"));
+const TarotLoveSimple = lazy(() => import("@pages/tarot/TarotLoveSimple"));
+const TarotLoveDeep = lazy(() => import("@pages/tarot/TarotLoveDeep"));
+const TarotDaily = lazy(() => import("@pages/tarot/TarotDaily"));
+const TarotOneCard = lazy(() => import("@pages/tarot/TarotOneCard"));
+const NhanTuong = lazy(() => import("@pages/nhantuong/NhanTuong"));
+const GioiThieu = lazy(() => import("@pages/nhantuong/GioiThieu"));
+const KetQua = lazy(() => import("@pages/nhantuong/KetQua"));
+const TestFaceAnalysis = lazy(() => import("@pages/nhantuong/TestFaceAnalysis"));
+const SocialMedia = lazy(() => import("@pages/SocialMedia"));
+const PostDetail = lazy(() => import("@pages/PostDetail"));
+const CreatePost = lazy(() => import("@pages/CreatePost"));
+const EditPost = lazy(() => import("@pages/EditPost"));
+const DraftList = lazy(() => import("@pages/DraftList"));
+const UserProfile = lazy(() => import("@pages/UserProfile"));
+const EditProfile = lazy(() => import("@pages/EditProfile"));
+const SavedPosts = lazy(() => import("@pages/SavedPosts"));
+const TagPage = lazy(() => import("@pages/TagPage"));
+const MyFollowingTagsPage = lazy(() => import("@pages/MyFollowingTagsPage"));
+const SearchResults = lazy(() => import("@pages/SearchResults"));
+const Dashboard = lazy(() => import("@pages/admin/Dashboard"));
+const UserManagement = lazy(() => import("@pages/admin/UserManagement"));
+const ReportManagement = lazy(() => import("@pages/admin/ReportManagement"));
+const PostCommentManagement = lazy(() => import("@pages/admin/PostCommentManagement"));
+const AdminProfile = lazy(() => import("@pages/admin/AdminProfile"));
+
+// Loading component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+  </div>
+);
 
 const AppRoutes = () => {
   return (
-    <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
       <Route
         path="/"
         element={
@@ -305,6 +318,7 @@ const AppRoutes = () => {
         />
       </Route>
     </Routes>
+    </Suspense>
   );
 };
 
