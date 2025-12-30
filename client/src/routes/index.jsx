@@ -28,6 +28,7 @@ import EditProfile from "@pages/EditProfile";
 import SavedPosts from "@pages/SavedPosts";
 import TagPage from "@pages/TagPage";
 import MyFollowingTagsPage from "@pages/MyFollowingTagsPage";
+import SearchResults from "@pages/SearchResults";
 import ProtectedRoute from "@components/common/ProtectedRoute";
 import TarotLayout from "@layouts/TarotLayout";
 import SocialLayout from "@layouts/SocialLayout";
@@ -206,6 +207,7 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/search" element={<SearchResults />} />
         <Route
           path="/drafts"
           element={
