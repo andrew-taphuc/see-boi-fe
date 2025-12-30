@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Users, Bookmark } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Users, Bookmark, PenSquare, Edit2, Settings, Tag } from "lucide-react";
 import { useAuth } from "@context/AuthContext";
 import FollowListModal from "@components/userProfile/FollowListModal";
 import SearchBar from "@components/socialMedia/SearchBar";
 
 const LeftSidebar = () => {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [followModalOpen, setFollowModalOpen] = useState(false);
 
   return (
@@ -65,6 +66,49 @@ const LeftSidebar = () => {
             </div>
           </Link>
 
+          {/* Action Buttons */}
+          <div className="space-y-1 pt-2 pb-2 border-b border-gray-200">
+            <button
+              onClick={() => navigate("/post/create")}
+              className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-lg w-full transition-colors"
+            >
+              <div className="w-6 h-6 flex items-center justify-center">
+                <PenSquare className="text-green-600" size={20} />
+              </div>
+              <span className="text-sm font-medium">Đăng bài</span>
+            </button>
+            
+            <Link
+              to="/user/edit"
+              className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-lg w-full transition-colors"
+            >
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Edit2 className="text-blue-500" size={20} />
+              </div>
+              <span className="text-sm font-medium">Chỉnh sửa</span>
+            </Link>
+            
+            <Link
+              to="/settings"
+              className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-lg w-full transition-colors"
+            >
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Settings className="text-gray-600" size={20} />
+              </div>
+              <span className="text-sm font-medium">Cài đặt</span>
+            </Link>
+            
+            <Link
+              to="/following-tags"
+              className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-lg w-full transition-colors"
+            >
+              <div className="w-6 h-6 flex items-center justify-center">
+                <Tag className="text-blue-600" size={20} />
+              </div>
+              <span className="text-sm font-medium">Tags theo dõi</span>
+            </Link>
+          </div>
+
           {/* Search Bar */}
           <div className="mb-4">
             <SearchBar />
@@ -79,7 +123,7 @@ const LeftSidebar = () => {
             <span>Người theo dõi</span>
           </button>
 
-          <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
+          {/* <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
             <Users className="text-cyan-600" size={24} />
             <span>Nhóm</span>
           </button>
@@ -87,7 +131,7 @@ const LeftSidebar = () => {
           <button className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-lg w-full">
             <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
             <span>Kỷ niệm</span>
-          </button>
+          </button> */}
 
           {/* Đã lưu */}
           <Link

@@ -3,13 +3,13 @@ import Logo2 from "@assets/nhantuong/introLogo2.svg";
 import MenuBackground from "@assets/nhantuong/menu_background.svg";
 
 const Header = () => {
-  const menuItems = [
-    { label: "Nhân tướng", href: "/nhantuong", active: false },
-    { label: "Luận giải", href: "/nhantuong#xem-tuong" },
-    { label: "Tính năng", href: "/nhantuong#tinh-nang" },
-    { label: "Giới thiệu", href: "/nhantuong/gioi-thieu" },
-    { label: "Liên hệ", href: "/nhantuong#nhantuong-footer" },
-  ];
+  // const menuItems = [
+  //   { label: "Nhân tướng", href: "/nhantuong", active: false },
+  //   { label: "Luận giải", href: "/nhantuong#xem-tuong" },
+  //   { label: "Tính năng", href: "/nhantuong#tinh-nang" },
+  //   { label: "Giới thiệu", href: "/nhantuong/gioi-thieu" },
+  //   { label: "Liên hệ", href: "/nhantuong#nhantuong-footer" },
+  // ];
 
   return (
     <div className="container mx-auto px-4 pt-4 md:pt-8 pb-4">
@@ -49,7 +49,7 @@ const Header = () => {
     
 
       {/* Desktop Navigation Section */}
-      <div className="hidden md:flex justify-center">
+      {/* <div className="hidden md:flex justify-center">
         <div
           className="px-32 py-12"
           style={{
@@ -76,7 +76,7 @@ const Header = () => {
             ))}
           </ul>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -546,29 +546,7 @@ const FaceAnalysisForm = () => {
               </div>
             )}
 
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              {/* Terms Checkbox */}
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={formData.agreeTerms}
-                  onChange={(e) =>
-                    setFormData({ ...formData, agreeTerms: e.target.checked })
-                  }
-                  className="mt-0.5 w-5 h-5 rounded border-yellow-600/30 bg-red-950/50 text-yellow-500 focus:ring-yellow-500 focus:ring-offset-0 cursor-pointer"
-                  required
-                />
-                <span className="text-yellow-100/90 text-sm">
-                  Đồng ý với{" "}
-                  <a
-                    href="#"
-                    className="text-yellow-400 underline hover:text-yellow-300"
-                  >
-                    điều khoản và dịch vụ
-                  </a>
-                </span>
-              </label>
-
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-center gap-4">
               {/* Action Buttons */}
               <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
                 <button
@@ -591,25 +569,6 @@ const FaceAnalysisForm = () => {
                   Xem lịch sử luận giải
                 </button>
 
-                <a
-                  href="#"
-                  className="flex items-center gap-2 text-yellow-400 hover:text-yellow-300 transition-colors text-sm font-medium whitespace-nowrap"
-                >
-                  <span>Nhân Tướng Mẫu</span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
               </div>
             </div>
           </div>

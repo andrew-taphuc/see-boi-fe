@@ -1,7 +1,7 @@
 import React from "react";
-import TuviFooter from "@components/TuviPage/TuviFooter";
 import ThemedHeader from "@components/common/ThemedHeader";
 import bgImage from "@assets/tuvi-bg.jpg";
+import CommonFooter from "@components/common/CommonFooter";
 
 const TuviLayout = ({ children }) => {
   return (
@@ -22,7 +22,7 @@ const TuviLayout = ({ children }) => {
         <ThemedHeader variant="tuvi" />
         <main className="flex-1 pt-20">{children}</main>
 
-        <TuviFooter />
+        <CommonFooter variant="tuvi" />;
       </div>
     </div>
   );
