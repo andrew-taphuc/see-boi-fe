@@ -13,6 +13,7 @@ import BackToTop from "@assets/nhantuong/gps-navigation.png";
 import FaceImageWithLandmarks from "@components/nhantuong/FaceImageWithLandmarks";
 import { calculateZodiacSign, calculateLunarYear, calculateMenh } from "@utils/astrologyUtils";
 import physiognomyService from "@utils/physiognomyService";
+import { DEFAULT_AVATAR_PLACEHOLDER } from "@utils/placeholderUtils";
 
 const KetQua = () => {
   const location = useLocation();
@@ -332,9 +333,13 @@ const KetQua = () => {
                         </div>
                       ) : (
                         <img
-                          src="https://via.placeholder.com/150"
+                          src={DEFAULT_AVATAR_PLACEHOLDER}
                           alt="Avatar"
                           className="w-full h-auto rounded-lg object-cover border-2 border-yellow-500/40 shadow-lg"
+                          onError={(e) => {
+                            // Fallback nếu image load lỗi
+                            e.target.src = DEFAULT_AVATAR_PLACEHOLDER;
+                          }}
                         />
                       )}
                     </div>
