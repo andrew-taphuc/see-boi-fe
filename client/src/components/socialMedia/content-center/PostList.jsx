@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "@utils/axiosInstance";
 import { useAuth } from "@context/AuthContext";
+import { DEFAULT_POST_THUMBNAIL } from "@utils/placeholderUtils";
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
@@ -117,8 +118,8 @@ const PostList = () => {
       return post.images[0].url;
     }
 
-    // Default placeholder
-    return "https://via.placeholder.com/400x225?text=No+Image";
+    // Default placeholder (SVG data URI - không cần internet)
+    return DEFAULT_POST_THUMBNAIL;
   };
 
   if (loading) {
@@ -195,11 +196,13 @@ const PostList = () => {
                   className="relative rounded-lg overflow-hidden"
                   style={{ paddingTop: "56.25%" }}
                 >
-                  <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${getPostThumbnail(post)})`,
-                      borderRadius: "8px",
+                  <img
+                    src={getPostThumbnail(post)}
+                    alt={post.title || "Post thumbnail"}
+                    className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      // Fallback nếu image load lỗi
+                      e.target.src = DEFAULT_POST_THUMBNAIL;
                     }}
                   />
                 </div>
