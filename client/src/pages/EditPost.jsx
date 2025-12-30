@@ -502,7 +502,7 @@ const EditPost = () => {
           >
             Hủy
           </button>
-          <button
+          {/* <button
             type="button"
             disabled={isSubmitting}
             onClick={() => submitPost({ draft: true })}
@@ -513,7 +513,7 @@ const EditPost = () => {
             }`}
           >
             Lưu nháp
-          </button>
+          </button> */}
           <button
             type="button"
             disabled={isSubmitting}
