@@ -4,7 +4,7 @@ import PostList from './PostList';
 
 const CenterContent = () => {
   return (
-    <main className="flex-1 lg:ml-64 lg:mr-80 max-w-4xl mx-auto pt-0">
+    <main className="w-full lg:ml-[21rem] lg:mr-[28rem] xl:ml-[21rem] xl:mr-[28rem] 2xl:ml-[21rem] 2xl:mr-[28rem] max-w-4xl mx-auto pt-4 px-4 lg:px-6">
       <BocThamVanMay />
       {/* Posts */}
       <PostList />

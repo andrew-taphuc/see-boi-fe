@@ -26,8 +26,8 @@ const SocialMedia = () => {
   }, []);
 
   return (
-    <div className="max-w-screen-2xl mx-auto">
-      <div className="flex gap-4 p-4 pt-4">
+    <div className="w-full min-h-screen">
+      <div className="flex justify-center">
         <LeftSidebar />
         <CenterContent />
         <RightSidebar />

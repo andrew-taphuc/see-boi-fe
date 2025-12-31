@@ -78,7 +78,7 @@ const SuggestUser = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl p-4 shadow-sm mt-4 mb-24">
+      <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col">
         <h3 className="font-semibold text-gray-900 mb-3 text-sm">Gợi ý cho bạn</h3>
         <div className="animate-pulse space-y-4">
           <div className="h-24 bg-gray-200 rounded-lg"></div>
@@ -89,7 +89,7 @@ const SuggestUser = () => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl p-4 shadow-sm mt-4 mb-24">
+      <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col">
         <h3 className="font-semibold text-gray-900 mb-3 text-sm">Gợi ý cho bạn</h3>
         <p className="text-red-500 text-sm">{error}</p>
         <button
@@ -104,7 +104,7 @@ const SuggestUser = () => {
 
   if (suggestedUsers.length === 0) {
     return (
-      <div className="bg-white rounded-xl p-4 shadow-sm mt-4 mb-24">
+      <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col">
         <h3 className="font-semibold text-gray-900 mb-3 text-sm">Gợi ý cho bạn</h3>
         <p className="text-gray-500 text-sm">Không có gợi ý người dùng</p>
       </div>
@@ -114,7 +114,7 @@ const SuggestUser = () => {
   const currentUserData = suggestedUsers[currentIndex];
   if (!currentUserData) {
     return (
-      <div className="bg-white rounded-xl p-4 shadow-sm mt-4 mb-24">
+      <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col">
         <h3 className="font-semibold text-gray-900 mb-3 text-sm">Gợi ý cho bạn</h3>
         <p className="text-gray-500 text-sm">Đã xem hết gợi ý</p>
       </div>
@@ -122,7 +122,7 @@ const SuggestUser = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm mt-4 mb-24">
+    <div className="bg-white rounded-xl p-4 shadow-sm flex flex-col">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-gray-900 text-sm">Gợi ý cho bạn</h3>
         <span className="text-xs text-gray-500">

@@ -76,12 +76,12 @@ const TrendingPost = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-lg p-6 shadow-sm flex flex-col h-full min-h-0">
+        <div className="flex items-center gap-2 mb-4 flex-shrink-0">
           <TrendingUp className="text-orange-500" size={20} />
           <h3 className="font-semibold text-gray-900">Bài viết nổi bật</h3>
         </div>
-        <div className="animate-pulse space-y-4">
+        <div className="animate-pulse space-y-4 flex-1 overflow-y-auto">
           <div className="h-48 bg-gray-200 rounded-lg"></div>
           <div className="space-y-2">
             <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -94,8 +94,8 @@ const TrendingPost = () => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-lg p-6 shadow-sm flex flex-col h-full min-h-0">
+        <div className="flex items-center gap-2 mb-4 flex-shrink-0">
           <TrendingUp className="text-orange-500" size={20} />
           <h3 className="font-semibold text-gray-900">Bài viết nổi bật</h3>
         </div>
@@ -112,8 +112,8 @@ const TrendingPost = () => {
 
   if (trendingPosts.length === 0) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-lg p-6 shadow-sm flex flex-col h-full min-h-0">
+        <div className="flex items-center gap-2 mb-4 flex-shrink-0">
           <TrendingUp className="text-orange-500" size={20} />
           <h3 className="font-semibold text-gray-900">Bài viết nổi bật</h3>
         </div>
@@ -126,17 +126,18 @@ const TrendingPost = () => {
   const otherPosts = trendingPosts.slice(1, 5);
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <div className="flex items-center gap-2 mb-4">
+    <div className="bg-white rounded-lg p-6 shadow-sm flex flex-col h-full min-h-0">
+      <div className="flex items-center gap-2 mb-4 flex-shrink-0">
         <TrendingUp className="text-orange-500" size={20} />
         <h3 className="font-semibold text-gray-900">Bài viết nổi bật</h3>
       </div>
 
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
       {/* Post nhiều view nhất - Format lớn */}
       {topPost && (
         <Link
           to={`/post/${topPost.id}`}
-          className="block mb-4 hover:opacity-90 transition-opacity"
+            className="block mb-4 hover:opacity-90 transition-opacity flex-shrink-0"
         >
           <div className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200 relative">
             {/* TOP 1 Badge */}
@@ -192,7 +193,7 @@ const TrendingPost = () => {
       )}
 
       {/* 4 bài còn lại - Format nhỏ */}
-      <div className="space-y-3">
+        <div className="space-y-3 flex-shrink-0">
         {otherPosts.map((post, index) => {
           const rank = index + 2; // Top 2, 3, 4, 5
           const getRankBadge = (rank) => {
@@ -268,6 +269,7 @@ const TrendingPost = () => {
           </Link>
           );
         })}
+        </div>
       </div>
     </div>
   );
