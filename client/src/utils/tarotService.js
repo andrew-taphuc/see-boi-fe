@@ -152,6 +152,45 @@ class TarotService {
   }
 
   /**
+   * Gọi API Love Deep Tarot
+   * @param {Object} data - { question: string, card1: string, card2: string, card3: string, card4: string, card5: string }
+   * @returns {Promise} Response từ API
+   */
+  async getLoveDeepReading(data) {
+    try {
+      const response = await axiosInstance.post('/tarot/love/deep', {
+        question: data.question,
+        card1: data.card1,
+        card2: data.card2,
+        card3: data.card3,
+        card4: data.card4,
+        card5: data.card5
+      });
+      return response.data;
+    } catch (error) {
+      // Xử lý lỗi
+      if (error.response) {
+        // Server trả về lỗi
+        const status = error.response.status;
+        const errorData = error.response.data;
+        
+        if (status === 400) {
+          throw new Error(errorData.message || 'Thiếu thông tin (câu hỏi hoặc tên lá bài)');
+        } else if (status === 401) {
+          throw new Error('Chưa đăng nhập hoặc token không hợp lệ');
+        } else if (status === 500) {
+          throw new Error(errorData.message || 'Lỗi server khi gọi AI service');
+        } else {
+          throw new Error(errorData.message || 'Có lỗi xảy ra');
+        }
+      } else {
+        // Lỗi network hoặc lỗi khác
+        throw new Error(error.message || 'Không thể kết nối đến server');
+      }
+    }
+  }
+
+  /**
    * Lấy danh sách ngẫu nhiên 22 lá bài từ 78 lá (id từ 1 đến 78)
    * @returns {Array<number>} Mảng chứa 22 id lá bài được chọn ngẫu nhiên
    */
