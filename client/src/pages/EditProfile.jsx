@@ -182,6 +182,27 @@ const EditProfile = () => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
+  // Ngăn overscroll và đặt background trắng
+  useEffect(() => {
+    const originalBodyBg = document.body.style.backgroundColor;
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyOverscroll = document.body.style.overscrollBehavior;
+    const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior;
+    
+    document.body.style.backgroundColor = '#ffffff';
+    document.documentElement.style.backgroundColor = '#ffffff';
+    document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
+    
+    // Cleanup khi unmount
+    return () => {
+      document.body.style.backgroundColor = originalBodyBg;
+      document.documentElement.style.backgroundColor = originalHtmlBg;
+      document.body.style.overscrollBehavior = originalBodyOverscroll;
+      document.documentElement.style.overscrollBehavior = originalHtmlOverscroll;
+    };
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -194,7 +215,8 @@ const EditProfile = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white relative" style={{ overscrollBehavior: 'none' }}>
+      <div className="max-w-3xl mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-6 flex items-center gap-4">
             <button
@@ -379,6 +401,7 @@ const EditProfile = () => {
             </form>
           </div>
       </div>
+    </div>
   );
 };
 
