@@ -64,13 +64,25 @@ const variantStyles = {
     copyrightHighlight: "text-yellow-500",
     brandName: "See Bói",
   },
+  social: {
+    bg: "bg-white",
+    titleColor: "text-gray-800",
+    textColor: "text-gray-600",
+    linkHover: "hover:text-gray-900",
+    highlightColor: "text-purple-600",
+    highlightHover: "hover:text-purple-700",
+    borderColor: "border-gray-200",
+    copyrightText: "text-gray-500",
+    copyrightHighlight: "text-gray-700",
+    brandName: "See Bói",
+  },
 };
 
 const CommonFooter = ({ variant = "nhantuong" }) => {
   const styles = variantStyles[variant] || variantStyles.nhantuong;
 
   return (
-    <footer className={`${styles.bg} py-12 md:py-16`}>
+    <footer className={`${styles.bg} ${variant === "social" ? "border-t border-gray-200" : ""} py-12 md:py-16`}>
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Main Footer Content */}
@@ -179,6 +191,8 @@ const CommonFooter = ({ variant = "nhantuong" }) => {
                         ? "border-[#d9b193] text-[#d9b193] hover:bg-[#d9b193]/10 hover:border-[#f0c9a8] hover:text-[#f0c9a8]"
                         : variant === "tuvi"
                         ? "bg-yellow-700 hover:bg-yellow-500 text-white"
+                        : variant === "social"
+                        ? "border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-800"
                         : "border-yellow-600/50 text-yellow-400 hover:bg-yellow-600/20 hover:border-yellow-500"
                     }`}
                     aria-label="Facebook"
@@ -202,6 +216,8 @@ const CommonFooter = ({ variant = "nhantuong" }) => {
                         ? "border-[#d9b193] text-[#d9b193] hover:bg-[#d9b193]/10 hover:border-[#f0c9a8] hover:text-[#f0c9a8]"
                         : variant === "tuvi"
                         ? "bg-red-700 hover:bg-red-600 text-white border-yellow-600"
+                        : variant === "social"
+                        ? "border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-800"
                         : "border-yellow-600/50 text-yellow-400 hover:bg-yellow-600/20 hover:border-yellow-500"
                     }`}
                     aria-label="YouTube"
@@ -225,6 +241,8 @@ const CommonFooter = ({ variant = "nhantuong" }) => {
                         ? "border-[#d9b193] text-[#d9b193] hover:bg-[#d9b193]/10 hover:border-[#f0c9a8] hover:text-[#f0c9a8]"
                         : variant === "tuvi"
                         ? "bg-black hover:bg-gray-800 text-white border-yellow-600"
+                        : variant === "social"
+                        ? "border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-800"
                         : "border-yellow-600/50 text-yellow-400 hover:bg-yellow-600/20 hover:border-yellow-500"
                     }`}
                     aria-label="TikTok"

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 import { X } from 'lucide-react';
@@ -8,14 +8,65 @@ import { X } from 'lucide-react';
  */
 const ImageNodeView = ({ node, deleteNode, editor }) => {
   const isEditable = editor?.isEditable ?? false;
+  const [imageStyle, setImageStyle] = useState({
+    maxWidth: '100%',
+    height: 'auto',
+  });
+  const imgRef = useRef(null);
+  
+  const updateImageStyle = (img) => {
+    if (!img || !img.naturalWidth || !img.naturalHeight) return;
+    
+    const width = img.naturalWidth;
+    const height = img.naturalHeight;
+    
+    // Phát hiện ảnh ngang hay dọc
+    if (width > height) {
+      // Ảnh ngang: chiều ngang nhỏ hơn để căn giữa đẹp hơn (75%)
+      setImageStyle({
+        maxWidth: '75%',
+        height: 'auto',
+      });
+    } else {
+      // Ảnh dọc: cố định chiều cao để tránh ảnh quá to (400px)
+      setImageStyle({
+        maxHeight: '400px',
+        width: 'auto',
+      });
+    }
+  };
+  
+  const handleImageLoad = (e) => {
+    updateImageStyle(e.target);
+  };
+  
+  // Xử lý trường hợp ảnh đã được cache (onLoad có thể không fire)
+  useEffect(() => {
+    // Reset style về mặc định khi src thay đổi
+    setImageStyle({
+      maxWidth: '100%',
+      height: 'auto',
+    });
+    
+    // Kiểm tra nếu ảnh đã load sẵn (cached)
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+      updateImageStyle(imgRef.current);
+    }
+  }, [node.attrs.src]);
   
   return (
     <NodeViewWrapper className="relative group my-4 flex justify-center">
       <img
+        ref={imgRef}
         src={node.attrs.src}
         alt={node.attrs.alt || ''}
-        className="max-w-full h-auto rounded-lg"
-        style={{ display: 'block', margin: '0 auto' }}
+        className="rounded-lg"
+        style={{ 
+          display: 'block', 
+          margin: '0 auto',
+          ...imageStyle
+        }}
+        onLoad={handleImageLoad}
       />
       {isEditable && (
         <button

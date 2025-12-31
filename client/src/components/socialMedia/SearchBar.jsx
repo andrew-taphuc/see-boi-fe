@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { searchAll } from '@utils/searchService';
 import { Search, User, FileText, TrendingUp } from 'lucide-react';
 
-const SearchBar = () => {
+const SearchBar = ({ compact = false }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState({ users: [], posts: [] });
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef(null);
   const navigate = useNavigate();
 
@@ -69,28 +70,44 @@ const SearchBar = () => {
 
   const hasResults = results.users.length > 0 || results.posts.length > 0;
 
+  // Tính toán width dựa trên focus state và compact mode
+  const getContainerWidth = () => {
+    if (!compact) return 'w-full max-w-2xl mx-auto';
+    if (isFocused || query) return 'w-full';
+    return 'w-auto';
+  };
+
   return (
-    <div ref={searchRef} className="relative w-full max-w-2xl mx-auto">
+    <div ref={searchRef} className={`relative ${getContainerWidth()} transition-all duration-300 ease-in-out`}>
       <form onSubmit={handleSearchSubmit}>
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className={`absolute ${compact ? 'left-3' : 'left-4'} top-1/2 -translate-y-1/2 ${compact ? 'w-4 h-4' : 'w-5 h-5'} text-gray-400`} />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm kiếm trên diễn đàn"
-            className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-300 dark:border-gray-600 
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => {
+              // Delay để cho phép click vào dropdown
+              setTimeout(() => {
+                if (!query) {
+                  setIsFocused(false);
+                }
+              }, 200);
+            }}
+            placeholder={compact ? "Tìm kiếm..." : "Tìm kiếm trên diễn đàn"}
+            className={`${compact && !isFocused && !query ? 'w-[135px]' : 'w-full'} ${compact ? 'pl-10 pr-3 py-2 text-sm' : 'pl-12 pr-4 py-3'} rounded-full border border-gray-300 dark:border-gray-600 
                      bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
                      focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
-                     transition-all duration-200"
+                     transition-all duration-300 ease-in-out`}
           />
         </div>
       </form>
 
       {/* Dropdown Results */}
       {showDropdown && query.trim().length >= 2 && (
-        <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl 
-                      border border-gray-200 dark:border-gray-700 max-h-[500px] overflow-y-auto">
+        <div className={`absolute z-[2000] w-full ${compact ? 'mt-1' : 'mt-2'} bg-white dark:bg-gray-800 rounded-xl shadow-2xl 
+                      border border-gray-200 dark:border-gray-700 max-h-[500px] overflow-y-auto`}>
           {isLoading ? (
             <div className="p-4 text-center text-gray-500">
               <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto"></div>

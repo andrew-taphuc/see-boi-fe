@@ -1,9 +1,11 @@
 import React from 'react';
-import { Video, Search, MoreHorizontal } from 'lucide-react';
+import TrendingPost from '../content-left/TrendingPost';
 
 const RightSidebar = () => {
   return (
-    <div></div>
+    <aside className="hidden lg:block w-[26rem] fixed right-0 top-24 pr-8 pb-6 h-[calc(100vh-6rem)] overflow-y-auto">
+      <TrendingPost />
+    </aside>
   );
 };
 

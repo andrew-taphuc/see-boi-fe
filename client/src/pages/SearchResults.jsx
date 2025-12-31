@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { searchAll } from '@utils/searchService';
 import { Search, User, FileText, ArrowLeft } from 'lucide-react';
+import ThumbnailImage from '@components/posts/ThumbnailImage';
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -184,11 +185,15 @@ const SearchResults = () => {
                             {post.contentText}
                           </p>
                           {post.thumbnailUrl && (
-                            <img
-                              src={post.thumbnailUrl}
-                              alt=""
-                              className="mt-3 rounded-lg w-full max-h-64 object-cover"
-                            />
+                            <div className="mt-3">
+                              <ThumbnailImage
+                                src={post.thumbnailUrl}
+                                alt=""
+                                className="rounded-xl"
+                                containerClassName=""
+                                maxHeight="200px"
+                              />
+                            </div>
                           )}
                           <div className="flex items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
                             <span>❤️ {post.likeCount}</span>

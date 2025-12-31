@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import physiognomyService from "@utils/physiognomyService";
 import { validateAndCropFace } from "@utils/faceDetection";
@@ -46,7 +46,6 @@ const FaceAnalysisForm = () => {
     year: "",
     email: "",
     imageFile: null,
-    agreeTerms: false,
   });
 
   const [imagePreview, setImagePreview] = useState(null);
@@ -56,6 +55,8 @@ const FaceAnalysisForm = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [focusedDateField, setFocusedDateField] = useState(null);
+  const dateFieldRefs = useRef({});
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
@@ -110,7 +111,36 @@ const FaceAnalysisForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    
+    // Validate và format cho ngày, tháng, năm
+    if (name === 'day' || name === 'month' || name === 'year') {
+      // Chỉ cho phép số
+      const numericValue = value.replace(/[^0-9]/g, '');
+      
+      // Validate range
+      if (numericValue) {
+        let numValue = parseInt(numericValue, 10);
+        
+        if (name === 'day') {
+          if (numValue > 31) numValue = 31;
+          if (numValue < 1 && numericValue.length > 0) numValue = 1;
+        } else if (name === 'month') {
+          if (numValue > 12) numValue = 12;
+          if (numValue < 1 && numericValue.length > 0) numValue = 1;
+        } else if (name === 'year') {
+          const currentYear = new Date().getFullYear();
+          const minYear = currentYear - 99;
+          if (numValue > currentYear) numValue = currentYear;
+          if (numValue < minYear && numericValue.length === 4) numValue = minYear;
+        }
+        
+        setFormData({ ...formData, [name]: numValue.toString() });
+      } else {
+        setFormData({ ...formData, [name]: '' });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -125,11 +155,6 @@ const FaceAnalysisForm = () => {
 
     if (!formData.fullName || !formData.gender || !formData.day || !formData.month || !formData.year) {
       setError("Vui lòng điền đầy đủ thông tin bắt buộc");
-      return;
-    }
-
-    if (!formData.agreeTerms) {
-      setError("Vui lòng đồng ý với điều khoản và dịch vụ");
       return;
     }
 
@@ -252,6 +277,23 @@ const FaceAnalysisForm = () => {
     { length: 100 },
     (_, i) => new Date().getFullYear() - i
   );
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (focusedDateField) {
+        const fieldRef = dateFieldRefs.current[focusedDateField];
+        if (fieldRef && !fieldRef.contains(event.target)) {
+          setFocusedDateField(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [focusedDateField]);
 
   return (
     <div id="xem-tuong" className="container mt-10 md:mt-20 mx-auto px-4 pb-20 relative">
@@ -475,40 +517,72 @@ const FaceAnalysisForm = () => {
                     {
                       name: "day",
                       label: "Ngày sinh",
-                      placeholder: "Chọn",
+                      placeholder: "Chọn hoặc nhập",
                       options: days,
                     },
                     {
                       name: "month",
                       label: "Tháng sinh",
-                      placeholder: "Chọn",
+                      placeholder: "Chọn hoặc nhập",
                       options: months,
                     },
                     {
                       name: "year",
                       label: "Năm sinh",
-                      placeholder: "Chọn",
+                      placeholder: "Chọn hoặc nhập",
                       options: years,
                     },
                   ].map((field, idx) => (
-                    <div key={idx}>
+                    <div key={idx} className="relative">
                       <label className="block text-yellow-400 text-sm font-medium mb-2">
                         {field.label} <span className="text-yellow-300">*</span>
                       </label>
-                      <select
-                        name={field.name}
-                        value={formData[field.name]}
-                        onChange={handleInputChange}
-                        className="w-full px-2 md:px-3 py-2 md:py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white focus:border-yellow-500 focus:outline-none transition-colors text-sm"
-                        required
+                      <div 
+                        className="relative"
+                        ref={(el) => (dateFieldRefs.current[field.name] = el)}
                       >
-                        <option value="">{field.placeholder}</option>
-                        {field.options.map((val) => (
-                          <option key={val} value={val}>
-                            {val}
-                          </option>
-                        ))}
-                      </select>
+                        <input
+                          type="text"
+                          name={field.name}
+                          value={formData[field.name]}
+                          onChange={handleInputChange}
+                          onFocus={() => setFocusedDateField(field.name)}
+                          placeholder={field.placeholder}
+                          className="w-full px-2 md:px-3 py-2 md:py-2.5 bg-red-950/50 border border-yellow-600/30 rounded-lg text-white placeholder-yellow-100/40 focus:border-yellow-500 focus:outline-none transition-colors text-sm"
+                          required
+                        />
+                        {/* Custom Dropdown */}
+                        {focusedDateField === field.name && (
+                          <div 
+                            className="absolute z-50 w-full mt-1 bg-red-950/95 backdrop-blur-sm border border-yellow-600/50 rounded-lg shadow-2xl max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-600/50 scrollbar-track-red-950/30"
+                            style={{
+                              scrollbarWidth: 'thin',
+                              scrollbarColor: 'rgba(202, 138, 4, 0.5) rgba(127, 29, 29, 0.3)'
+                            }}
+                            onMouseDown={(e) => e.preventDefault()}
+                          >
+                            {field.options
+                              .filter((val) => {
+                                const inputValue = formData[field.name];
+                                if (!inputValue) return true;
+                                return val.toString().includes(inputValue);
+                              })
+                              .map((val) => (
+                                <div
+                                  key={val}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    setFormData({ ...formData, [field.name]: val.toString() });
+                                    setFocusedDateField(null);
+                                  }}
+                                  className="px-3 py-2 text-white hover:bg-yellow-600/20 active:bg-yellow-600/30 cursor-pointer text-sm transition-colors first:rounded-t-lg last:rounded-b-lg"
+                                >
+                                  {val}
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

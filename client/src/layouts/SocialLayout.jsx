@@ -4,9 +4,9 @@ import ThemedHeader from '@components/common/ThemedHeader'
 
 const SocialLayout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen" style={{ backgroundColor: '#F5E6D3' }}>
       <ThemedHeader variant="social" />
-      <div className="pt-20">
+      <div className="pt-16">
         {children || <Outlet />}
       </div>
     </div>

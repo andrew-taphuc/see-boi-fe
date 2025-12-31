@@ -30,7 +30,8 @@ const GioiThieu = lazy(() => import("@pages/nhantuong/GioiThieu"));
 const KetQua = lazy(() => import("@pages/nhantuong/KetQua"));
 const TestFaceAnalysis = lazy(() => import("@pages/nhantuong/TestFaceAnalysis"));
 const SocialMedia = lazy(() => import("@pages/SocialMedia"));
-const PostDetail = lazy(() => import("@pages/PostDetail"));
+// PostDetail không lazy load để giữ nội dung cũ khi navigate
+import PostDetail from "@pages/PostDetail";
 const CreatePost = lazy(() => import("@pages/CreatePost"));
 const EditPost = lazy(() => import("@pages/EditPost"));
 const DraftList = lazy(() => import("@pages/DraftList"));

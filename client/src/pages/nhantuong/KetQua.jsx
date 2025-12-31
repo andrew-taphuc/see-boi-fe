@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import ThemedHeader from "@components/common/ThemedHeader";
 import Header from "@components/nhantuong/Header";
 import ImageBackground from "@assets/nhantuong/bg.jpg";
 import ButtonInfo from "@assets/nhantuong/button_info.svg";
@@ -180,15 +181,12 @@ const KetQua = () => {
     ],
   };
 
-  const NavButton = ({ href, label }) => (
-    <a href={href} className="relative flex flex-col items-center gap-2 group">
+  const NavButton = ({ href, label, disabled }) => (
+    <div className="relative flex flex-col items-center gap-2 group cursor-not-allowed pointer-events-none">
       <div className="relative w-32 h-32">
-        <img src={ButtonInfo} alt={label} className="w-full h-full" />
-        <p className="absolute inset-0 flex items-center justify-center text-yellow-900 text-xl font-semibold">
-          {label}
-        </p>
+        <img src={ButtonInfo} alt={label || ""} className="w-full h-full" />
       </div>
-    </a>
+    </div>
   );
 
   return (
@@ -280,15 +278,19 @@ const KetQua = () => {
       </a>
 
       <div className="relative z-10">
+        {/* ThemedHeader */}
+        <ThemedHeader variant="nhantuong" />
         {/* Header with background */}
-        <Header />
+        <div className="pt-16 md:pt-20">
+          <Header />
+        </div>
         {/* Content Section with 3 columns */}
         <div className="container mx-auto px-4 md:px-20">
           <div className="flex gap-6 items-start justify-center">
             {/* Left Column - Navigation Buttons - Desktop Only */}
             <div className="hidden md:flex flex-col gap-6 sticky top-24 self-start">
               {navigationButtons.left.map((btn, idx) => (
-                <NavButton key={idx} {...btn} />
+                <NavButton key={idx} {...btn} disabled />
               ))}
               <div className="flex justify-center">
                 <img src={Hook} alt="decoration" className="w-20 h-auto" />
@@ -608,7 +610,7 @@ const KetQua = () => {
             {/* Right Column - Navigation Buttons - Desktop Only */}
             <div className="hidden md:flex flex-col gap-6 sticky top-24 self-start">
               {navigationButtons.right.map((btn, idx) => (
-                <NavButton key={idx} {...btn} />
+                <NavButton key={idx} {...btn} disabled />
               ))}
               <div className="flex justify-center">
                 <img src={Hook} alt="decoration" className="w-16 h-auto" />

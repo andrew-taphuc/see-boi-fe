@@ -41,6 +41,28 @@ const NhanTuong = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Ngăn overscroll và đặt background để tránh lộ nền trắng
+  useEffect(() => {
+    const originalBodyBg = document.body.style.backgroundColor;
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyOverscroll = document.body.style.overscrollBehavior;
+    const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior;
+    
+    // Đặt màu nền và ngăn overscroll
+    document.body.style.backgroundColor = '#500001';
+    document.documentElement.style.backgroundColor = '#500001';
+    document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
+    
+    // Cleanup khi unmount
+    return () => {
+      document.body.style.backgroundColor = originalBodyBg;
+      document.documentElement.style.backgroundColor = originalHtmlBg;
+      document.body.style.overscrollBehavior = originalBodyOverscroll;
+      document.documentElement.style.overscrollBehavior = originalHtmlOverscroll;
+    };
+  }, []);
+
   // const menuItems = [
   //   { label: "Nhân tướng", href: "/nhantuong" },
   //   { label: "Luận giải", href: "/nhantuong#xem-tuong" },
@@ -61,7 +83,14 @@ const NhanTuong = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#500001] relative overflow-hidden">
+    <div 
+      className="min-h-screen bg-[#500001] relative overflow-hidden flex flex-col"
+      style={{
+        overscrollBehavior: 'none',
+        overscrollBehaviorY: 'none',
+        overflowX: 'hidden',
+      }}
+    >
       {/* Mobile Menu Button - Fixed in top left */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -166,7 +195,13 @@ const NhanTuong = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 pt-">
+      <div 
+        className="relative z-10 flex-1 flex flex-col"
+        style={{
+          overscrollBehavior: 'none',
+          overscrollBehaviorY: 'none',
+        }}
+      >
         <div
           style={{
             backgroundImage: `linear-gradient(rgba(45, 10, 10, 0.1), rgba(45, 10, 10, 0.3)), url(${ImageBackground})`,
@@ -186,6 +221,7 @@ const NhanTuong = () => {
         </div>
         <Features />
         <div
+          className="mt-auto"
           style={{
             backgroundImage: `linear-gradient(rgba(45, 10, 10, 0.5), rgba(45, 10, 10, 0.7)), url(${ImageBackground2})`,
             backgroundSize: "cover",
@@ -194,7 +230,7 @@ const NhanTuong = () => {
           }}
         >
           {/* <FAQ /> */}
-          <CommonFooter variant="nhantuong" />;
+          <CommonFooter variant="nhantuong" />
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { useAuth } from '@context/AuthContext'
 import ballLogo from '@assets/ball.png'
 import ProfileDropdown from '@components/common/ProfileDropdown'
 import NotificationBell from '@components/common/NotificationBell'
+import SearchBar from '@components/socialMedia/SearchBar'
 
 const headerConfigs = {
   tarot: {
@@ -73,6 +74,7 @@ const ThemedHeader = ({ variant = 'default' }) => {
   const avatarRef = useRef(null)
 
   const config = headerConfigs[variant] || headerConfigs.default
+  const isSocialMediaRoute = location.pathname === '/socialmedia' || location.pathname.startsWith('/socialmedia/')
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -92,7 +94,7 @@ const ThemedHeader = ({ variant = 'default' }) => {
     >
       <div className="relative flex items-center px-10 h-16  ">
         {/* Left text link */}
-        <div className="w-1/3 flex">
+        <div className="w-1/3 flex items-center gap-4">
           <Link
             to="/socialmedia"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0"
@@ -104,6 +106,11 @@ const ThemedHeader = ({ variant = 'default' }) => {
               {config.title}
             </span>
           </Link>
+          {isSocialMediaRoute && (
+            <div className="flex-1 max-w-md">
+              <SearchBar compact={true} />
+            </div>
+          )}
         </div>
 
         {/* Center logo with overlay nav (hover trigger) */}

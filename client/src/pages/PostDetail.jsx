@@ -25,6 +25,10 @@ import { useToast } from "@context/ToastContext";
 import BookmarkModal from "@components/socialMedia/BookmarkModal";
 import PollDisplay from "@components/posts/PollDisplay";
 import ReportModal from "@components/common/ReportModal";
+import ThumbnailImage from "@components/posts/ThumbnailImage";
+import CommonFooter from "@components/common/CommonFooter";
+import AuthorSidebar from "@components/posts/AuthorSidebar";
+import RelatedPosts from "@components/posts/RelatedPosts";
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -36,6 +40,7 @@ const PostDetail = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [formattedDate, setFormattedDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingNewPost, setIsLoadingNewPost] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   // Like & Bookmark state
@@ -61,6 +66,13 @@ const PostDetail = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [showPostMenu, setShowPostMenu] = useState(false);
 
+  // Scroll về đầu trang khi vào trang hoặc khi postId thay đổi
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [id]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -69,10 +81,16 @@ const PostDetail = () => {
       if (!postId || Number.isNaN(postId)) {
         setErrorMsg("ID bài viết không hợp lệ");
         setIsLoading(false);
+        setIsLoadingNewPost(false);
         return;
       }
 
-      setIsLoading(true);
+      // Nếu đã có post (đang chuyển sang post khác), chỉ set loading overlay
+      if (post) {
+        setIsLoadingNewPost(true);
+      } else {
+        setIsLoading(true);
+      }
       setErrorMsg("");
       try {
         const res = await axiosInstance.get(`/post/${postId}`);
@@ -140,7 +158,10 @@ const PostDetail = () => {
               "Không thể tải bài viết. Vui lòng thử lại."
           );
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+          setIsLoadingNewPost(false);
+        }
       }
     };
 
@@ -323,6 +344,27 @@ const PostDetail = () => {
     }
   };
 
+  // Ngăn overscroll và đặt background trắng
+  useEffect(() => {
+    const originalBodyBg = document.body.style.backgroundColor;
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyOverscroll = document.body.style.overscrollBehavior;
+    const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior;
+    
+    document.body.style.backgroundColor = '#ffffff';
+    document.documentElement.style.backgroundColor = '#ffffff';
+    document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
+    
+    // Cleanup khi unmount
+    return () => {
+      document.body.style.backgroundColor = originalBodyBg;
+      document.documentElement.style.backgroundColor = originalHtmlBg;
+      document.body.style.overscrollBehavior = originalBodyOverscroll;
+      document.documentElement.style.overscrollBehavior = originalHtmlOverscroll;
+    };
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -341,18 +383,39 @@ const PostDetail = () => {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Back button */}
+      <div className="min-h-screen bg-white relative" style={{ overscrollBehavior: 'none' }}>
+        {/* Loading overlay khi đang load post mới */}
+        {isLoadingNewPost && post && (
+          <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <p className="text-gray-600 font-medium">Đang tải bài viết...</p>
+            </div>
+          </div>
+        )}
+        {/* Back button - Fixed (dưới header 64px + padding 16px = 80px) */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="fixed top-20 left-4 z-50 flex items-center gap-2 px-4 py-2 bg-white text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg shadow-md transition-all duration-200"
         >
           <ArrowLeft size={20} />
-          <span>Quay lại</span>
+          <span className="font-medium">Quay lại</span>
         </button>
 
-        {/* Single white container for all content */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        {/* Sidebar bên trái - Tạm thời ẩn */}
+        {/* {post.userId && (
+          <div className="fixed top-28 left-4 w-80 max-h-[calc(100vh-7rem)] overflow-y-auto z-40">
+            <AuthorSidebar 
+              authorId={post.userId} 
+              currentUserId={currentUser?.id}
+            />
+          </div>
+        )} */}
+
+        {/* Content chính - Centered */}
+        <div className="max-w-4xl mx-auto px-4 pt-4 pb-6">
+              {/* Single white container for all content */}
+              <div className="bg-white overflow-hidden">
           {/* Thread Title */}
           {post.title && (
             <div className="p-6">
@@ -363,7 +426,7 @@ const PostDetail = () => {
           )}
 
           {/* Thread Info */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Link
@@ -473,38 +536,15 @@ const PostDetail = () => {
 
           {/* Thread Cover Image */}
           {post.thumbnailUrl && (
-            <div className="w-full overflow-hidden">
-              <img
-                src={post.thumbnailUrl}
-                alt={post.title}
-                className="w-full h-auto object-cover"
-              />
-            </div>
-          )}
-
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="px-6 py-3 border-b border-gray-200">
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map(({ tag }) => (
-                  <button
-                    key={tag.id}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      navigate(`/tag/${tag.id}`);
-                    }}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm hover:shadow-lg transition-shadow cursor-pointer"
-                  >
-                    #{tag.name}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <ThumbnailImage
+              src={post.thumbnailUrl}
+              alt={post.title}
+              className="w-full h-auto object-cover rounded-xl"
+            />
           )}
 
           {/* Article Content hoặc Poll */}
-          <article className="p-6 border-b border-gray-200">
+          <article className="p-6">
             {/* Hiển thị nội dung (cho cả POLL và NORMAL) */}
             {(post?.contentJson && typeof post.contentJson === "object") ||
             post?.contentText ||
@@ -547,6 +587,27 @@ const PostDetail = () => {
                 <div className="text-gray-500 italic">Không có nội dung</div>
               )}
           </article>
+
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="px-6 py-3">
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map(({ tag }) => (
+                  <button
+                    key={tag.id}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      navigate(`/tag/${tag.id}`);
+                    }}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm hover:shadow-lg transition-shadow cursor-pointer"
+                  >
+                    #{tag.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="p-4">
@@ -597,7 +658,16 @@ const PostDetail = () => {
 
           {/* Comments Section */}
           <CommentList postId={parseInt(id)} />
+              </div>
+
+          {/* Related Posts Section - Dưới comment */}
+          <div className="mt-8">
+            <RelatedPosts postId={parseInt(id)} limit={5} />
+          </div>
         </div>
+        
+        {/* Footer */}
+        <CommonFooter variant="social" />
       </div>
 
       {/* Delete Confirmation Modal */}
