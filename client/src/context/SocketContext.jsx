@@ -11,9 +11,15 @@ export const SocketProvider = ({ children }) => {
 
   // Khởi tạo socket instance một lần duy nhất
   const socket = useMemo(() => {
-    return io(import.meta.env.VITE_SOCKET_URL || "https://seeboi.xyz/api/", {
+    // URL ưu tiên: VITE_SOCKET_URL, fallback = origin hiện tại (https://seeboi.xyz)
+    const baseURL =
+      import.meta.env.VITE_SOCKET_URL || window.location.origin || "https://seeboi.xyz";
+
+    return io(baseURL, {
+      path: "/socket.io", // khớp với Nginx & backend
       transports: ["websocket", "polling"],
       autoConnect: true,
+      withCredentials: true,
     });
   }, []);
 
