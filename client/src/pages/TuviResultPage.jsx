@@ -162,7 +162,11 @@ const TuviResultPage = () => {
             dummyFormData
           );
 
-          setData(adaptedData);
+          // Đảm bảo chartId được lưu vào data
+          setData({
+            ...adaptedData,
+            chartId: urlChartId,
+          });
           setChartId(urlChartId);
           setIsSaved(true);
         } catch (error) {
@@ -224,19 +228,29 @@ const TuviResultPage = () => {
 
   // Xử lý gọi AI luận giải (tự động lưu nếu chưa lưu)
   const handleRequestAI = async () => {
-    if (!formData) {
-      alert("Không có thông tin để xem luận giải!");
-      return;
-    }
-
     setLoadingAi(true);
     setAiError("");
 
     try {
       let currentChartId = data?.chartId || chartId;
 
-      // Nếu chưa lưu, tự động lưu trước
-      if (!isSaved || !currentChartId) {
+      // Debug log
+      console.log("🔍 DEBUG - Data:", {
+        dataChartId: data?.chartId,
+        chartId: chartId,
+        currentChartId: currentChartId,
+        isSaved: isSaved,
+        hasFormData: !!formData,
+      });
+
+      // Nếu chưa có chartId, cần lưu lá số trước
+      if (!currentChartId) {
+        if (!formData) {
+          alert("Không có thông tin để xem luận giải!");
+          return;
+        }
+
+        // Tự động lưu lá số
         const apiData = {
           name: formData.name || "Khách",
           birthDate: `${formData.year}-${String(formData.month).padStart(
@@ -400,9 +414,9 @@ const TuviResultPage = () => {
           <div className="mt-4 mb-4 text-center">
             <button
               onClick={handleRequestAI}
-              disabled={loadingAi || !formData}
+              disabled={loadingAi || !(chartId || data?.chartId || formData)}
               className={`font-bold py-3 px-10 rounded shadow-lg border-2 transform transition-all duration-200 uppercase tracking-widest font-['Playfair_Display'] ${
-                !formData
+                !(chartId || data?.chartId || formData)
                   ? "bg-gray-600 text-gray-300 border-gray-500 cursor-not-allowed opacity-60"
                   : loadingAi
                   ? "bg-red-700 text-yellow-400 border-yellow-500 opacity-50 cursor-not-allowed"
@@ -411,6 +425,11 @@ const TuviResultPage = () => {
             >
               {loadingAi ? "Đang xử lý..." : "Xem luận giải"}
             </button>
+            {!(chartId || data?.chartId || formData) && (
+              <p className="text-orange-500 mt-2 text-sm font-serif">
+                ⚠️ Không có dữ liệu lá số để luận giải
+              </p>
+            )}
             {aiError && (
               <p className="text-red-600 mt-2 text-sm font-serif">{aiError}</p>
             )}
