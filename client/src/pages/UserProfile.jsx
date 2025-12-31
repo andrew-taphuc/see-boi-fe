@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useAuth } from "@context/AuthContext";
 import {
   Edit2,
@@ -10,10 +10,7 @@ import {
   Users,
   Save,
   Loader2,
-  PenSquare,
   Camera,
-  Bookmark,
-  Tag,
 } from "lucide-react";
 import FollowButton from "@components/userProfile/FollowButton";
 import FollowListModal from "@components/userProfile/FollowListModal";
@@ -26,7 +23,6 @@ import axiosInstance from "@utils/axiosInstance";
 
 const UserProfile = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { currentUser, updateCurrentUser } = useAuth();
   const [user, setUser] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
@@ -213,6 +209,28 @@ const UserProfile = () => {
     };
   }, [id, isOwnProfile, updateCurrentUser, currentUser?.id]);
 
+  // Đặt background trắng cho body/html và ngăn overscroll để tránh lộ viền
+  useEffect(() => {
+    const originalBodyBg = document.body.style.backgroundColor;
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyOverscroll = document.body.style.overscrollBehavior;
+    const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior;
+    
+    // Đặt màu nền trắng và ngăn overscroll
+    document.body.style.backgroundColor = '#ffffff';
+    document.documentElement.style.backgroundColor = '#ffffff';
+    document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
+    
+    // Cleanup khi unmount
+    return () => {
+      document.body.style.backgroundColor = originalBodyBg;
+      document.documentElement.style.backgroundColor = originalHtmlBg;
+      document.body.style.overscrollBehavior = originalBodyOverscroll;
+      document.documentElement.style.overscrollBehavior = originalHtmlOverscroll;
+    };
+  }, []);
+
   const handleFollowChange = async (newStatus) => {
     setIsFollowing(newStatus);
 
@@ -278,7 +296,7 @@ const UserProfile = () => {
 
   if (isLoadingMe) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <div className="flex items-center gap-2 text-gray-600">
           <Loader2 className="animate-spin" size={18} />
           <span>Đang tải thông tin cá nhân...</span>
@@ -289,7 +307,7 @@ const UserProfile = () => {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-white">
         <p className="text-gray-600">
           {errorMsg || "Không tìm thấy người dùng"}
         </p>
@@ -298,26 +316,33 @@ const UserProfile = () => {
   }
 
   return (
-    <>
-      <div className="max-w-4xl mx-auto px-4 py-6">
+    <div 
+      className="min-h-screen bg-white"
+      style={{
+        overscrollBehavior: 'none',
+        overscrollBehaviorY: 'none',
+        overflowX: 'hidden',
+      }}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         {/* Profile Header Card */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
-          <div className="p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div className="p-6 lg:p-8">
             {!!errorMsg && (
-              <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm">
                 {errorMsg}
               </div>
             )}
             {!!successMsg && (
-              <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+              <div className="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 shadow-sm">
                 {successMsg}
               </div>
             )}
-            <div className="flex items-start gap-6">
+            <div className="flex flex-col sm:flex-row items-start gap-6 lg:gap-8">
               {/* Avatar */}
-              <div className="flex-shrink-0 relative">
+              <div className="flex-shrink-0 relative mx-auto sm:mx-0">
                 <div
-                  className="w-32 h-32 rounded-full border-4 border-blue-500 bg-cover bg-center cursor-pointer transition-all duration-200 relative group"
+                  className="w-28 h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-40 rounded-full border-4 border-white shadow-lg bg-cover bg-center cursor-pointer transition-all duration-300 relative group ring-4 ring-gray-100"
                   style={{ backgroundImage: `url(${user.avatarUrl || ""})` }}
                   onClick={() => {
                     if (isOwnProfile) {
@@ -329,8 +354,8 @@ const UserProfile = () => {
                 >
                   {/* Hover overlay với icon camera - chỉ hiện khi là own profile */}
                   {isOwnProfile && (
-                    <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                      <Camera size={32} className="text-white" />
+                    <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm">
+                      <Camera size={32} className="text-white drop-shadow-lg" />
                     </div>
                   )}
                 </div>
@@ -347,19 +372,19 @@ const UserProfile = () => {
               </div>
 
               {/* User Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                      {user.userName}
+              <div className="flex-1 min-w-0 w-full">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+                  <div className="flex-1">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+                      {user.fullName}
                     </h1>
-                    <p className="text-gray-600 mb-2">{user.fullName}</p>
+                    <p className="text-base sm:text-lg text-gray-600 mb-2">{user.userName}</p>
                     {user.email && isOwnProfile && (
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                      <p className="text-sm text-gray-500 mb-3">{user.email}</p>
                     )}
 
                     {/* Level Badge - visible for everyone */}
-                    <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full">
+                    <div className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-md">
                       <svg
                         className="w-4 h-4 text-white"
                         fill="currentColor"
@@ -372,79 +397,27 @@ const UserProfile = () => {
                       </span>
                     </div>
 
-                    {/* Extra XP info chỉ khi xem profile bản thân */}
-                    {isOwnProfile && (
-                      <div className="mt-2">
-                        <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                          <span>
-                            XP: {user.xp ?? 0} / {(user.level ?? 1) * 1000}
-                          </span>
-                          <span>
-                            {Math.floor(((user.xp ?? 0) % 1000) / 10)}%
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
-                            style={{
-                              width: `${((user.xp ?? 0) % 1000) / 10}%`,
-                            }}
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Còn {1000 - ((user.xp ?? 0) % 1000)} XP nữa lên Level{" "}
-                          {(user.level ?? 1) + 1}
-                        </p>
-                      </div>
-                    )}
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-start">
                     {isOwnProfile ? (
-                      <>
-                        {/* Hàng trên: 3 buttons chính */}
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => navigate("/post/create")}
-                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                          >
-                            <PenSquare size={18} />
-                            <span>Đăng bài</span>
-                          </button>
-                          <Link
-                            to="/user/edit"
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                          >
-                            <Edit2 size={18} />
-                            <span>Chỉnh sửa</span>
-                          </Link>
-                          <Link
-                            to="/settings"
-                            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                          >
-                            <Settings size={18} />
-                            <span>Cài đặt</span>
-                          </Link>
-                        </div>
-                        {/* Hàng dưới: Bài viết đã lưu + Tags đang theo dõi - căn phải */}
-                        <div className="flex justify-end gap-2">
-                          <Link
-                            to="/saved-posts"
-                            className="flex items-center gap-2 px-4 py-2 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg hover:bg-yellow-100 transition-colors"
-                          >
-                            <Bookmark size={18} />
-                            <span>Bài viết đã lưu</span>
-                          </Link>
-                          <Link
-                            to="/following-tags"
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
-                          >
-                            <Tag size={18} />
-                            <span>Tags theo dõi</span>
-                          </Link>
-                        </div>
-                      </>
+                      <div className="flex flex-wrap gap-2">
+                        <Link
+                          to="/user/edit"
+                          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+                        >
+                          <Edit2 size={18} />
+                          <span>Chỉnh sửa</span>
+                        </Link>
+                        <Link
+                          to="/settings"
+                          className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                        >
+                          <Settings size={18} />
+                          <span>Cài đặt</span>
+                        </Link>
+                      </div>
                     ) : (
                       <FollowButton
                         userId={user?.id}
@@ -457,35 +430,67 @@ const UserProfile = () => {
 
                 {/* Bio */}
                 {user.bio && (
-                  <p className="text-gray-700 mb-4 leading-relaxed">
-                    {user.bio}
-                  </p>
+                  <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <p className="text-gray-700 leading-relaxed text-base">
+                      {user.bio}
+                    </p>
+                  </div>
+                )}
+
+                {/* Extra XP info chỉ khi xem profile bản thân */}
+                {isOwnProfile && (
+                  <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <div className="flex items-center justify-between text-xs text-gray-700 mb-2 font-medium">
+                      <span>
+                        XP: {user.xp ?? 0} / {(user.level ?? 1) * 1000}
+                      </span>
+                      <span className="text-purple-600 font-semibold">
+                        {Math.floor(((user.xp ?? 0) % 1000) / 10)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden shadow-inner">
+                      <div
+                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-500 rounded-full"
+                        style={{
+                          width: `${((user.xp ?? 0) % 1000) / 10}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Còn {1000 - ((user.xp ?? 0) % 1000)} XP nữa lên Level{" "}
+                      {(user.level ?? 1) + 1}
+                    </p>
+                  </div>
                 )}
 
                 {/* Stats */}
-                <div className="flex items-center gap-6 pt-4 border-t border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={18} className="text-gray-500" />
-                    <div>
-                      <span className="font-bold text-gray-900">
-                        {userPosts.length}
-                      </span>
-                      <span className="text-gray-600 ml-1">Bài viết</span>
+                <div className="flex flex-wrap items-center gap-6 lg:gap-8 pt-6 border-t border-gray-200">
+                  <button className="flex items-center gap-3 hover:opacity-80 transition-all duration-200 group">
+                    <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+                      <Calendar size={20} className="text-gray-600" />
                     </div>
-                  </div>
+                    <div>
+                      <div className="font-bold text-gray-900 text-lg">
+                        {userPosts.length}
+                      </div>
+                      <div className="text-sm text-gray-600">Bài viết</div>
+                    </div>
+                  </button>
                   <button
                     onClick={() => {
                       setFollowModalInitialTab("followers");
                       setFollowModalOpen(true);
                     }}
-                    className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                    className="flex items-center gap-3 hover:opacity-80 transition-all duration-200 group cursor-pointer"
                   >
-                    <Users size={18} className="text-gray-500" />
+                    <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+                      <Users size={20} className="text-gray-600" />
+                    </div>
                     <div>
-                      <span className="font-bold text-gray-900">
+                      <div className="font-bold text-gray-900 text-lg">
                         {followersCount}
-                      </span>
-                      <span className="text-gray-600 ml-1">Người theo dõi</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Người theo dõi</div>
                     </div>
                   </button>
                   <button
@@ -493,39 +498,29 @@ const UserProfile = () => {
                       setFollowModalInitialTab("following");
                       setFollowModalOpen(true);
                     }}
-                    className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                    className="flex items-center gap-3 hover:opacity-80 transition-all duration-200 group cursor-pointer"
                   >
-                    <Users size={18} className="text-gray-500" />
+                    <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-gray-200 transition-colors">
+                      <Users size={20} className="text-gray-600" />
+                    </div>
                     <div>
-                      <span className="font-bold text-gray-900">
+                      <div className="font-bold text-gray-900 text-lg">
                         {followingCount}
-                      </span>
-                      <span className="text-gray-600 ml-1">Đang theo dõi</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Đang theo dõi</div>
                     </div>
                   </button>
                 </div>
-
-                {/* Meta info */}
-                {isOwnProfile && (
-                  <div className="mt-4 text-xs text-gray-500">
-                    <div>
-                      Tạo lúc:{" "}
-                      {user.createdAt ? formatDate(user.createdAt) : "—"}
-                    </div>
-                    <div>
-                      Cập nhật:{" "}
-                      {user.updatedAt ? formatDate(user.updatedAt) : "—"}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
         </div>
 
         {/* Posts Section */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Bài viết</h2>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:p-8">
+          <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-200">
+            Bài viết
+          </h2>
           <UserPostsList
             posts={userPosts}
             formatDateTime={formatDateTime}
@@ -559,7 +554,7 @@ const UserProfile = () => {
         avatarUrl={user?.avatarUrl}
         userName={user?.userName || user?.fullName}
       />
-    </>
+    </div>
   );
 };
 
