@@ -171,28 +171,28 @@ const NhanTuong = () => {
       </a>
 
       {/* Left Navigation - Fixed Position - Desktop Only */}
-      <div className="hidden md:flex fixed left-15 top-20 flex-col gap-6 z-40">
-        {/* {navigationButtons.left.map((btn, idx) => (
+      {/* <div className="hidden md:flex fixed left-15 top-20 flex-col gap-6 z-40">
+        {navigationButtons.left.map((btn, idx) => (
           <NavButton key={idx} {...btn} disabled />
-        ))} */}
+        ))}
         <NavButton/>
         <NavButton/>
         <div className="flex justify-center">
           <img src={Hook} alt="decoration" className="w-20 h-auto" />
         </div>
-      </div>
+      </div> */}
 
       {/* Right Navigation - Fixed Position - Desktop Only */}
-      <div className="hidden md:flex fixed right-15 top-20 flex-col gap-6 z-40">
-        {/* {navigationButtons.right.map((btn, idx) => (
+      {/* <div className="hidden md:flex fixed right-15 top-20 flex-col gap-6 z-40">
+        {navigationButtons.right.map((btn, idx) => (
           <NavButton key={idx} {...btn} disabled />
-        ))} */}
+        ))}
         <NavButton/>
         <NavButton/>
         <div className="flex justify-center">
           <img src={Hook} alt="decoration" className="w-20 h-auto" />
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div 

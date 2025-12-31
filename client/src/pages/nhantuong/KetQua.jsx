@@ -268,6 +268,27 @@ const KetQua = () => {
         />
       )}
 
+      {/* Back Button */}
+      <a
+        href="/nhantuong"
+        className="fixed top-20 left-4 md:top-24 md:left-8 z-50 flex items-center gap-2 bg-gradient-to-r from-yellow-600/80 to-yellow-500/80 hover:from-yellow-600 hover:to-yellow-500 backdrop-blur-sm text-white px-4 md:px-5 py-2 md:py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-sm md:text-base border border-yellow-400/30"
+      >
+        <svg
+          className="w-4 h-4 md:w-5 md:h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        <span className="hidden md:inline">Quay lại</span>
+      </a>
+
       {/* Back to Top Button */}
       <a
         href="#top"
@@ -623,7 +644,7 @@ const KetQua = () => {
           <div className="mt-10 pt-6 text-center">
             <div className="text-yellow-100/70 text-xs">
               Copyright © 2025 by{" "}
-              <span className="text-yellow-300">nhantuong.vn</span>. All rights
+              <span className="text-yellow-300">SEE BOI TEAM</span>. All rights
               reserved.
             </div>
           </div>
