@@ -292,7 +292,7 @@ const LandingPage = () => {
                 <p className="text-lg sm:text-xl text-gray-700 leading-relaxed" style={{ fontFamily: "'Lexend', sans-serif" }}>
                   <strong className="text-red-800">Tử Vi Đẩu Số</strong> là một <em className="text-amber-700">môn khoa học dự đoán</em> cổ xưa của người Việt, dựa trên <span className="font-bold text-red-700">ngày tháng năm sinh</span> và <em className="text-amber-600">giờ sinh</em> để luận giải vận mệnh. 
                   <br /><br />
-                  Hệ thống <strong className="text-red-800">12 cung</strong> và <span className="font-semibold text-amber-700">108 sao</span> sẽ tiết lộ những <em className="text-indigo-600">bí mật</em> về <strong className="text-red-700">công danh</strong>, <em className="text-purple-600">tài lộc</em>, <span className="font-bold text-amber-800">tình duyên</span>, và <strong className="text-indigo-800">sức khỏe</strong>. Mỗi <em className="text-amber-700">cung mệnh</em> là một <span className="font-semibold text-red-800">bản đồ</span> chỉ đường cho cuộc đời bạn.
+                  Hệ thống <strong className="text-red-800">12 cung</strong> và <span className="font-semibold text-amber-700">108 sao</span> sẽ tiết lộ những <em className="text-indigo-600">bí mật</em> về <strong className="text-red-700">công danh</strong>, <em className="text-purple-600">tài lộc</em>, <span className="font-bold text-amber-800">tình duyên</span>, và <strong className="text-indigo-800">sức khỏe</strong>. Mỗi <em className="text-amber-700">cung mệnh</em> là một <span className="font-semibold text-red-800">bản đồ</span> chỉ đường cho cuộc đời bạn nha.
                 </p>
               </div>
 
