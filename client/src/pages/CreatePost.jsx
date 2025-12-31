@@ -414,9 +414,31 @@ const CreatePost = () => {
     }
   };
 
+  // Đặt background trắng giống PostDetail
+  useEffect(() => {
+    const originalBodyBg = document.body.style.backgroundColor;
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyOverscroll = document.body.style.overscrollBehavior;
+    const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior;
+    
+    document.body.style.backgroundColor = '#ffffff';
+    document.documentElement.style.backgroundColor = '#ffffff';
+    document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
+    
+    // Cleanup khi unmount
+    return () => {
+      document.body.style.backgroundColor = originalBodyBg;
+      document.documentElement.style.backgroundColor = originalHtmlBg;
+      document.body.style.overscrollBehavior = originalBodyOverscroll;
+      document.documentElement.style.overscrollBehavior = originalHtmlOverscroll;
+    };
+  }, []);
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen bg-white relative" style={{ overscrollBehavior: 'none' }}>
+      <div className="max-w-3xl mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <button
             onClick={tryLeave}
@@ -624,6 +646,7 @@ const CreatePost = () => {
             <span>{draftId ? "Đăng bài" : "Đăng"}</span>
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

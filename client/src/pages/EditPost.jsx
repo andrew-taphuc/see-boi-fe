@@ -365,6 +365,27 @@ const EditPost = () => {
     navigate(-1);
   };
 
+  // Ngăn overscroll và đặt background trắng
+  useEffect(() => {
+    const originalBodyBg = document.body.style.backgroundColor;
+    const originalHtmlBg = document.documentElement.style.backgroundColor;
+    const originalBodyOverscroll = document.body.style.overscrollBehavior;
+    const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior;
+    
+    document.body.style.backgroundColor = '#ffffff';
+    document.documentElement.style.backgroundColor = '#ffffff';
+    document.body.style.overscrollBehavior = 'none';
+    document.documentElement.style.overscrollBehavior = 'none';
+    
+    // Cleanup khi unmount
+    return () => {
+      document.body.style.backgroundColor = originalBodyBg;
+      document.documentElement.style.backgroundColor = originalHtmlBg;
+      document.body.style.overscrollBehavior = originalBodyOverscroll;
+      document.documentElement.style.overscrollBehavior = originalHtmlOverscroll;
+    };
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -379,34 +400,37 @@ const EditPost = () => {
   if (errorMsg && !title) {
     // Error khi load post
     return (
-      <div className="max-w-3xl mx-auto px-4 py-6">
-        <div className="bg-white rounded-xl shadow-md p-5">
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {errorMsg}
+      <div className="min-h-screen bg-white relative" style={{ overscrollBehavior: 'none' }}>
+        <div className="max-w-3xl mx-auto px-4 py-6">
+          <div className="bg-white rounded-xl shadow-md p-5">
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMsg}
+            </div>
+            <button
+              onClick={tryLeave}
+              className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors text-sm"
+            >
+              Quay lại
+            </button>
           </div>
-          <button
-            onClick={tryLeave}
-            className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors text-sm"
-          >
-            Quay lại
-          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      <div className="flex items-center gap-3 mb-4">
-        <button
-          onClick={tryLeave}
-          className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
-        >
-          <ArrowLeft size={18} />
-          <span>Quay lại</span>
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900">Chỉnh sửa bài viết</h1>
-      </div>
+    <div className="min-h-screen bg-white relative" style={{ overscrollBehavior: 'none' }}>
+      <div className="max-w-3xl mx-auto px-4 py-6">
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={tryLeave}
+            className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+          >
+            <ArrowLeft size={18} />
+            <span>Quay lại</span>
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900">Chỉnh sửa bài viết</h1>
+        </div>
 
       <div className="bg-white rounded-xl shadow-md p-5 relative">
         {/* Privacy Button ở góc trên phải */}
@@ -533,6 +557,7 @@ const EditPost = () => {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 };
