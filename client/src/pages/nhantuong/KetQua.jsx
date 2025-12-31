@@ -369,14 +369,14 @@ const KetQua = () => {
                         ))}
                       </div>
 
-                      <div className="flex flex-col items-center gap-3 md:pt-4">
+                      {/* <div className="flex flex-col items-center gap-3 md:pt-4">
                         <button 
                           onClick={() => navigate('/nhantuong')}
                           className="border border-yellow-400/60 text-yellow-300 px-6 py-3 rounded-full text-base md:text-lg hover:bg-yellow-400/10 transition-colors w-fit font-bold"
                         >
                           <b>Đổi ảnh luận giải</b>
                         </button>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
 
@@ -583,7 +583,7 @@ const KetQua = () => {
                   </div>
 
                   {/* Bottom Buttons */}
-                  <div className="flex flex-col items-center gap-4 pt-6 border-t border-yellow-600/20">
+                  {/* <div className="flex flex-col items-center gap-4 pt-6 border-t border-yellow-600/20">
                     {saveError && (
                       <div className="text-red-400 text-sm text-center">
                         {saveError}
@@ -602,7 +602,7 @@ const KetQua = () => {
                     >
                       {isSaving ? "Đang lưu..." : "Lưu kết quả luận giải"}
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
