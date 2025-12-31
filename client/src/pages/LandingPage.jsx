@@ -91,10 +91,19 @@ const LandingPage = () => {
     }
   }, [searchParams, popupType, setSearchParams]);
 
-  // Redirect đến /socialmedia khi đăng nhập thành công
+  // Redirect sau khi đăng nhập thành công
   useEffect(() => {
     if (currentUser) {
-      navigate("/socialmedia");
+      // Kiểm tra role ADMIN (case-insensitive)
+      const userRole = currentUser.role?.toUpperCase();
+      
+      if (userRole === "ADMIN") {
+        // Nếu là ADMIN thì redirect đến trang admin
+        navigate("/admin", { replace: true });
+      } else {
+        // Nếu không phải ADMIN thì redirect đến socialmedia
+        navigate("/socialmedia", { replace: true });
+      }
     }
   }, [currentUser, navigate]);
 

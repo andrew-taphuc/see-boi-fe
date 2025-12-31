@@ -40,15 +40,20 @@ const Login = ({ onClose, onSwitchToRegister }) => {
           onClose();
         }
         
-        // nếu là ADMIN thì chuyển đến trang quản lý admin
-        if (user.role === "ADMIN") {
-          navigate("/admin");
+        // Kiểm tra role ADMIN (case-insensitive để đảm bảo hoạt động đúng)
+        const userRole = user.role?.toUpperCase();
+        console.log('User role after login:', userRole, 'Full user object:', user);
+        
+        // Nếu là ADMIN thì chuyển đến trang quản lý admin
+        if (userRole === "ADMIN") {
+          console.log('Redirecting to admin page');
+          navigate("/admin", { replace: true });
         } else if (!user.avatarUrl || !user.birthday || !user.gender) {
           // Nếu thiếu avatarUrl, birthday hoặc gender, redirect đến trang cập nhật thông tin cá nhân
-          navigate("/user/edit");
+          navigate("/user/edit", { replace: true });
         } else {
           // Redirect đến socialmedia page
-          navigate("/socialmedia");
+          navigate("/socialmedia", { replace: true });
         }
       }
     } catch (err) {
